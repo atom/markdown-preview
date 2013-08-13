@@ -1,4 +1,6 @@
 {
+  "name": "markdown-preview",
+  "version": "0.0.0",
   "main": "./lib/markdown-preview",
   "description": "Open a rendered version of the Markdown in the current editor with `ctrl-m`.",
   "activationEvents": {
@@ -6,5 +8,18 @@
   },
   "deferredDeserializers": [
     "MarkdownPreviewView"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/markdown-preview.git"
+  },
+  "bugs": {
+    "url": "https://github.com/atom/markdown-preview/issues"
+  },
+  "engines": {
+    "atom": "*"
+  },
+  "publishConfig": {
+    "registry": "https://atom.iriscouch.com/registry/_design/app/_rewrite"
+  }
 }
