@@ -1,6 +1,6 @@
 {
   "name": "markdown-preview",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "main": "./lib/markdown-preview",
   "description": "Open a rendered version of the Markdown in the current editor with `ctrl-m`.",
   "activationEvents": {
