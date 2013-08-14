@@ -9,6 +9,9 @@
   "deferredDeserializers": [
     "MarkdownPreviewView"
   ],
+  "dependencies": {
+    "roaster": "0.0.7"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/atom/markdown-preview.git"
