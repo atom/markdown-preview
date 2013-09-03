@@ -15,6 +15,7 @@ fenceNameToExtension =
   'java': 'java'
   'javascript': 'js'
   'js': 'js'
+  'json': 'json'
   'mustache': 'mustache'
   'python': 'py'
   'rb': 'rb'
