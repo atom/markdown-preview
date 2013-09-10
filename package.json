@@ -10,7 +10,7 @@
     "MarkdownPreviewView"
   ],
   "dependencies": {
-    "roaster": "0.0.7"
+    "roaster": "0.0.8"
   },
   "repository": {
     "type": "git",
