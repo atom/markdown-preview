@@ -1,9 +1,5 @@
-$ = require 'jquery'
-_ = require 'underscore'
-ScrollView = require 'scroll-view'
-{$$$} = require 'space-pen'
+{_, $, $$$, Editor, ScrollView} = require 'atom-api'
 roaster = require 'roaster'
-Editor = require 'editor'
 
 fenceNameToExtension =
   'bash': 'sh'

@@ -1,6 +1,5 @@
-RootView = require 'root-view'
-MarkdownPreviewView = require 'markdown-preview/lib/markdown-preview-view'
-{$$} = require 'space-pen'
+{$$, RootView} = require 'atom-api'
+MarkdownPreviewView = require '../lib/markdown-preview-view'
 
 describe "Markdown preview package", ->
   beforeEach ->

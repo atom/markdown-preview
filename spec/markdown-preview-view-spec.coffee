@@ -1,6 +1,5 @@
-MarkdownPreviewView = require 'markdown-preview/lib/markdown-preview-view'
-$ = require 'jquery'
-{$$$} = require 'space-pen'
+MarkdownPreviewView = require '../lib/markdown-preview-view'
+{$, $$$} = require 'atom-api'
 
 describe "MarkdownPreviewView", ->
   [buffer, preview] = []
