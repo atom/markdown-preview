@@ -1,4 +1,4 @@
-{$$, RootView} = require 'atom-api'
+{$$, RootView} = require 'atom'
 MarkdownPreviewView = require '../lib/markdown-preview-view'
 
 describe "Markdown preview package", ->

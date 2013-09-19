@@ -1,5 +1,5 @@
 MarkdownPreviewView = require '../lib/markdown-preview-view'
-{$, $$$} = require 'atom-api'
+{$, $$$} = require 'atom'
 
 describe "MarkdownPreviewView", ->
   [buffer, preview] = []

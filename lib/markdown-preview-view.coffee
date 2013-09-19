@@ -1,4 +1,4 @@
-{_, $, $$$, Editor, ScrollView} = require 'atom-api'
+{_, $, $$$, Editor, ScrollView} = require 'atom'
 roaster = require 'roaster'
 
 fenceNameToExtension =
