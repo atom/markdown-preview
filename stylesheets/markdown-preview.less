@@ -1,5 +1,6 @@
+@font-family: "Helvetica Neue", Helvetica, sans-serif;
 .markdown-preview {
-  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  font-family: @font-family;
   font-size: 14px;
   line-height: 1.6;
   background-color: #fff;
@@ -72,8 +73,9 @@
 
   // Headings
   h1, h2, h3, h4, h5, h6 {
+    font-family: @font-family;
     margin: 20px 0 10px;
-    padding: 0;
+    padding: 0 0 10px 0;
     font-weight: bold;
     -webkit-font-smoothing: antialiased;
     cursor: text;
@@ -248,6 +250,11 @@
     & > :last-child {
       margin-bottom: 0;
     }
+
+    p {
+      font-size: 16px;
+      line-height: 1.5;
+    }
   }
 
   // Tables
@@ -375,6 +382,7 @@
     border: 1px solid #eaeaea;
     background-color: #f8f8f8;
     border-radius:3px;
+    text-shadow: none;
   }
 
   code { white-space: nowrap; }
@@ -388,7 +396,8 @@
     background: transparent;
   }
 
-  .highlight pre, pre {
+  pre {
+    background: #f8f8f8;
     border: 1px solid #ccc;
     font-size: 13px;
     line-height: 19px;
