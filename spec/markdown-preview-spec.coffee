@@ -10,7 +10,7 @@ describe "Markdown preview package", ->
 
   describe "markdown-preview:show", ->
     beforeEach ->
-      rootView.open("file.markdown")
+      rootView.openSync("file.markdown")
 
     describe "when the active item is an edit session", ->
       beforeEach ->
@@ -19,7 +19,7 @@ describe "Markdown preview package", ->
       describe "when the edit session does not use the GFM grammar", ->
         it "does not show a markdown preview", ->
           spyOn(console, 'warn')
-          rootView.open()
+          rootView.openSync()
           expect(rootView.getPanes()).toHaveLength(1)
           rootView.getActiveView().trigger 'markdown-preview:show'
           expect(rootView.getPanes()).toHaveLength(1)
@@ -80,7 +80,7 @@ describe "Markdown preview package", ->
           expect(rootView.getActivePane()).toBe pane2
           preview = pane2.activeItem
           expect(preview).toBeInstanceOf(MarkdownPreviewView)
-          rootView.open()
+          rootView.openSync()
           expect(pane2.activeItem).not.toBe preview
           pane1.focus()
 
