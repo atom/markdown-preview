@@ -25,20 +25,25 @@ class MarkdownPreviewView extends ScrollView
   registerDeserializer(this)
 
   @deserialize: ({path}) ->
-    new MarkdownPreviewView(project.bufferForPath(path))
+    markdownPreviewView = new MarkdownPreviewView()
+    project.bufferForPath(path).done (buffer) ->
+      markdownPreviewView.setBuffer(buffer)
+
+    markdownPreviewView
 
   @content: ->
     @div class: 'markdown-preview', tabindex: -1
 
-  initialize: (@buffer) ->
+  initialize: (buffer) ->
     super
+    @setBuffer(buffer) if buffer
 
+  setBuffer: (@buffer) ->
     @renderMarkdown()
     @subscribe syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
     @on 'core:move-up', => @scrollUp()
     @on 'core:move-down', => @scrollDown()
 
-  afterAttach: (onDom) ->
     @subscribe @buffer, 'saved reloaded', =>
       @renderMarkdown()
       pane = @getPane()

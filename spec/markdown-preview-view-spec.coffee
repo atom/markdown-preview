@@ -6,7 +6,7 @@ describe "MarkdownPreviewView", ->
 
   beforeEach ->
     project.setPath(project.resolve('markdown'))
-    buffer = project.bufferForPath('file.markdown')
+    buffer = project.bufferForPathSync('file.markdown')
     atom.activatePackage('ruby-tmbundle', sync: true)
     preview = new MarkdownPreviewView(buffer)
 
@@ -30,7 +30,11 @@ describe "MarkdownPreviewView", ->
   describe "serialization", ->
     it "reassociates with the same buffer when deserialized", ->
       newPreview = deserialize(preview.serialize())
-      expect(newPreview.buffer).toBe buffer
+      waitsFor ->
+        newPreview.buffer
+
+      runs ->
+        expect(newPreview.buffer).toBe buffer
 
   describe "code block tokenization", ->
     describe "when the code block's fence name has a matching grammar", ->
