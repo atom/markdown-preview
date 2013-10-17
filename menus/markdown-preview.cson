@@ -1,0 +1,10 @@
+'menu': [
+  'label': 'Packages'
+  'submenu': [
+    'label': 'Markdown'
+    'submenu': [
+      'label': 'Preview Buffer'
+      'command': 'markdown-preview:show'
+    ]
+  ]
+]
