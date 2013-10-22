@@ -24,9 +24,9 @@ module.exports =
 class MarkdownPreviewView extends ScrollView
   registerDeserializer(this)
 
-  @deserialize: ({path}) ->
+  @deserialize: ({filePath}) ->
     markdownPreviewView = new MarkdownPreviewView()
-    project.bufferForPath(path).done (buffer) ->
+    project.bufferForPath(filePath).done (buffer) ->
       markdownPreviewView.setBuffer(buffer)
 
     markdownPreviewView
