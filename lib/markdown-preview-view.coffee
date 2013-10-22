@@ -1,4 +1,5 @@
 {_, $, $$$, Editor, ScrollView} = require 'atom'
+path = require 'path'
 roaster = require 'roaster'
 
 fenceNameToExtension =
@@ -25,45 +26,39 @@ class MarkdownPreviewView extends ScrollView
   registerDeserializer(this)
 
   @deserialize: ({filePath}) ->
-    markdownPreviewView = new MarkdownPreviewView()
-    project.bufferForPath(filePath).done (buffer) ->
-      markdownPreviewView.setBuffer(buffer)
-
-    markdownPreviewView
+    new MarkdownPreviewView(filePath)
 
   @content: ->
     @div class: 'markdown-preview', tabindex: -1
 
-  initialize: (buffer) ->
+  initialize: (@filePath) ->
     super
-    @setBuffer(buffer) if buffer
-
-  setBuffer: (@buffer) ->
-    @renderMarkdown()
-    @subscribe syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
-    @on 'core:move-up', => @scrollUp()
-    @on 'core:move-down', => @scrollDown()
-
-    @subscribe @buffer, 'saved reloaded', =>
+    project.bufferForPath(filePath).done (buffer) =>
+      @buffer = buffer
       @renderMarkdown()
-      pane = @getPane()
-      pane.showItem(this) if pane? and pane isnt rootView.getActivePane()
+      @subscribe syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
+      @on 'core:move-up', => @scrollUp()
+      @on 'core:move-down', => @scrollDown()
+      @subscribe @buffer, 'saved reloaded', =>
+        @renderMarkdown()
+        pane = @getPane()
+        pane.showItem(this) if pane? and pane isnt rootView.getActivePane()
 
   getPane: ->
     @parent('.item-views').parent('.pane').view()
 
   serialize: ->
     deserializer: 'MarkdownPreviewView'
-    path: @buffer.getPath()
+    filePath: @getPath()
 
   getTitle: ->
-    "#{@buffer.getBaseName()} Preview"
+    "#{path.basename(@getPath())} Preview"
 
   getUri: ->
-    "markdown-preview:#{@buffer.getPath()}"
+    "markdown-preview:#{@getPath()}"
 
   getPath: ->
-    @buffer.getPath()
+    @filePath
 
   setErrorHtml: (result) ->
     failureMessage = result?.message

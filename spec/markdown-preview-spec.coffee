@@ -36,8 +36,13 @@ describe "Markdown preview package", ->
 
             preview = pane2.activeItem
             expect(preview).toBeInstanceOf(MarkdownPreviewView)
-            expect(preview.buffer).toBe rootView.getActivePaneItem().buffer
-            expect(pane1).toMatchSelector(':has(:focus)')
+
+            waitsFor ->
+              preview.buffer
+
+            runs ->
+              expect(preview.buffer).toBe rootView.getActivePaneItem().buffer
+              expect(pane1).toMatchSelector(':has(:focus)')
 
         describe "when there is only one pane", ->
           it "splits the current pane to the right with a markdown preview for the current buffer", ->
@@ -51,8 +56,13 @@ describe "Markdown preview package", ->
             expect(pane2.items).toHaveLength 1
             preview = pane2.activeItem
             expect(preview).toBeInstanceOf(MarkdownPreviewView)
-            expect(preview.buffer).toBe rootView.getActivePaneItem().buffer
-            expect(pane1).toMatchSelector(':has(:focus)')
+
+            waitsFor ->
+              preview.buffer
+
+            runs ->
+              expect(preview.buffer).toBe rootView.getActivePaneItem().buffer
+              expect(pane1).toMatchSelector(':has(:focus)')
 
         describe "when a buffer is saved", ->
           it "does not show the markdown preview", ->
@@ -102,10 +112,14 @@ describe "Markdown preview package", ->
               pane1.showItemAtIndex(0)
               preview = pane1.itemAtIndex(1)
 
-              preview.renderMarkdown.reset()
-              pane1.activeItem.buffer.trigger 'saved'
-              expect(preview.renderMarkdown).toHaveBeenCalled()
-              expect(pane1.activeItem).not.toBe preview
+              waitsFor ->
+                pane2.activeItem.buffer
+
+              runs ->
+                preview.renderMarkdown.reset()
+                pane1.activeItem.buffer.trigger 'saved'
+                expect(preview.renderMarkdown).toHaveBeenCalled()
+                expect(pane1.activeItem).not.toBe preview
 
           describe "when the preview is not in the same pane", ->
             it "updates the preview and makes it active", ->
@@ -116,10 +130,14 @@ describe "Markdown preview package", ->
               expect(pane2.activeItem).not.toBe preview
               pane1.focus()
 
-              preview.renderMarkdown.reset()
-              pane1.activeItem.buffer.trigger 'saved'
-              expect(preview.renderMarkdown).toHaveBeenCalled()
-              expect(pane2.activeItem).toBe preview
+              waitsFor ->
+                preview.buffer
+
+              runs ->
+                preview.renderMarkdown.reset()
+                pane1.activeItem.buffer.trigger 'saved'
+                expect(preview.renderMarkdown).toHaveBeenCalled()
+                expect(pane2.activeItem).toBe preview
 
       describe "when a new grammar is loaded", ->
         it "reloads the view to colorize any fenced code blocks matching the newly loaded grammar", ->

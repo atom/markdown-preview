@@ -14,13 +14,14 @@ module.exports =
       return
 
     {previewPane, previewItem} = @getExistingPreview(editSession)
+    filePath = editSession.getPath()
     if previewItem?
       previewPane.showItem(previewItem)
       previewItem.renderMarkdown()
     else if nextPane = activePane.getNextPane()
-      nextPane.showItem(new MarkdownPreviewView(editSession.buffer))
+      nextPane.showItem(new MarkdownPreviewView(filePath))
     else
-      activePane.splitRight(new MarkdownPreviewView(editSession.buffer))
+      activePane.splitRight(new MarkdownPreviewView(filePath))
     activePane.focus()
 
   getExistingPreview: (editSession) ->

@@ -8,13 +8,15 @@ describe "MarkdownPreviewView", ->
     project.setPath(project.resolve('markdown'))
     buffer = project.bufferForPathSync('file.markdown')
     atom.activatePackage('language-ruby', sync: true)
-    preview = new MarkdownPreviewView(buffer)
+    preview = new MarkdownPreviewView(buffer.getPath())
+
+    waitsFor ->
+      preview.buffer
 
   afterEach ->
     buffer.release()
 
   describe "on construction", ->
-
     it "shows a loading spinner and renders the markdown", ->
       preview.setLoading()
       expect(preview.find('.markdown-spinner')).toExist()
