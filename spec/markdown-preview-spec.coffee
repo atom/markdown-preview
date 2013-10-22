@@ -129,5 +129,5 @@ describe "Markdown preview package", ->
           preview.renderMarkdown.reset()
           jasmine.unspy(window, 'setTimeout')
 
-          atom.activatePackage('javascript-tmbundle', sync: true)
+          atom.activatePackage('language-javascript', sync: true)
           waitsFor -> preview.renderMarkdown.callCount > 0
