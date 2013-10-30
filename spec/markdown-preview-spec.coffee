@@ -3,7 +3,7 @@ MarkdownPreviewView = require '../lib/markdown-preview-view'
 
 describe "Markdown preview package", ->
   beforeEach ->
-    atom.activatePackage('gfm')
+    atom.activatePackage('language-gfm', sync: true)
     window.rootView = new RootView
     atom.activatePackage("markdown-preview", immediate: true)
     spyOn(MarkdownPreviewView.prototype, 'renderMarkdown')
