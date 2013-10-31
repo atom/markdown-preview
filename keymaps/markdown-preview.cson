@@ -1,7 +1,7 @@
 '.editor':
-  'ctrl-m': 'markdown-preview:show'
 
 '.markdown-preview':
   'meta-x': 'native!'
   'meta-c': 'native!'
   'meta-v': 'native!'
+  'ctrl-M': 'markdown-preview:show'
