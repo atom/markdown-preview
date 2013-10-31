@@ -30,7 +30,7 @@ class MarkdownPreviewView extends ScrollView
     new MarkdownPreviewView(filePath)
 
   @content: ->
-    @div class: 'markdown-preview', tabindex: -1
+    @div class: 'markdown-preview native-key-bindings', tabindex: -1
 
   initialize: (@filePath) ->
     super
