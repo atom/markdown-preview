@@ -24,7 +24,7 @@ fenceNameToExtension =
 
 module.exports =
 class MarkdownPreviewView extends ScrollView
-  registerDeserializer(this)
+  atom.deserializers.add(this)
 
   @deserialize: ({filePath}) ->
     new MarkdownPreviewView(filePath)
@@ -34,16 +34,16 @@ class MarkdownPreviewView extends ScrollView
 
   initialize: (@filePath) ->
     super
-    project.bufferForPath(filePath).done (buffer) =>
+    atom.project.bufferForPath(filePath).done (buffer) =>
       @buffer = buffer
       @renderMarkdown()
-      @subscribe syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
+      @subscribe atom.syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
       @on 'core:move-up', => @scrollUp()
       @on 'core:move-down', => @scrollDown()
       @subscribe @buffer, 'saved reloaded', =>
         @renderMarkdown()
         pane = @getPane()
-        pane.showItem(this) if pane? and pane isnt rootView.getActivePane()
+        pane.showItem(this) if pane? and pane isnt atom.rootView.getActivePane()
 
   getPane: ->
     @parent('.item-views').parent('.pane').view()
@@ -87,7 +87,7 @@ class MarkdownPreviewView extends ScrollView
       continue unless extension = fenceNameToExtension[fenceName]
       text = codeBlock.text()
 
-      grammar = syntax.selectGrammar("foo.#{extension}", text)
+      grammar = atom.syntax.selectGrammar("foo.#{extension}", text)
 
       codeBlock.empty()
       for tokens in grammar.tokenizeLines(text)

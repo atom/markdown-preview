@@ -2,10 +2,10 @@ MarkdownPreviewView = require './markdown-preview-view'
 
 module.exports =
   activate: ->
-    rootView.command 'markdown-preview:show', '.editor', => @show()
+    atom.rootView.command 'markdown-preview:show', '.editor', => @show()
 
   show: ->
-    activePane = rootView.getActivePane()
+    activePane = atom.rootView.getActivePane()
     editSession = activePane.activeItem
 
     isMarkdownEditor = editSession.getGrammar?()?.scopeName is "source.gfm"
@@ -26,7 +26,7 @@ module.exports =
 
   getExistingPreview: (editSession) ->
     uri = "markdown-preview:#{editSession.getPath()}"
-    for previewPane in rootView.getPanes()
+    for previewPane in atom.rootView.getPanes()
       previewItem = previewPane.itemForUri(uri)
       return {previewPane, previewItem} if previewItem?
     {}

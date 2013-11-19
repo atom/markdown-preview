@@ -5,9 +5,9 @@ describe "MarkdownPreviewView", ->
   [buffer, preview] = []
 
   beforeEach ->
-    project.setPath(project.resolve('markdown'))
-    buffer = project.bufferForPathSync('file.markdown')
-    atom.activatePackage('language-ruby', sync: true)
+    atom.project.setPath(project.resolve('markdown'))
+    buffer = atom.project.bufferForPathSync('file.markdown')
+    atom.packages.activatePackage('language-ruby', sync: true)
     preview = new MarkdownPreviewView(buffer.getPath())
 
     waitsFor ->
