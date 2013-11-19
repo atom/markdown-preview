@@ -70,7 +70,7 @@ describe "Markdown preview package", ->
             pane.focus()
 
             MarkdownPreviewView.prototype.renderMarkdown.reset()
-            pane.activeItem.buffer.trigger 'saved'
+            pane.activeItem.buffer.emit 'saved'
             expect(MarkdownPreviewView.prototype.renderMarkdown).not.toHaveBeenCalled()
 
         describe "when a buffer is reloaded", ->
@@ -79,7 +79,7 @@ describe "Markdown preview package", ->
             pane.focus()
 
             MarkdownPreviewView.prototype.renderMarkdown.reset()
-            pane.activeItem.buffer.trigger 'reloaded'
+            pane.activeItem.buffer.emit 'reloaded'
             expect(MarkdownPreviewView.prototype.renderMarkdown).not.toHaveBeenCalled()
 
       describe "when a preview item has already been created for the edit session's uri", ->
@@ -117,7 +117,7 @@ describe "Markdown preview package", ->
 
               runs ->
                 preview.renderMarkdown.reset()
-                pane1.activeItem.buffer.trigger 'saved'
+                pane1.activeItem.buffer.emit 'saved'
                 expect(preview.renderMarkdown).toHaveBeenCalled()
                 expect(pane1.activeItem).not.toBe preview
 
@@ -135,7 +135,7 @@ describe "Markdown preview package", ->
 
               runs ->
                 preview.renderMarkdown.reset()
-                pane1.activeItem.buffer.trigger 'saved'
+                pane1.activeItem.buffer.emit 'saved'
                 expect(preview.renderMarkdown).toHaveBeenCalled()
                 expect(pane2.activeItem).toBe preview
 
