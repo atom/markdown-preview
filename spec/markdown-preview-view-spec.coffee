@@ -31,7 +31,7 @@ describe "MarkdownPreviewView", ->
 
   describe "serialization", ->
     it "reassociates with the same buffer when deserialized", ->
-      newPreview = deserialize(preview.serialize())
+      newPreview = atom.deserializers.deserialize(preview.serialize())
       waitsFor ->
         newPreview.buffer
 
