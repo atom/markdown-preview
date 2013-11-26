@@ -43,7 +43,7 @@ class MarkdownPreviewView extends ScrollView
       @subscribe @buffer, 'saved reloaded', =>
         @renderMarkdown()
         pane = @getPane()
-        pane.showItem(this) if pane? and pane isnt atom.rootView.getActivePane()
+        pane.showItem(this) if pane? and pane isnt atom.workspaceView.getActivePane()
 
   getPane: ->
     @parent('.item-views').parent('.pane').view()
