@@ -1,4 +1,4 @@
-{_, $, $$$, Editor, ScrollView} = require 'atom'
+{_, $, $$$, EditorView, ScrollView} = require 'atom'
 path = require 'path'
 roaster = require 'roaster'
 
@@ -91,7 +91,7 @@ class MarkdownPreviewView extends ScrollView
 
       codeBlock.empty()
       for tokens in grammar.tokenizeLines(text)
-        codeBlock.append(Editor.buildLineHtml({ tokens, text }))
+        codeBlock.append(EditorView.buildLineHtml({ tokens, text }))
 
     html
 
