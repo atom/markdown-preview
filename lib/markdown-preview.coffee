@@ -6,15 +6,15 @@ module.exports =
 
   show: ->
     activePane = atom.workspaceView.getActivePane()
-    editSession = activePane.activeItem
+    editor = activePane.activeItem
 
-    isMarkdownEditor = editSession.getGrammar?()?.scopeName is "source.gfm"
+    isMarkdownEditor = editor.getGrammar?()?.scopeName is "source.gfm"
     unless isMarkdownEditor
-      console.warn("Can not render markdown for '#{editSession.getUri() ? 'untitled'}'")
+      console.warn("Can not render markdown for '#{editor.getUri() ? 'untitled'}'")
       return
 
-    {previewPane, previewItem} = @getExistingPreview(editSession)
-    filePath = editSession.getPath()
+    {previewPane, previewItem} = @getExistingPreview(editor)
+    filePath = editor.getPath()
     if previewItem?
       previewPane.showItem(previewItem)
       previewItem.renderMarkdown()
@@ -24,8 +24,8 @@ module.exports =
       activePane.splitRight(new MarkdownPreviewView(filePath))
     activePane.focus()
 
-  getExistingPreview: (editSession) ->
-    uri = "markdown-preview:#{editSession.getPath()}"
+  getExistingPreview: (editor) ->
+    uri = "markdown-preview:#{editor.getPath()}"
     for previewPane in atom.workspaceView.getPanes()
       previewItem = previewPane.itemForUri(uri)
       return {previewPane, previewItem} if previewItem?
