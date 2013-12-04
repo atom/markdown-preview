@@ -12,17 +12,8 @@
   "dependencies": {
     "roaster": "0.0.8"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atom/markdown-preview.git"
-  },
-  "bugs": {
-    "url": "https://github.com/atom/markdown-preview/issues"
-  },
+  "repository": "https://github.com/atom/markdown-preview",
   "engines": {
     "atom": "*"
-  },
-  "publishConfig": {
-    "registry": "https://atom.cloudant.com/registry/_design/app/_rewrite"
   }
 }
