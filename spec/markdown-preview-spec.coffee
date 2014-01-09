@@ -12,11 +12,11 @@ describe "Markdown preview package", ->
     beforeEach ->
       atom.workspaceView.openSync("file.markdown")
 
-    describe "when the active item is an edit session", ->
+    describe "when the active item is an editor", ->
       beforeEach ->
         atom.workspaceView.attachToDom()
 
-      describe "when the edit session does not use the GFM grammar", ->
+      describe "when the editor does not use the GFM grammar", ->
         it "does not show a markdown preview", ->
           spyOn(console, 'warn')
           atom.workspaceView.openSync()
@@ -25,7 +25,7 @@ describe "Markdown preview package", ->
           expect(atom.workspaceView.getPanes()).toHaveLength(1)
           expect(console.warn).toHaveBeenCalled()
 
-      describe "when a preview item has not been created for the edit session's uri", ->
+      describe "when a preview item has not been created for the editor's uri", ->
         describe "when there is more than one pane", ->
           it "shows a markdown preview for the current buffer on the next pane", ->
             atom.workspaceView.getActivePane().splitRight()
@@ -82,7 +82,7 @@ describe "Markdown preview package", ->
             pane.activeItem.buffer.emit 'reloaded'
             expect(MarkdownPreviewView.prototype.renderMarkdown).not.toHaveBeenCalled()
 
-      describe "when a preview item has already been created for the edit session's uri", ->
+      describe "when a preview item has already been created for the editor's uri", ->
         it "updates and shows the existing preview item if it isn't displayed", ->
           atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
           [pane1, pane2] = atom.workspaceView.getPanes()
