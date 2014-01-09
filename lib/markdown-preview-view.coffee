@@ -56,7 +56,7 @@ class MarkdownPreviewView extends ScrollView
     "#{path.basename(@getPath())} Preview"
 
   getUri: ->
-    "markdown-preview:#{@getPath()}"
+    "markdown-preview://#{@getPath()}"
 
   getPath: ->
     @filePath

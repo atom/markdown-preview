@@ -25,7 +25,7 @@ module.exports =
     activePane.focus()
 
   getExistingPreview: (editor) ->
-    uri = "markdown-preview:#{editor.getPath()}"
+    uri = "markdown-preview://#{editor.getPath()}"
     for previewPane in atom.workspaceView.getPanes()
       previewItem = previewPane.itemForUri(uri)
       return {previewPane, previewItem} if previewItem?
