@@ -1,8 +1,15 @@
+url = require 'url'
+{fs} = require 'atom'
 MarkdownPreviewView = require './markdown-preview-view'
 
 module.exports =
   activate: ->
     atom.workspaceView.command 'markdown-preview:show', '.editor', => @show()
+
+    atom.project.registerOpener (uriToOpen='') ->
+      {protocol, pathname} = url.parse(uriToOpen)
+      if protocol is 'markdown-preview:' and fs.isFileSync(pathname)
+        new MarkdownPreviewView(pathname)
 
   show: ->
     activePane = atom.workspaceView.getActivePane()

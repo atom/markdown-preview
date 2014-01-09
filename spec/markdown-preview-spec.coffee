@@ -149,3 +149,13 @@ describe "Markdown preview package", ->
 
           atom.packages.activatePackage('language-javascript', sync: true)
           waitsFor -> preview.renderMarkdown.callCount > 0
+
+      describe "when pane:reopen-closed-item is triggered", ->
+        it "reopens the markdown preview view", ->
+          atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
+          [pane1, pane2] = atom.workspaceView.getPanes()
+          preview = pane2.activeItem
+          pane2.destroyActiveItem()
+          expect(atom.workspaceView.getPanes().length).toBe 1
+          atom.workspaceView.trigger 'pane:reopen-closed-item'
+          expect(atom.workspaceView.getActivePaneItem().constructor.name).toBe 'MarkdownPreviewView'
