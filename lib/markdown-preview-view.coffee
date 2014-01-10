@@ -46,7 +46,7 @@ class MarkdownPreviewView extends ScrollView
         pane.showItem(this) if pane? and pane isnt atom.workspaceView.getActivePane()
 
   getPane: ->
-    @parent('.item-views').parent('.pane').view()
+    @parents('.pane').view()
 
   serialize: ->
     deserializer: 'MarkdownPreviewView'
