@@ -107,13 +107,15 @@ describe "Markdown preview package", ->
             it "updates the preview but does not make it active", ->
               atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
               [pane1, pane2] = atom.workspaceView.getPanes()
-              pane2.moveItemToPane(pane2.activeItem, pane1, 1)
+              preview = pane2.activeItem
+              pane2.moveItemToPane(preview, pane1, 1)
+
               pane1.showItemAtIndex(1)
               pane1.showItemAtIndex(0)
               preview = pane1.itemAtIndex(1)
 
               waitsFor ->
-                pane2.activeItem.buffer
+                preview.buffer
 
               runs ->
                 preview.renderMarkdown.reset()
@@ -156,6 +158,5 @@ describe "Markdown preview package", ->
           [pane1, pane2] = atom.workspaceView.getPanes()
           preview = pane2.activeItem
           pane2.destroyActiveItem()
-          expect(atom.workspaceView.getPanes().length).toBe 1
           atom.workspaceView.trigger 'pane:reopen-closed-item'
           expect(atom.workspaceView.getActivePaneItem().constructor.name).toBe 'MarkdownPreviewView'
