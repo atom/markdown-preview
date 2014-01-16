@@ -10,7 +10,7 @@
     "MarkdownPreviewView"
   ],
   "dependencies": {
-    "roaster": "0.0.8"
+    "roaster": "0.1.0"
   },
   "repository": "https://github.com/atom/markdown-preview",
   "engines": {
