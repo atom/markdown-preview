@@ -3,9 +3,7 @@
   "version": "0.25.1",
   "main": "./lib/markdown-preview",
   "description": "Open a rendered version of the Markdown in the current editor with `ctrl-m`.",
-  "activationEvents": {
-    "markdown-preview:show": ".editor"
-  },
+  "activationEvents": ["markdown-preview:show"],
   "deferredDeserializers": [
     "MarkdownPreviewView"
   ],

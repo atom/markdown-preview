@@ -4,7 +4,7 @@ MarkdownPreviewView = require './markdown-preview-view'
 
 module.exports =
   activate: ->
-    atom.workspaceView.command 'markdown-preview:show', '.editor', => @show()
+    atom.workspaceView.command 'markdown-preview:show', => @show()
 
     atom.project.registerOpener (uriToOpen='') ->
       {protocol, pathname} = url.parse(uriToOpen)
