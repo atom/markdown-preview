@@ -6,7 +6,7 @@ module.exports =
   activate: ->
     atom.workspaceView.command 'markdown-preview:show', => @show()
 
-    atom.project.registerOpener (uriToOpen='') ->
+    atom.project.registerOpener (uriToOpen) ->
       {protocol, pathname} = url.parse(uriToOpen)
       if protocol is 'markdown-preview:' and fs.isFileSync(pathname)
         new MarkdownPreviewView(pathname)
