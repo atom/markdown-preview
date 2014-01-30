@@ -20,20 +20,6 @@ module.exports =
       console.warn("Can not render markdown for '#{editor.getUri() ? 'untitled'}'")
       return
 
-    {previewPane, previewItem} = @getExistingPreview(editor)
-    filePath = editor.getPath()
-    if previewItem?
-      previewPane.showItem(previewItem)
-      previewItem.renderMarkdown()
-    else if nextPane = activePane.getNextPane()
-      nextPane.showItem(new MarkdownPreviewView(filePath))
-    else
-      activePane.splitRight(new MarkdownPreviewView(filePath))
+    markdownUrl = "markdown-preview://#{editor.getPath()}"
+    atom.workspace.openSingletonSync(markdownUrl, split: 'right')
     activePane.focus()
-
-  getExistingPreview: (editor) ->
-    uri = "markdown-preview://#{editor.getPath()}"
-    for previewPane in atom.workspaceView.getPanes()
-      previewItem = previewPane.itemForUri(uri)
-      return {previewPane, previewItem} if previewItem?
-    {}
