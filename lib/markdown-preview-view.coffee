@@ -13,18 +13,16 @@ class MarkdownPreviewView extends ScrollView
   @content: ->
     @div class: 'markdown-preview native-key-bindings', tabindex: -1
 
-  constructor: (@filePath) ->
+  constructor: (@buffer) ->
     super
-    atom.project.bufferForPath(filePath).done (buffer) =>
-      @buffer = buffer
+    @renderMarkdown()
+    @subscribe atom.syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
+    @on 'core:move-up', => @scrollUp()
+    @on 'core:move-down', => @scrollDown()
+    @subscribe @buffer, 'saved reloaded', =>
       @renderMarkdown()
-      @subscribe atom.syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
-      @on 'core:move-up', => @scrollUp()
-      @on 'core:move-down', => @scrollDown()
-      @subscribe @buffer, 'saved reloaded', =>
-        @renderMarkdown()
-        pane = @getPane()
-        pane.showItem(this) if pane? and pane isnt atom.workspaceView.getActivePane()
+      pane = @getPane()
+      pane.showItem(this) if pane? and pane isnt atom.workspaceView.getActivePane()
 
   getPane: ->
     @parents('.pane').view()
@@ -40,7 +38,7 @@ class MarkdownPreviewView extends ScrollView
     "markdown-preview://#{@getPath()}"
 
   getPath: ->
-    @filePath
+    @buffer.getPath()
 
   setErrorHtml: (result) ->
     failureMessage = result?.message
