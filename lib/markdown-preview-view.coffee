@@ -13,7 +13,7 @@ class MarkdownPreviewView extends ScrollView
   @content: ->
     @div class: 'markdown-preview native-key-bindings', tabindex: -1
 
-  initialize: (@filePath) ->
+  constructor: (@filePath) ->
     super
     atom.project.bufferForPath(filePath).done (buffer) =>
       @buffer = buffer
