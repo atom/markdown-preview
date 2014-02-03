@@ -17,8 +17,8 @@ class MarkdownPreviewView extends ScrollView
     super
     @renderMarkdown()
     @subscribe atom.syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
-    @on 'core:move-up', => @scrollUp()
-    @on 'core:move-down', => @scrollDown()
+    @subscribe this, 'core:move-up', => @scrollUp()
+    @subscribe this, 'core:move-down', => @scrollDown()
     @subscribe @buffer, 'saved reloaded', =>
       @renderMarkdown()
       pane = @getPane()
