@@ -21,5 +21,6 @@ module.exports =
       return
 
     markdownUrl = "markdown-preview://#{editor.getPath()}"
-    atom.workspace.openSingletonSync(markdownUrl, split: 'right')
+    markdownPreviewView = atom.workspace.openSingletonSync(markdownUrl, split: 'right')
+    markdownPreviewView.renderMarkdown()
     activePane.focus()
