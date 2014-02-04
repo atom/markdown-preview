@@ -17,14 +17,18 @@ class MarkdownPreviewView extends ScrollView
     super
     atom.project.bufferForPath(filePath).done (buffer) =>
       @buffer = buffer
+      @handleEvents()
       @renderMarkdown()
-      @subscribe atom.syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
-      @subscribe this, 'core:move-up', => @scrollUp()
-      @subscribe this, 'core:move-down', => @scrollDown()
-      @subscribe @buffer, 'saved reloaded', =>
-        @renderMarkdown()
-        pane = @getPane()
-        pane.showItem(this) if pane? and pane isnt atom.workspaceView.getActivePane()
+
+
+  handleEvents: ->
+    @subscribe atom.syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
+    @subscribe this, 'core:move-up', => @scrollUp()
+    @subscribe this, 'core:move-down', => @scrollDown()
+    @subscribe @buffer, 'saved reloaded', =>
+      @renderMarkdown()
+      pane = @getPane()
+      pane.showItem(this) if pane? and pane isnt atom.workspaceView.getActivePane()
 
   getPane: ->
     @parents('.pane').view()
