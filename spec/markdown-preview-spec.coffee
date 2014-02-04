@@ -6,7 +6,7 @@ describe "Markdown preview package", ->
     atom.packages.activatePackage('language-gfm', sync: true)
     atom.workspaceView = new WorkspaceView
     atom.workspace = atom.workspaceView.model
-    atom.packages.activatePackage("markdown-preview", immediate: true)
+    atom.packages.activatePackage("markdown-preview")
     spyOn(MarkdownPreviewView.prototype, 'renderMarkdown')
 
   describe "when the active item can't be rendered as markdown", ->
