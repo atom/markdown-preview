@@ -1,26 +1,7 @@
 {_, $, $$$, EditorView, ScrollView} = require 'atom'
 path = require 'path'
 roaster = require 'roaster'
-
-fenceNameToExtension =
-  'bash': 'sh'
-  'coffee': 'coffee'
-  'coffeescript': 'coffee'
-  'coffee-script': 'coffee'
-  'css': 'css'
-  'go': 'go'
-  'java': 'java'
-  'javascript': 'js'
-  'js': 'js'
-  'json': 'json'
-  'less': 'less'
-  'mustache': 'mustache'
-  'python': 'py'
-  'rb': 'rb'
-  'ruby': 'rb'
-  'sh': 'sh'
-  'toml': 'toml'
-  'xml': 'xml'
+{extensionForFenceName} = require 'extension-helper'
 
 module.exports =
 class MarkdownPreviewView extends ScrollView
@@ -84,7 +65,7 @@ class MarkdownPreviewView extends ScrollView
 
       fenceName = className.replace(/^lang-/, '')
       # go to next block unless the class name matches `lang`
-      continue unless extension = fenceNameToExtension[fenceName]
+      continue unless extension = extensionForFenceName(fenceName)
       text = codeBlock.text()
 
       grammar = atom.syntax.selectGrammar("foo.#{extension}", text)
