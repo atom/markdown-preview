@@ -20,6 +20,9 @@ class MarkdownPreviewView extends ScrollView
       @handleEvents()
       @renderMarkdown()
 
+  serialize: ->
+    deserializer: 'MarkdownPreviewView'
+    filePath: @getPath()
 
   handleEvents: ->
     @subscribe atom.syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
@@ -30,12 +33,13 @@ class MarkdownPreviewView extends ScrollView
       paneView = @getPaneView()
       paneView.showItem(this) if paneView? and paneView isnt atom.workspaceView.getActivePaneView()
 
-  getPaneView: ->
-    @parents('.pane').view()
-
-  serialize: ->
-    deserializer: 'MarkdownPreviewView'
-    filePath: @getPath()
+  renderMarkdown: ->
+    @showLoading()
+    roaster @buffer.getText(), (error, html) =>
+      if error
+        @showError(error)
+      else
+        @html(@tokenizeCodeBlocks(html))
 
   getTitle: ->
     "#{path.basename(@getPath())} Preview"
@@ -46,15 +50,16 @@ class MarkdownPreviewView extends ScrollView
   getPath: ->
     @filePath
 
-  setErrorHtml: (result) ->
+  showError: (result) ->
     failureMessage = result?.message
 
     @html $$$ ->
       @h2 'Previewing Markdown Failed'
       @h3 failureMessage if failureMessage?
 
-  setLoading: ->
-    @html($$$ -> @div class: 'markdown-spinner', 'Loading Markdown...')
+  showLoading: ->
+    @html $$$ ->
+      @div class: 'markdown-spinner', 'Loading Markdown...'
 
   tokenizeCodeBlocks: (html) =>
     html = $(html)
@@ -80,10 +85,5 @@ class MarkdownPreviewView extends ScrollView
 
     html
 
-  renderMarkdown: ->
-    @setLoading()
-    roaster @buffer.getText(), (err, html) =>
-      if err
-        @setErrorHtml(err)
-      else
-        @html(@tokenizeCodeBlocks(html))
+  getPaneView: ->
+    @parents('.pane').view()

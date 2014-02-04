@@ -16,7 +16,7 @@ describe "MarkdownPreviewView", ->
 
   describe "::constructor", ->
     it "shows a loading spinner and renders the markdown", ->
-      preview.setLoading()
+      preview.showLoading()
       expect(preview.find('.markdown-spinner')).toExist()
       expect(preview.buffer.getText()).toBe buffer.getText()
 
@@ -24,7 +24,7 @@ describe "MarkdownPreviewView", ->
       expect(preview.find(".emoji")).toExist()
 
     it "shows an error message when there is an error", ->
-      preview.setErrorHtml("Not a real file")
+      preview.showError("Not a real file")
       expect(preview.text()).toContain "Failed"
 
   describe "serialization", ->
