@@ -1,7 +1,7 @@
 {_, $, $$$, EditorView, ScrollView} = require 'atom'
 path = require 'path'
 roaster = require 'roaster'
-{extensionForFenceName} = require 'extension-helper'
+{extensionForFenceName} = require './extension-helper'
 
 module.exports =
 class MarkdownPreviewView extends ScrollView
