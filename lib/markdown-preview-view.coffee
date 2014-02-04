@@ -27,10 +27,10 @@ class MarkdownPreviewView extends ScrollView
     @subscribe this, 'core:move-down', => @scrollDown()
     @subscribe @buffer, 'saved reloaded', =>
       @renderMarkdown()
-      pane = @getPane()
-      pane.showItem(this) if pane? and pane isnt atom.workspaceView.getActivePane()
+      paneView = @getPaneView()
+      paneView.showItem(this) if paneView? and paneView isnt atom.workspaceView.getActivePaneView()
 
-  getPane: ->
+  getPaneView: ->
     @parents('.pane').view()
 
   serialize: ->
