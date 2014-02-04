@@ -21,7 +21,7 @@ module.exports =
       console.warn("Can not render markdown for '#{editor.getUri() ? 'untitled'}'")
       return
 
-    markdownUrl = "markdown-preview://#{editor.getPath()}"
-    atom.workspace.open(markdownUrl, split: 'right').done (markdownPreviewView) ->
+    uri = "markdown-preview://#{editor.getPath()}"
+    atom.workspace.open(uri, split: 'right').done (markdownPreviewView) ->
       markdownPreviewView.renderMarkdown()
       activePane.focus()
