@@ -32,7 +32,7 @@ describe "Markdown preview package", ->
 
     it "splits the current pane to the right with a markdown preview for the current buffer", ->
       preview = null
-      [pane1, pane2] = []
+      [editorPane, previewPane] = []
 
       atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
 
@@ -41,16 +41,16 @@ describe "Markdown preview package", ->
 
       runs ->
         expect(atom.workspaceView.getPanes()).toHaveLength 2
-        [pane1, pane2] = atom.workspaceView.getPanes()
+        [editorPane, previewPane] = atom.workspaceView.getPanes()
 
-        expect(pane1.items).toHaveLength 1
-        preview = pane2.activeItem
+        expect(editorPane.items).toHaveLength 1
+        preview = previewPane.activeItem
         expect(preview).toBeInstanceOf(MarkdownPreviewView)
         expect(preview.buffer).toBe atom.workspaceView.getActivePaneItem().buffer
-        expect(pane1).toHaveFocus()
+        expect(editorPane).toHaveFocus()
 
   describe "when a preview has been created for the buffer", ->
-    [pane1, pane2, preview] = []
+    [editorPane, previewPane, preview] = []
 
     beforeEach ->
       atom.workspaceView.attachToDom()
@@ -65,59 +65,59 @@ describe "Markdown preview package", ->
         MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
 
       runs ->
-        [pane1, pane2] = atom.workspaceView.getPanes()
-        preview = pane2.activeItem
+        [editorPane, previewPane] = atom.workspaceView.getPanes()
+        preview = previewPane.activeItem
         MarkdownPreviewView.prototype.renderMarkdown.reset()
 
     it "re-renders and shows the existing preview", ->
       waitsForPromise ->
-        pane2.focus()
+        previewPane.focus()
         atom.workspaceView.open()
 
       runs ->
-        pane1.focus()
+        editorPane.focus()
         atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
 
       waitsFor ->
         MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
 
       runs ->
-        expect(pane2.activeItem).toBe preview
-        expect(pane1).toHaveFocus()
+        expect(previewPane.activeItem).toBe preview
+        expect(editorPane).toHaveFocus()
 
     describe "when the buffer is saved", ->
       describe "when the preview is in the active pane", ->
         it "re-renders the preview but does not make it active", ->
           waitsForPromise ->
-            pane2.focus()
+            previewPane.focus()
             atom.workspaceView.open(preview.getPath())
 
           runs ->
-            pane2.activeItem.buffer.emit 'saved'
+            previewPane.activeItem.buffer.emit 'saved'
 
           waitsFor ->
             MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
 
           runs ->
-            expect(pane2).toHaveFocus()
-            expect(pane2.activeItem).not.toBe preview
+            expect(previewPane).toHaveFocus()
+            expect(previewPane.activeItem).not.toBe preview
 
       describe "when the preview is not in the active pane", ->
         it "re-renders the preview and makes it active", ->
           waitsForPromise ->
-            pane2.focus()
+            previewPane.focus()
             atom.workspaceView.open(preview.getPath())
 
           runs ->
-            pane1.focus()
-            pane1.activeItem.buffer.emit 'saved'
+            editorPane.focus()
+            editorPane.activeItem.buffer.emit 'saved'
 
           waitsFor ->
             MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
 
           runs ->
-            expect(pane1).toHaveFocus()
-            expect(pane2.activeItem).toBe preview
+            expect(editorPane).toHaveFocus()
+            expect(previewPane.activeItem).toBe preview
 
     describe "when a new grammar is loaded", ->
       it "re-renders the preview", ->
