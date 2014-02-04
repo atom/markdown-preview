@@ -1,11 +1,9 @@
 MarkdownPreviewView = require '../lib/markdown-preview-view'
-{$, $$$} = require 'atom'
 
 describe "MarkdownPreviewView", ->
   [buffer, preview] = []
 
   beforeEach ->
-    atom.project.setPath(atom.project.resolve('markdown'))
     buffer = atom.project.bufferForPathSync('file.markdown')
     atom.packages.activatePackage('language-ruby', sync: true)
     preview = new MarkdownPreviewView(buffer.getPath())
@@ -16,7 +14,7 @@ describe "MarkdownPreviewView", ->
   afterEach ->
     buffer.release()
 
-  describe "on construction", ->
+  describe "::constructor", ->
     it "shows a loading spinner and renders the markdown", ->
       preview.setLoading()
       expect(preview.find('.markdown-spinner')).toExist()
@@ -25,12 +23,12 @@ describe "MarkdownPreviewView", ->
       preview.renderMarkdown()
       expect(preview.find(".emoji")).toExist()
 
-    it "shows an error message on error", ->
+    it "shows an error message when there is an error", ->
       preview.setErrorHtml("Not a real file")
       expect(preview.text()).toContain "Failed"
 
   describe "serialization", ->
-    it "reassociates with the same buffer when deserialized", ->
+    it "reassociates with the same buffer when serialized/deserialized", ->
       newPreview = atom.deserializers.deserialize(preview.serialize())
       waitsFor ->
         newPreview.buffer
