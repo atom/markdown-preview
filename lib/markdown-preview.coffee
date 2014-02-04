@@ -10,8 +10,7 @@ module.exports =
     atom.project.registerOpener (urlToOpen) ->
       {protocol, pathname} = url.parse(urlToOpen)
       return unless protocol is 'markdown-preview:' and fs.isFileSync(pathname)
-      atom.project.bufferForPath(pathname).done (buffer) =>
-        new MarkdownPreviewView(buffer)
+      new MarkdownPreviewView(pathname)
 
   show: ->
     activePane = atom.workspaceView.getActivePane()
