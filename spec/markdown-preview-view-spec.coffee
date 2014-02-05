@@ -1,5 +1,4 @@
 path = require 'path'
-{fs, File} = require 'atom'
 MarkdownPreviewView = require '../lib/markdown-preview-view'
 
 describe "MarkdownPreviewView", ->

@@ -1,5 +1,6 @@
 path = require 'path'
-{_, $, $$$, EditorView, File, ScrollView} = require 'atom'
+{$, $$$, EditorView, File, ScrollView} = require 'atom'
+_ = require 'underscore-plus'
 roaster = require 'roaster'
 {extensionForFenceName} = require './extension-helper'
 

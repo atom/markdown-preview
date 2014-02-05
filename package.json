@@ -14,7 +14,9 @@
     "atom": "*"
   },
   "dependencies": {
-    "roaster": "0.1.0"
+    "roaster": "0.1.0",
+    "fs-plus": "1.x",
+    "underscore-plus": "1.x"
   },
   "devDependencies": {
     "temp": "~0.6.0",

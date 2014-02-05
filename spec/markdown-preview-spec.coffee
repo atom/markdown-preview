@@ -1,5 +1,6 @@
+fs = require 'fs'
 path = require 'path'
-{$$, fs, WorkspaceView} = require 'atom'
+{WorkspaceView} = require 'atom'
 temp = require 'temp'
 wrench = require 'wrench'
 MarkdownPreviewView = require '../lib/markdown-preview-view'

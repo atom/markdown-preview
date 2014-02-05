@@ -1,5 +1,5 @@
+fs = require 'fs-plus'
 url = require 'url'
-{fs} = require 'atom'
 MarkdownPreviewView = require './markdown-preview-view'
 
 module.exports =
