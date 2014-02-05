@@ -1,15 +1,16 @@
-fs = require 'fs-plus'
-url = require 'url'
-MarkdownPreviewView = require './markdown-preview-view'
-
 module.exports =
   activate: ->
     atom.workspaceView.command 'markdown-preview:show', =>
       @show()
 
     atom.project.registerOpener (urlToOpen) ->
+      fs = require 'fs-plus'
+      url = require 'url'
+
       {protocol, pathname} = url.parse(urlToOpen)
       return unless protocol is 'markdown-preview:' and fs.isFileSync(pathname)
+
+      MarkdownPreviewView = require './markdown-preview-view'
       new MarkdownPreviewView(pathname)
 
   show: ->
