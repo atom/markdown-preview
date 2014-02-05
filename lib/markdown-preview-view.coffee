@@ -1,7 +1,6 @@
 path = require 'path'
 {$, $$$, EditorView, File, ScrollView} = require 'atom'
 _ = require 'underscore-plus'
-roaster = require 'roaster'
 {extensionForFenceName} = require './extension-helper'
 
 module.exports =
@@ -38,6 +37,7 @@ class MarkdownPreviewView extends ScrollView
   renderMarkdown: ->
     @showLoading()
     @file.read().then (contents) =>
+      roaster = require 'roaster'
       roaster contents, (error, html) =>
         if error
           @showError(error)
