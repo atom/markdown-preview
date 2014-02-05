@@ -3,16 +3,18 @@
   "version": "0.25.1",
   "main": "./lib/markdown-preview",
   "description": "Open a rendered version of the Markdown in the current editor with `ctrl-m`.",
-  "activationEvents": ["markdown-preview:show"],
+  "activationEvents": [
+    "markdown-preview:show"
+  ],
   "deferredDeserializers": [
     "MarkdownPreviewView"
   ],
-  "dependencies": {
-    "roaster": "0.1.0"
-  },
   "repository": "https://github.com/atom/markdown-preview",
   "engines": {
     "atom": "*"
+  },
+  "dependencies": {
+    "roaster": "0.1.0"
   },
   "devDependencies": {
     "temp": "~0.6.0",
