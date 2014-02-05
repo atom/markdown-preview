@@ -1,5 +1,5 @@
 path = require 'path'
-{_, $, $$$, EditorView, ScrollView} = require 'atom'
+{_, $, $$$, EditorView, File, ScrollView} = require 'atom'
 roaster = require 'roaster'
 {extensionForFenceName} = require './extension-helper'
 
@@ -13,33 +13,35 @@ class MarkdownPreviewView extends ScrollView
   @content: ->
     @div class: 'markdown-preview native-key-bindings', tabindex: -1
 
-  constructor: (@filePath) ->
+  constructor: (filePath) ->
     super
-    atom.project.bufferForPath(filePath).done (buffer) =>
-      @buffer = buffer
-      @handleEvents()
-      @renderMarkdown()
+    @file = new File(filePath)
+    @handleEvents()
 
   serialize: ->
     deserializer: 'MarkdownPreviewView'
     filePath: @getPath()
 
+  destroy: ->
+    @unsubscribe()
+
   handleEvents: ->
     @subscribe atom.syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
     @subscribe this, 'core:move-up', => @scrollUp()
     @subscribe this, 'core:move-down', => @scrollDown()
-    @subscribe @buffer, 'saved reloaded', =>
+    @subscribe @file, 'contents-changed', =>
       @renderMarkdown()
       paneView = @getPaneView()
       paneView.showItem(this) if paneView? and paneView isnt atom.workspaceView.getActivePaneView()
 
   renderMarkdown: ->
     @showLoading()
-    roaster @buffer.getText(), (error, html) =>
-      if error
-        @showError(error)
-      else
-        @html(@tokenizeCodeBlocks(html))
+    @file.read().then (contents) =>
+      roaster contents, (error, html) =>
+        if error
+          @showError(error)
+        else
+          @html(@tokenizeCodeBlocks(html))
 
   getTitle: ->
     "#{path.basename(@getPath())} Preview"
@@ -48,7 +50,7 @@ class MarkdownPreviewView extends ScrollView
     "markdown-preview://#{@getPath()}"
 
   getPath: ->
-    @filePath
+    @file.getPath()
 
   showError: (result) ->
     failureMessage = result?.message
