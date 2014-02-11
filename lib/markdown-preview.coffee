@@ -1,39 +1,26 @@
-url = require 'url'
-{fs} = require 'atom'
 MarkdownPreviewView = require './markdown-preview-view'
 
 module.exports =
   activate: ->
-    atom.workspaceView.command 'markdown-preview:show', '.editor', => @show()
+    atom.workspaceView.command 'markdown-preview:show', =>
+      @show()
 
-    atom.project.registerOpener (uriToOpen='') ->
+    atom.project.registerOpener (uriToOpen) ->
+      fs = require 'fs-plus'
+      url = require 'url'
+
       {protocol, pathname} = url.parse(uriToOpen)
-      if protocol is 'markdown-preview:' and fs.isFileSync(pathname)
-        new MarkdownPreviewView(pathname)
+      return unless protocol is 'markdown-preview:' and fs.isFileSync(pathname)
+      new MarkdownPreviewView(pathname)
 
   show: ->
-    activePane = atom.workspaceView.getActivePane()
-    editor = activePane.activeItem
-
-    isMarkdownEditor = editor.getGrammar?()?.scopeName is "source.gfm"
-    unless isMarkdownEditor
-      console.warn("Can not render markdown for '#{editor.getUri() ? 'untitled'}'")
+    editor = atom.workspace.getActiveEditor()
+    unless editor? and editor.getGrammar().scopeName is "source.gfm"
+      console.warn("Can not render markdown for '#{editor?.getUri() ? 'untitled'}'")
       return
 
-    {previewPane, previewItem} = @getExistingPreview(editor)
-    filePath = editor.getPath()
-    if previewItem?
-      previewPane.showItem(previewItem)
-      previewItem.renderMarkdown()
-    else if nextPane = activePane.getNextPane()
-      nextPane.showItem(new MarkdownPreviewView(filePath))
-    else
-      activePane.splitRight(new MarkdownPreviewView(filePath))
-    activePane.focus()
-
-  getExistingPreview: (editor) ->
+    previousActivePaneView = atom.workspaceView.getActivePaneView()
     uri = "markdown-preview://#{editor.getPath()}"
-    for previewPane in atom.workspaceView.getPanes()
-      previewItem = previewPane.itemForUri(uri)
-      return {previewPane, previewItem} if previewItem?
-    {}
+    atom.workspace.open(uri, split: 'right').done (markdownPreviewView) ->
+      markdownPreviewView.renderMarkdown()
+      previousActivePaneView.focus()

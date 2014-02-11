@@ -1,26 +1,7 @@
-{_, $, $$$, EditorView, ScrollView} = require 'atom'
 path = require 'path'
-roaster = require 'roaster'
-
-fenceNameToExtension =
-  'bash': 'sh'
-  'coffee': 'coffee'
-  'coffeescript': 'coffee'
-  'coffee-script': 'coffee'
-  'css': 'css'
-  'go': 'go'
-  'java': 'java'
-  'javascript': 'js'
-  'js': 'js'
-  'json': 'json'
-  'less': 'less'
-  'mustache': 'mustache'
-  'python': 'py'
-  'rb': 'rb'
-  'ruby': 'rb'
-  'sh': 'sh'
-  'toml': 'toml'
-  'xml': 'xml'
+{$, $$$, EditorView, File, ScrollView} = require 'atom'
+_ = require 'underscore-plus'
+{extensionForFenceName} = require './extension-helper'
 
 module.exports =
 class MarkdownPreviewView extends ScrollView
@@ -32,25 +13,36 @@ class MarkdownPreviewView extends ScrollView
   @content: ->
     @div class: 'markdown-preview native-key-bindings', tabindex: -1
 
-  initialize: (@filePath) ->
+  constructor: (filePath) ->
     super
-    atom.project.bufferForPath(filePath).done (buffer) =>
-      @buffer = buffer
-      @renderMarkdown()
-      @subscribe atom.syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
-      @on 'core:move-up', => @scrollUp()
-      @on 'core:move-down', => @scrollDown()
-      @subscribe @buffer, 'saved reloaded', =>
-        @renderMarkdown()
-        pane = @getPane()
-        pane.showItem(this) if pane? and pane isnt atom.workspaceView.getActivePane()
-
-  getPane: ->
-    @parents('.pane').view()
+    @file = new File(filePath)
+    @handleEvents()
 
   serialize: ->
     deserializer: 'MarkdownPreviewView'
     filePath: @getPath()
+
+  destroy: ->
+    @unsubscribe()
+
+  handleEvents: ->
+    @subscribe atom.syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
+    @subscribe this, 'core:move-up', => @scrollUp()
+    @subscribe this, 'core:move-down', => @scrollDown()
+    @subscribe @file, 'contents-changed', =>
+      @renderMarkdown()
+      paneView = @getPaneView()
+      paneView.showItem(this) if paneView? and paneView isnt atom.workspaceView.getActivePaneView()
+
+  renderMarkdown: ->
+    @showLoading()
+    @file.read().then (contents) =>
+      roaster = require 'roaster'
+      roaster contents, (error, html) =>
+        if error
+          @showError(error)
+        else
+          @html(@tokenizeCodeBlocks(html))
 
   getTitle: ->
     "#{path.basename(@getPath())} Preview"
@@ -59,17 +51,18 @@ class MarkdownPreviewView extends ScrollView
     "markdown-preview://#{@getPath()}"
 
   getPath: ->
-    @filePath
+    @file.getPath()
 
-  setErrorHtml: (result) ->
+  showError: (result) ->
     failureMessage = result?.message
 
     @html $$$ ->
       @h2 'Previewing Markdown Failed'
       @h3 failureMessage if failureMessage?
 
-  setLoading: ->
-    @html($$$ -> @div class: 'markdown-spinner', 'Loading Markdown...')
+  showLoading: ->
+    @html $$$ ->
+      @div class: 'markdown-spinner', 'Loading Markdown...'
 
   tokenizeCodeBlocks: (html) =>
     html = $(html)
@@ -84,7 +77,7 @@ class MarkdownPreviewView extends ScrollView
 
       fenceName = className.replace(/^lang-/, '')
       # go to next block unless the class name matches `lang`
-      continue unless extension = fenceNameToExtension[fenceName]
+      continue unless extension = extensionForFenceName(fenceName)
       text = codeBlock.text()
 
       grammar = atom.syntax.selectGrammar("foo.#{extension}", text)
@@ -95,10 +88,5 @@ class MarkdownPreviewView extends ScrollView
 
     html
 
-  renderMarkdown: ->
-    @setLoading()
-    roaster @buffer.getText(), (err, html) =>
-      if err
-        @setErrorHtml(err)
-      else
-        @html(@tokenizeCodeBlocks(html))
+  getPaneView: ->
+    @parents('.pane').view()

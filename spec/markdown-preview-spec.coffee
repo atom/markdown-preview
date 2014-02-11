@@ -1,162 +1,138 @@
-{$$, WorkspaceView} = require 'atom'
+fs = require 'fs'
+path = require 'path'
+{WorkspaceView} = require 'atom'
+temp = require 'temp'
+wrench = require 'wrench'
 MarkdownPreviewView = require '../lib/markdown-preview-view'
 
 describe "Markdown preview package", ->
   beforeEach ->
+    fixturesPath = path.join(__dirname, 'fixtures')
+    tempPath = temp.mkdirSync('atom')
+    wrench.copyDirSyncRecursive(fixturesPath, tempPath, forceDelete: true)
+    atom.project.setPath(tempPath)
+
     atom.packages.activatePackage('language-gfm', sync: true)
     atom.workspaceView = new WorkspaceView
-    atom.packages.activatePackage("markdown-preview", immediate: true)
+    atom.workspace = atom.workspaceView.model
+    atom.packages.activatePackage("markdown-preview")
     spyOn(MarkdownPreviewView.prototype, 'renderMarkdown')
 
-  describe "markdown-preview:show", ->
-    beforeEach ->
-      atom.workspaceView.openSync("file.markdown")
+  describe "when the active item can't be rendered as markdown", ->
+    describe "when the editor does not use the GFM grammar", ->
+      it "does not show a markdown preview", ->
+        spyOn(console, 'warn')
 
-    describe "when the active item is an editor", ->
-      beforeEach ->
-        atom.workspaceView.attachToDom()
+        waitsForPromise ->
+          atom.workspaceView.open()
 
-      describe "when the editor does not use the GFM grammar", ->
-        it "does not show a markdown preview", ->
-          spyOn(console, 'warn')
-          atom.workspaceView.openSync()
+        runs ->
           expect(atom.workspaceView.getPanes()).toHaveLength(1)
           atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
           expect(atom.workspaceView.getPanes()).toHaveLength(1)
           expect(console.warn).toHaveBeenCalled()
 
-      describe "when a preview item has not been created for the editor's uri", ->
-        describe "when there is more than one pane", ->
-          it "shows a markdown preview for the current buffer on the next pane", ->
-            atom.workspaceView.getActivePane().splitRight()
-            [pane1, pane2] = atom.workspaceView.getPanes()
-            pane1.focus()
+  describe "when a preview has not been created for the file", ->
+    beforeEach ->
+      atom.workspaceView.attachToDom()
 
-            atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
+      waitsForPromise ->
+        atom.workspaceView.open("file.markdown")
 
-            preview = pane2.activeItem
-            expect(preview).toBeInstanceOf(MarkdownPreviewView)
+    it "splits the current pane to the right with a markdown preview for the file", ->
+      [editorPane, previewPane] = []
 
-            waitsFor ->
-              preview.buffer
+      atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
 
-            runs ->
-              expect(preview.buffer).toBe atom.workspaceView.getActivePaneItem().buffer
-              expect(pane1).toMatchSelector(':has(:focus)')
+      waitsFor ->
+        MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
 
-        describe "when there is only one pane", ->
-          it "splits the current pane to the right with a markdown preview for the current buffer", ->
-            expect(atom.workspaceView.getPanes()).toHaveLength 1
+      runs ->
+        expect(atom.workspaceView.getPanes()).toHaveLength 2
+        [editorPane, previewPane] = atom.workspaceView.getPanes()
 
-            atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
+        expect(editorPane.items).toHaveLength 1
+        preview = previewPane.getActiveItem()
+        expect(preview).toBeInstanceOf(MarkdownPreviewView)
+        expect(preview.getPath()).toBe atom.workspaceView.getActivePaneItem().getPath()
+        expect(editorPane).toHaveFocus()
 
-            expect(atom.workspaceView.getPanes()).toHaveLength 2
-            [pane1, pane2] = atom.workspaceView.getPanes()
+  describe "when a preview has been created for the file", ->
+    [editorPane, previewPane, preview] = []
 
-            expect(pane2.items).toHaveLength 1
-            preview = pane2.activeItem
-            expect(preview).toBeInstanceOf(MarkdownPreviewView)
+    beforeEach ->
+      atom.workspaceView.attachToDom()
 
-            waitsFor ->
-              preview.buffer
+      waitsForPromise ->
+        atom.workspaceView.open("file.markdown")
 
-            runs ->
-              expect(preview.buffer).toBe atom.workspaceView.getActivePaneItem().buffer
-              expect(pane1).toMatchSelector(':has(:focus)')
+      runs ->
+        atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
 
-        describe "when a buffer is saved", ->
-          it "does not show the markdown preview", ->
-            [pane] = atom.workspaceView.getPanes()
-            pane.focus()
+      waitsFor ->
+        MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
 
-            MarkdownPreviewView.prototype.renderMarkdown.reset()
-            pane.activeItem.buffer.emit 'saved'
-            expect(MarkdownPreviewView.prototype.renderMarkdown).not.toHaveBeenCalled()
+      runs ->
+        [editorPane, previewPane] = atom.workspaceView.getPanes()
+        preview = previewPane.getActiveItem()
+        MarkdownPreviewView.prototype.renderMarkdown.reset()
 
-        describe "when a buffer is reloaded", ->
-          it "does not show the markdown preview", ->
-            [pane] = atom.workspaceView.getPanes()
-            pane.focus()
+    it "re-renders and shows the existing preview", ->
+      waitsForPromise ->
+        previewPane.focus()
+        atom.workspaceView.open()
 
-            MarkdownPreviewView.prototype.renderMarkdown.reset()
-            pane.activeItem.buffer.emit 'reloaded'
-            expect(MarkdownPreviewView.prototype.renderMarkdown).not.toHaveBeenCalled()
+      runs ->
+        editorPane.focus()
+        atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
 
-      describe "when a preview item has already been created for the editor's uri", ->
-        it "updates and shows the existing preview item if it isn't displayed", ->
-          atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
-          [pane1, pane2] = atom.workspaceView.getPanes()
-          pane2.focus()
-          expect(atom.workspaceView.getActivePane()).toBe pane2
-          preview = pane2.activeItem
-          expect(preview).toBeInstanceOf(MarkdownPreviewView)
-          atom.workspaceView.openSync()
-          expect(pane2.activeItem).not.toBe preview
-          pane1.focus()
+      waitsFor ->
+        MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
 
-          preview.renderMarkdown.reset()
-          atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
-          expect(preview.renderMarkdown).toHaveBeenCalled()
-          expect(atom.workspaceView.getPanes()).toHaveLength 2
-          expect(pane2.getItems()).toHaveLength 2
-          expect(pane2.activeItem).toBe preview
-          expect(pane1).toMatchSelector(':has(:focus)')
+      runs ->
+        expect(previewPane.getActiveItem()).toBe preview
+        expect(editorPane).toHaveFocus()
 
-        describe "when a buffer is saved", ->
-          describe "when the preview is in the same pane", ->
-            it "updates the preview but does not make it active", ->
-              atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
-              [pane1, pane2] = atom.workspaceView.getPanes()
-              preview = pane2.activeItem
-              pane2.moveItemToPane(preview, pane1, 1)
+    describe "when the file modified", ->
+      describe "when the preview is in the active pane but is not the active item", ->
+        it "re-renders the preview but does not make it active", ->
+          previewPane.focus()
 
-              pane1.showItemAtIndex(1)
-              pane1.showItemAtIndex(0)
-              preview = pane1.itemAtIndex(1)
+          waitsForPromise ->
+            atom.workspaceView.open()
 
-              waitsFor ->
-                preview.buffer
+          runs ->
+            fs.writeFileSync(preview.getPath(), "Hey!")
 
-              runs ->
-                preview.renderMarkdown.reset()
-                pane1.activeItem.buffer.emit 'saved'
-                expect(preview.renderMarkdown).toHaveBeenCalled()
-                expect(pane1.activeItem).not.toBe preview
+          waitsFor ->
+            MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
 
-          describe "when the preview is not in the same pane", ->
-            it "updates the preview and makes it active", ->
-              atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
-              [pane1, pane2] = atom.workspaceView.getPanes()
-              preview = pane2.activeItem
-              pane2.showItem($$ -> @div id: 'view', tabindex: -1, 'View')
-              expect(pane2.activeItem).not.toBe preview
-              pane1.focus()
+          runs ->
+            expect(previewPane).toHaveFocus()
+            expect(previewPane.getActiveItem()).not.toBe preview
 
-              waitsFor ->
-                preview.buffer
+      describe "when the preview is not the active item and not in the active pane", ->
+        it "re-renders the preview and makes it active", ->
+          previewPane.focus()
 
-              runs ->
-                preview.renderMarkdown.reset()
-                pane1.activeItem.buffer.emit 'saved'
-                expect(preview.renderMarkdown).toHaveBeenCalled()
-                expect(pane2.activeItem).toBe preview
+          waitsForPromise ->
+            atom.workspaceView.open()
 
-      describe "when a new grammar is loaded", ->
-        it "reloads the view to colorize any fenced code blocks matching the newly loaded grammar", ->
-          atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
-          [pane1, pane2] = atom.workspaceView.getPanes()
-          preview = pane2.activeItem
-          preview.renderMarkdown.reset()
-          jasmine.unspy(window, 'setTimeout')
+          runs ->
+            editorPane.focus()
+            fs.writeFileSync(preview.getPath(), "Hey!")
 
-          atom.packages.activatePackage('language-javascript', sync: true)
-          waitsFor -> preview.renderMarkdown.callCount > 0
+          waitsFor ->
+            MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
 
-      describe "when pane:reopen-closed-item is triggered", ->
-        it "reopens the markdown preview view", ->
-          atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
-          [pane1, pane2] = atom.workspaceView.getPanes()
-          preview = pane2.activeItem
-          pane2.destroyActiveItem()
-          atom.workspaceView.trigger 'pane:reopen-closed-item'
-          expect(atom.workspaceView.getActivePaneItem().constructor.name).toBe 'MarkdownPreviewView'
+          runs ->
+            expect(editorPane).toHaveFocus()
+            expect(previewPane.getActiveItem()).toBe preview
+
+    describe "when a new grammar is loaded", ->
+      it "re-renders the preview", ->
+        jasmine.unspy(window, 'setTimeout')
+        atom.packages.activatePackage('language-javascript', sync: true)
+
+        waitsFor ->
+          MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
