@@ -8,12 +8,10 @@
     "atom": "*"
   },
   "dependencies": {
-    "roaster": "0.1.0",
     "fs-plus": "1.x",
-    "underscore-plus": "1.x"
-  },
-  "devDependencies": {
-    "temp": "~0.6.0",
-    "wrench": "~1.5.6"
+    "roaster": "0.1.x",
+    "temp": "0.6.x",
+    "underscore-plus": "1.x",
+    "wrench": "1.5.x"
   }
 }
