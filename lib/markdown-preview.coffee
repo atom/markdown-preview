@@ -15,7 +15,7 @@ module.exports =
 
   show: ->
     paneView = atom.workspaceView.getActivePaneView()
-    editor = paneView.activeItem
+    editor = paneView.getActiveItem()
 
     unless editor.getGrammar?().scopeName is "source.gfm"
       console.warn("Can not render markdown for '#{editor.getUri() ? 'untitled'}'")

@@ -52,7 +52,7 @@ describe "Markdown preview package", ->
         [editorPane, previewPane] = atom.workspaceView.getPanes()
 
         expect(editorPane.items).toHaveLength 1
-        preview = previewPane.activeItem
+        preview = previewPane.getActiveItem()
         expect(preview).toBeInstanceOf(MarkdownPreviewView)
         expect(preview.getPath()).toBe atom.workspaceView.getActivePaneItem().getPath()
         expect(editorPane).toHaveFocus()
@@ -74,7 +74,7 @@ describe "Markdown preview package", ->
 
       runs ->
         [editorPane, previewPane] = atom.workspaceView.getPanes()
-        preview = previewPane.activeItem
+        preview = previewPane.getActiveItem()
         MarkdownPreviewView.prototype.renderMarkdown.reset()
 
     it "re-renders and shows the existing preview", ->
@@ -90,7 +90,7 @@ describe "Markdown preview package", ->
         MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
 
       runs ->
-        expect(previewPane.activeItem).toBe preview
+        expect(previewPane.getActiveItem()).toBe preview
         expect(editorPane).toHaveFocus()
 
     describe "when the file modified", ->
@@ -109,7 +109,7 @@ describe "Markdown preview package", ->
 
           runs ->
             expect(previewPane).toHaveFocus()
-            expect(previewPane.activeItem).not.toBe preview
+            expect(previewPane.getActiveItem()).not.toBe preview
 
       describe "when the preview is not the active item and not in the active pane", ->
         it "re-renders the preview and makes it active", ->
@@ -127,7 +127,7 @@ describe "Markdown preview package", ->
 
           runs ->
             expect(editorPane).toHaveFocus()
-            expect(previewPane.activeItem).toBe preview
+            expect(previewPane.getActiveItem()).toBe preview
 
     describe "when a new grammar is loaded", ->
       it "re-renders the preview", ->
