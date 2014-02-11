@@ -14,14 +14,13 @@ module.exports =
       new MarkdownPreviewView(pathname)
 
   show: ->
-    paneView = atom.workspaceView.getActivePaneView()
-    editor = paneView.getActiveItem()
-
-    unless editor.getGrammar?().scopeName is "source.gfm"
-      console.warn("Can not render markdown for '#{editor.getUri() ? 'untitled'}'")
+    editor = atom.workspace.getActiveEditor()
+    unless editor? and editor.getGrammar().scopeName is "source.gfm"
+      console.warn("Can not render markdown for '#{editor?.getUri() ? 'untitled'}'")
       return
 
+    previousActivePaneView = atom.workspaceView.getActivePaneView()
     uri = "markdown-preview://#{editor.getPath()}"
     atom.workspace.open(uri, split: 'right').done (markdownPreviewView) ->
       markdownPreviewView.renderMarkdown()
-      paneView.focus()
+      previousActivePaneView.focus()
