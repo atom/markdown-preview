@@ -5,9 +5,11 @@ describe "MarkdownPreviewView", ->
   [file, preview] = []
 
   beforeEach ->
-    atom.packages.activatePackage('language-ruby', sync: true)
     filePath = atom.project.resolve('file.markdown')
     preview = new MarkdownPreviewView(filePath)
+
+    waitsForPromise ->
+      atom.packages.activatePackage('language-ruby')
 
   afterEach ->
     preview.destroy()

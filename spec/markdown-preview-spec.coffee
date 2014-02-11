@@ -12,11 +12,15 @@ describe "Markdown preview package", ->
     wrench.copyDirSyncRecursive(fixturesPath, tempPath, forceDelete: true)
     atom.project.setPath(tempPath)
 
-    atom.packages.activatePackage('language-gfm', sync: true)
     atom.workspaceView = new WorkspaceView
     atom.workspace = atom.workspaceView.model
-    atom.packages.activatePackage("markdown-preview")
     spyOn(MarkdownPreviewView.prototype, 'renderMarkdown')
+
+    waitsForPromise ->
+      atom.packages.activatePackage("markdown-preview")
+
+    waitsForPromise ->
+      atom.packages.activatePackage('language-gfm')
 
   describe "when the active item can't be rendered as markdown", ->
     describe "when the editor does not use the GFM grammar", ->
