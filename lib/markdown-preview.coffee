@@ -5,7 +5,7 @@ module.exports =
     atom.workspaceView.command 'markdown-preview:show', =>
       @show()
 
-    atom.project.registerOpener (uriToOpen) ->
+    atom.workspace.registerOpener (uriToOpen) ->
       fs = require 'fs-plus'
       url = require 'url'
 
