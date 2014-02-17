@@ -41,7 +41,7 @@ describe "Markdown preview package", ->
       atom.workspaceView.attachToDom()
 
       waitsForPromise ->
-        atom.workspaceView.open("file.markdown")
+        atom.workspaceView.open("subdir/file.markdown")
 
     it "splits the current pane to the right with a markdown preview for the file", ->
       [editorPane, previewPane] = []
@@ -68,7 +68,7 @@ describe "Markdown preview package", ->
       atom.workspaceView.attachToDom()
 
       waitsForPromise ->
-        atom.workspaceView.open("file.markdown")
+        atom.workspaceView.open("subdir/file.markdown")
 
       runs ->
         atom.workspaceView.getActiveView().trigger 'markdown-preview:show'

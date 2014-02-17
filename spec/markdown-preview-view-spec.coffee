@@ -5,7 +5,7 @@ describe "MarkdownPreviewView", ->
   [file, preview] = []
 
   beforeEach ->
-    filePath = atom.project.resolve('file.markdown')
+    filePath = atom.project.resolve('subdir/file.markdown')
     preview = new MarkdownPreviewView(filePath)
 
     waitsForPromise ->
@@ -52,3 +52,23 @@ describe "MarkdownPreviewView", ->
       it "does not tokenize the code block", ->
         expect(preview.find("pre code:not([class])").children().length).toBe 0
         expect(preview.find("pre code.lang-kombucha").children().length).toBe 0
+
+  describe "image resolving", ->
+    beforeEach ->
+      waitsForPromise ->
+        preview.renderMarkdown()
+
+    describe "when the image uses a relative path", ->
+      it "resolves to a path relative to the file", ->
+        image = preview.find("img[alt=Image1]")
+        expect(image.attr('src')).toBe atom.project.resolve('subdir/image1.png')
+
+    describe "when the image uses an absolute path", ->
+      it "doesn't change the path", ->
+        image = preview.find("img[alt=Image2]")
+        expect(image.attr('src')).toBe '/tmp/image2.png'
+
+    describe "when the image uses a web URL", ->
+      it "doesn't change the URL", ->
+        image = preview.find("img[alt=Image3]")
+        expect(image.attr('src')).toBe 'http://github.com/image3.png'
