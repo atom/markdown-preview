@@ -8,7 +8,7 @@
     "atom": "*"
   },
   "dependencies": {
-    "fs-plus": "1.x",
+    "fs-plus": "2.x",
     "roaster": "0.1.x",
     "temp": "0.6.x",
     "underscore-plus": "1.x",
