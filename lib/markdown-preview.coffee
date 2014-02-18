@@ -21,6 +21,6 @@ module.exports =
 
     previousActivePaneView = atom.workspaceView.getActivePaneView()
     uri = "markdown-preview://#{editor.getPath()}"
-    atom.workspace.open(uri, split: 'right').done (markdownPreviewView) ->
+    atom.workspace.open(uri, split: 'right', searchAllPanes: true).done (markdownPreviewView) ->
       markdownPreviewView.renderMarkdown()
       previousActivePaneView.focus()
