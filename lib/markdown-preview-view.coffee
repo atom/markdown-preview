@@ -31,8 +31,9 @@ class MarkdownPreviewView extends ScrollView
     @subscribe this, 'core:move-down', => @scrollDown()
     @subscribe @file, 'contents-changed', =>
       @renderMarkdown()
-      paneView = @getPaneView()
-      paneView.showItem(this) if paneView? and paneView isnt atom.workspaceView.getActivePaneView()
+      pane = atom.workspace.paneForUri(@getUri())
+      if pane? and pane isnt atom.workspace.getActivePane()
+        pane.activateItem(this)
 
   renderMarkdown: ->
     @showLoading()
@@ -99,6 +100,3 @@ class MarkdownPreviewView extends ScrollView
         codeBlock.append(EditorView.buildLineHtml({ tokens, text }))
 
     html
-
-  getPaneView: ->
-    @parents('.pane').view()
