@@ -42,7 +42,7 @@ class MarkdownPreviewView extends ScrollView
         if error
           @showError(error)
         else
-          @html(@tokenizeCodeBlocks(html))
+          @html(@tokenizeCodeBlocks(@resolveImagePaths(html)))
 
   getTitle: ->
     "#{path.basename(@getPath())} Preview"
@@ -63,6 +63,18 @@ class MarkdownPreviewView extends ScrollView
   showLoading: ->
     @html $$$ ->
       @div class: 'markdown-spinner', 'Loading Markdown...'
+
+  resolveImagePaths: (html) =>
+    html = $(html)
+    imgList = html.find("img")
+
+    for imgElement in imgList
+      img = $(imgElement)
+      src = img.attr('src')
+      continue if src.match /^(https?:\/\/)/
+      img.attr('src', path.resolve(path.dirname(@getPath()), src))
+
+    html
 
   tokenizeCodeBlocks: (html) =>
     html = $(html)

@@ -18,3 +18,9 @@ function f(x) {
 drink-that-stuff:
   tastes-weird~
 ```
+
+![Image1](image1.png)
+
+![Image2](/tmp/image2.png)
+
+![Image3](http://github.com/image3.png)
