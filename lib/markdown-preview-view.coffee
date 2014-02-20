@@ -1,6 +1,7 @@
 path = require 'path'
-{$, $$$, EditorView, File, ScrollView} = require 'atom'
+{$, $$$, EditorView, ScrollView} = require 'atom'
 _ = require 'underscore-plus'
+{File} = require 'pathwatcher'
 {extensionForFenceName} = require './extension-helper'
 
 module.exports =
