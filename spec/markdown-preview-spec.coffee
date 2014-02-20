@@ -82,9 +82,11 @@ describe "Markdown preview package", ->
         MarkdownPreviewView.prototype.renderMarkdown.reset()
 
     it "re-renders and shows the existing preview", ->
+      rightPane = previewPane.splitRight()
+
       waitsForPromise ->
         previewPane.focus()
-        atom.workspaceView.open()
+        atom.workspace.open()
 
       runs ->
         editorPane.focus()
@@ -95,6 +97,7 @@ describe "Markdown preview package", ->
 
       runs ->
         expect(previewPane.getActiveItem()).toBe preview
+        expect(rightPane.getActiveItem()).toBeUndefined()
         expect(editorPane).toHaveFocus()
 
     describe "when the file modified", ->
