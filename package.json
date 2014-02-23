@@ -4,6 +4,7 @@
   "main": "./lib/markdown-preview",
   "description": "Open a rendered version of the Markdown in the current editor with `ctrl-m`.",
   "repository": "https://github.com/atom/markdown-preview",
+  "license": "MIT",
   "engines": {
     "atom": "*"
   },
