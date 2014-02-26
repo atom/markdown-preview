@@ -1,3 +1,6 @@
+url = require 'url'
+fs = require 'fs-plus'
+
 MarkdownPreviewView = require './markdown-preview-view'
 
 module.exports =
@@ -6,17 +9,20 @@ module.exports =
       @show()
 
     atom.workspace.registerOpener (uriToOpen) ->
-      fs = require 'fs-plus'
-      url = require 'url'
-
       {protocol, pathname} = url.parse(uriToOpen)
       return unless protocol is 'markdown-preview:' and fs.isFileSync(pathname)
       new MarkdownPreviewView(pathname)
 
   show: ->
     editor = atom.workspace.getActiveEditor()
-    unless editor? and editor.getGrammar().scopeName is "source.gfm"
-      console.warn("Can not render markdown for '#{editor?.getUri() ? 'untitled'}'")
+    return unless editor?
+
+    unless editor.getGrammar().scopeName is "source.gfm"
+      console.warn("Cannot render markdown for '#{editor.getUri() ? 'untitled'}'")
+      return
+
+    unless fs.existsSync(editor.getPath())
+      console.warn("Cannot render markdown for '#{editor.getPath() ? 'untitled'}'")
       return
 
     previousActivePane = atom.workspace.getActivePane()

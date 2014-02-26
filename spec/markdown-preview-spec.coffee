@@ -1,6 +1,6 @@
-fs = require 'fs'
 path = require 'path'
 {WorkspaceView} = require 'atom'
+fs = require 'fs-plus'
 temp = require 'temp'
 wrench = require 'wrench'
 MarkdownPreviewView = require '../lib/markdown-preview-view'
@@ -31,6 +31,20 @@ describe "Markdown preview package", ->
           atom.workspaceView.open()
 
         runs ->
+          expect(atom.workspaceView.getPanes()).toHaveLength(1)
+          atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
+          expect(atom.workspaceView.getPanes()).toHaveLength(1)
+          expect(console.warn).toHaveBeenCalled()
+
+    describe "when the editor's path does not exit", ->
+      it "does not show a markdown preview", ->
+        spyOn(console, 'warn')
+
+        waitsForPromise ->
+          atom.workspaceView.open("subdir/file.markdown")
+
+        runs ->
+          fs.removeSync(atom.workspace.getActiveEditor().getPath())
           expect(atom.workspaceView.getPanes()).toHaveLength(1)
           atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
           expect(atom.workspaceView.getPanes()).toHaveLength(1)
