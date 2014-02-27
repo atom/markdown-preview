@@ -21,7 +21,7 @@ module.exports =
       console.warn("Cannot render markdown for '#{editor.getUri() ? 'untitled'}'")
       return
 
-    unless fs.existsSync(editor.getPath())
+    unless fs.isFileSync(editor.getPath())
       console.warn("Cannot render markdown for '#{editor.getPath() ? 'untitled'}'")
       return
 
