@@ -1,2 +1,4 @@
-'.workspace':
+'.platform-win32 .workspace':
   'ctrl-M': 'markdown-preview:show'
+'.platform-darwin .workspace':
+  'cmd-M': 'markdown-preview:show'
