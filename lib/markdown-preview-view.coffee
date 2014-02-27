@@ -40,7 +40,8 @@ class MarkdownPreviewView extends ScrollView
     @showLoading()
     @file.read().then (contents) =>
       roaster = require 'roaster'
-      roaster contents, (error, html) =>
+      sanitize = true
+      roaster contents, {sanitize}, (error, html) =>
         if error
           @showError(error)
         else
