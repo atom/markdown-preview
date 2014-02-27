@@ -28,5 +28,6 @@ module.exports =
     previousActivePane = atom.workspace.getActivePane()
     uri = "markdown-preview://#{editor.getPath()}"
     atom.workspace.open(uri, split: 'right', searchAllPanes: true).done (markdownPreviewView) ->
-      markdownPreviewView.renderMarkdown()
-      previousActivePane.activate()
+      if markdownPreviewView instanceof MarkdownPreviewView
+        markdownPreviewView.renderMarkdown()
+        previousActivePane.activate()
