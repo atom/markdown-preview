@@ -36,7 +36,7 @@ describe "Markdown preview package", ->
           expect(atom.workspaceView.getPanes()).toHaveLength(1)
           expect(console.warn).toHaveBeenCalled()
 
-    describe "when the editor's path does not exit", ->
+    describe "when the editor's path does not exist", ->
       it "does not show a markdown preview", ->
         spyOn(console, 'warn')
 
@@ -74,6 +74,28 @@ describe "Markdown preview package", ->
         expect(preview).toBeInstanceOf(MarkdownPreviewView)
         expect(preview.getPath()).toBe atom.workspaceView.getActivePaneItem().getPath()
         expect(editorPane).toHaveFocus()
+
+
+    describe "when the path contains a space", ->
+      it "renders the preview", ->
+        waitsForPromise ->
+          atom.workspaceView.open("subdir/file with space.md")
+
+        runs ->
+          atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
+
+        waitsFor ->
+          MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
+
+        runs ->
+          expect(atom.workspaceView.getPanes()).toHaveLength 2
+          [editorPane, previewPane] = atom.workspaceView.getPanes()
+
+          expect(editorPane.items).toHaveLength 2
+          preview = previewPane.getActiveItem()
+          expect(preview).toBeInstanceOf(MarkdownPreviewView)
+          expect(preview.getPath()).toBe atom.workspaceView.getActivePaneItem().getPath()
+          expect(editorPane).toHaveFocus()
 
   describe "when a preview has been created for the file", ->
     [editorPane, previewPane, preview] = []
@@ -153,7 +175,7 @@ describe "Markdown preview package", ->
     describe "when a new grammar is loaded", ->
       it "re-renders the preview", ->
         jasmine.unspy(window, 'setTimeout')
-        atom.packages.activatePackage('language-javascript', sync: true)
+        atom.packages.activatePackage('language-javascript')
 
         waitsFor ->
           MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
