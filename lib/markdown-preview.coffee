@@ -11,7 +11,7 @@ module.exports =
 
     atom.workspace.registerOpener (uriToOpen) ->
       {protocol, pathname} = url.parse(uriToOpen)
-      pathname = querystring.unescape(pathname)
+      pathname = querystring.unescape(pathname) if pathname
       return unless protocol is 'markdown-preview:' and fs.isFileSync(pathname)
       new MarkdownPreviewView(pathname)
 
