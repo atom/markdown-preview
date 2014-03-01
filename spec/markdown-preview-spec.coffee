@@ -118,7 +118,6 @@ describe "Markdown preview package", ->
           expect(preview.getPath()).toBe atom.workspaceView.getActivePaneItem().getPath()
           expect(editorPane).toHaveFocus()
 
-
   describe "when a preview has been created for the file", ->
     [editorPane, previewPane, preview] = []
 
