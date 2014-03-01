@@ -97,6 +97,28 @@ describe "Markdown preview package", ->
           expect(preview.getPath()).toBe atom.workspaceView.getActivePaneItem().getPath()
           expect(editorPane).toHaveFocus()
 
+    describe "when the path contains accented characters", ->
+      it "renders the preview", ->
+        waitsForPromise ->
+          atom.workspaceView.open("subdir/áccéntéd.md")
+
+        runs ->
+          atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
+
+        waitsFor ->
+          MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
+
+        runs ->
+          expect(atom.workspaceView.getPanes()).toHaveLength 2
+          [editorPane, previewPane] = atom.workspaceView.getPanes()
+
+          expect(editorPane.items).toHaveLength 2
+          preview = previewPane.getActiveItem()
+          expect(preview).toBeInstanceOf(MarkdownPreviewView)
+          expect(preview.getPath()).toBe atom.workspaceView.getActivePaneItem().getPath()
+          expect(editorPane).toHaveFocus()
+
+
   describe "when a preview has been created for the file", ->
     [editorPane, previewPane, preview] = []
 
