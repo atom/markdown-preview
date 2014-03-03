@@ -151,7 +151,7 @@ describe "Markdown preview package", ->
         preview = previewPane.getActiveItem()
         MarkdownPreviewView::renderMarkdown.reset()
 
-    it "re-renders and shows the existing preview", ->
+    it "show re-renders and shows the existing preview", ->
       rightPane = previewPane.splitRight()
 
       waitsForPromise ->
@@ -169,6 +169,20 @@ describe "Markdown preview package", ->
         expect(previewPane.getActiveItem()).toBe preview
         expect(rightPane.getActiveItem()).toBeUndefined()
         expect(editorPane).toHaveFocus()
+
+    it "toggle closes the existing preview", ->
+      waitsForPromise ->
+        previewPane.focus()
+        atom.workspace.open()
+
+      runs ->
+        editorPane.focus()
+        atom.workspaceView.getActiveView().trigger 'markdown-preview:toggle'
+
+      runs ->
+        [editorPane, previewPane] = atom.workspaceView.getPanes()
+        expect(editorPane).toHaveFocus()
+        expect(previewPane).toBeUndefined()
 
     describe "when the editor is modified", ->
       describe "when the preview is in the active pane but is not the active item", ->
