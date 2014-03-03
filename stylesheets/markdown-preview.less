@@ -1,3 +1,5 @@
+@import "syntax-variables";
+
 @font-family: "Helvetica Neue", Helvetica, sans-serif;
 .markdown-preview {
   font-family: @font-family;
@@ -404,6 +406,11 @@
     overflow: auto;
     padding: 6px 10px;
     border-radius:3px;
+  }
+
+  pre.editor-colors {
+    background: @syntax-background-color;
+    border: 1px solid darken(@syntax-background-color, 10%);
   }
 
   pre code, pre tt {
