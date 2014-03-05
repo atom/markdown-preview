@@ -10,6 +10,7 @@ module.exports =
       'text.plain'
       'text.plain.null-grammar'
     ]
+
   activate: ->
     atom.workspaceView.command 'markdown-preview:show', =>
       @show()
