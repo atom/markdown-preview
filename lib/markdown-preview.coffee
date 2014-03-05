@@ -18,7 +18,7 @@ module.exports =
     editor = atom.workspace.getActiveEditor()
     return unless editor?
 
-    unless editor.getGrammar().scopeName is "source.gfm"
+    unless editor.getGrammar().scopeName is "source.gfm" or editor.getGrammar().scopeName is "source.litcoffee"
       console.warn("Cannot render markdown for '#{editor.getUri() ? 'untitled'}'")
       return
 
