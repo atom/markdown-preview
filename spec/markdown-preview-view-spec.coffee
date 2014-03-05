@@ -53,6 +53,15 @@ describe "MarkdownPreviewView", ->
         expect(preview.find("pre code:not([class])").children().length).toBe 0
         expect(preview.find("pre code.lang-kombucha").children().length).toBe 0
 
+  describe "html markup", ->
+    beforeEach ->
+      waitsForPromise ->
+        preview.renderMarkdown()
+
+    describe "when the document contains an <u> tag", ->
+      it "doesn't escape the tag", ->
+        expect(preview.find("u")).toExist()
+
   describe "image resolving", ->
     beforeEach ->
       waitsForPromise ->
