@@ -8,53 +8,100 @@ module.exports =
 class MarkdownPreviewView extends ScrollView
   atom.deserializers.add(this)
 
-  @deserialize: ({filePath}) ->
-    new MarkdownPreviewView(filePath)
+  @deserialize: (state) ->
+    new MarkdownPreviewView(state)
 
   @content: ->
     @div class: 'markdown-preview native-key-bindings', tabindex: -1
 
-  constructor: (filePath) ->
+  constructor: ({@editorId, filePath}) ->
     super
-    @file = new File(filePath)
-    @handleEvents()
+
+    if @editorId?
+      @resolveEditor(@editorId)
+    else
+      @file = new File(filePath)
+      @handleEvents()
 
   serialize: ->
     deserializer: 'MarkdownPreviewView'
     filePath: @getPath()
+    editorId: @editorId
 
   destroy: ->
     @unsubscribe()
+
+  resolveEditor: (editorId) ->
+    resolve = =>
+      @editor = @editorForId(editorId)
+      @trigger 'title-changed' if @editor?
+      @handleEvents()
+
+    if atom.workspace?
+      resolve()
+    else
+      process.nextTick =>
+        resolve()
+        @renderMarkdown()
+
+  editorForId: (editorId) ->
+    for editor in atom.workspace.getEditors()
+      return editor if editor.id.toString() is editorId
+    null
 
   handleEvents: ->
     @subscribe atom.syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
     @subscribe this, 'core:move-up', => @scrollUp()
     @subscribe this, 'core:move-down', => @scrollDown()
-    @subscribe @file, 'contents-changed', =>
+
+    changeHandler = =>
+      console.log 'changed!'
       @renderMarkdown()
       pane = atom.workspace.paneForUri(@getUri())
       if pane? and pane isnt atom.workspace.getActivePane()
         pane.activateItem(this)
 
+    if @file?
+      @subscribe(@file, 'contents-changed', changeHandler)
+    else if @editor?
+      console.log 'listening to buffer'
+      @subscribe(@editor.getBuffer(), 'contents-modified', changeHandler)
+
   renderMarkdown: ->
     @showLoading()
-    @file.read().then (contents) =>
-      roaster = require 'roaster'
-      sanitize = true
-      roaster contents, {sanitize}, (error, html) =>
-        if error
-          @showError(error)
-        else
-          @html(@tokenizeCodeBlocks(@resolveImagePaths(html)))
+    if @file?
+      @file.read().then (contents) => @renderMarkdownText(contents)
+    else if @editor?
+      @renderMarkdownText(@editor.getText())
+
+  renderMarkdownText: (text) ->
+    roaster = require 'roaster'
+    sanitize = true
+    roaster text, {sanitize}, (error, html) =>
+      if error
+        @showError(error)
+      else
+        @html(@tokenizeCodeBlocks(@resolveImagePaths(html)))
 
   getTitle: ->
-    "#{path.basename(@getPath())} Preview"
+    if @file?
+      "#{path.basename(@getPath())} Preview"
+    else if @editor?
+      "#{@editor.getTitle()} Preview"
+    else
+      "Markdown Preview"
 
   getUri: ->
-    "markdown-preview://#{@getPath()}"
+    if @file?
+      "markdown-preview://#{@getPath()}"
+    else
+      "markdown-preview://editor/#{@editorId}"
 
   getPath: ->
-    @file.getPath()
+    if @file?
+      @file.getPath()
+    else if @editor?
+      @editor.getPath()
 
   showError: (result) ->
     failureMessage = result?.message
@@ -65,7 +112,7 @@ class MarkdownPreviewView extends ScrollView
 
   showLoading: ->
     @html $$$ ->
-      @div class: 'markdown-spinner', 'Loading Markdown...'
+      @div class: 'markdown-spinner', 'Loading Markdown\u2026'
 
   resolveImagePaths: (html) =>
     html = $(html)

@@ -6,7 +6,7 @@ describe "MarkdownPreviewView", ->
 
   beforeEach ->
     filePath = atom.project.resolve('subdir/file.markdown')
-    preview = new MarkdownPreviewView(filePath)
+    preview = new MarkdownPreviewView({filePath})
 
     waitsForPromise ->
       atom.packages.activatePackage('language-ruby')
