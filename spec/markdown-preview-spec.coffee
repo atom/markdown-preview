@@ -29,7 +29,7 @@ describe "Markdown preview package", ->
 
     it "splits the current pane to the right with a markdown preview for the file", ->
       waitsForPromise ->
-        atom.workspaceView.open("subdir/file.markdown")
+        atom.workspace.open("subdir/file.markdown")
 
       runs ->
         atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
@@ -50,7 +50,7 @@ describe "Markdown preview package", ->
     describe "when the editor's path does not exist", ->
       it "splits the current pane to the right with a markdown preview for the file", ->
         waitsForPromise ->
-          atom.workspaceView.open("new.markdown")
+          atom.workspace.open("new.markdown")
 
         runs ->
           atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
@@ -71,7 +71,7 @@ describe "Markdown preview package", ->
     describe "when the editor does not have a path", ->
       it "splits the current pane to the right with a markdown preview for the file", ->
         waitsForPromise ->
-          atom.workspaceView.open("")
+          atom.workspace.open("")
 
         runs ->
           atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
@@ -92,7 +92,7 @@ describe "Markdown preview package", ->
     describe "when the path contains a space", ->
       it "renders the preview", ->
         waitsForPromise ->
-          atom.workspaceView.open("subdir/file with space.md")
+          atom.workspace.open("subdir/file with space.md")
 
         runs ->
           atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
@@ -113,7 +113,7 @@ describe "Markdown preview package", ->
     describe "when the path contains accented characters", ->
       it "renders the preview", ->
         waitsForPromise ->
-          atom.workspaceView.open("subdir/áccéntéd.md")
+          atom.workspace.open("subdir/áccéntéd.md")
 
         runs ->
           atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
@@ -138,7 +138,7 @@ describe "Markdown preview package", ->
       atom.workspaceView.attachToDom()
 
       waitsForPromise ->
-        atom.workspaceView.open("subdir/file.markdown")
+        atom.workspace.open("subdir/file.markdown")
 
       runs ->
         atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
@@ -176,7 +176,7 @@ describe "Markdown preview package", ->
           previewPane.focus()
 
           waitsForPromise ->
-            atom.workspaceView.open()
+            atom.workspace.open()
 
           runs ->
             atom.workspace.getActiveEditor().setText("Hey!")
@@ -193,7 +193,7 @@ describe "Markdown preview package", ->
           previewPane.focus()
 
           waitsForPromise ->
-            atom.workspaceView.open()
+            atom.workspace.open()
 
           runs ->
             editorPane.focus()
@@ -217,7 +217,7 @@ describe "Markdown preview package", ->
   describe "when the markdown preview view is requested by file URI", ->
     it "opens a preview editor and watches the file for changes", ->
       waitsForPromise ->
-        atom.workspaceView.open("markdown-preview://#{atom.project.resolve('subdir/file.markdown')}")
+        atom.workspace.open("markdown-preview://#{atom.project.resolve('subdir/file.markdown')}")
 
       runs ->
         preview = atom.workspaceView.getActivePaneItem()
@@ -237,7 +237,7 @@ describe "Markdown preview package", ->
       atom.workspaceView.attachToDom()
 
       waitsForPromise ->
-        atom.workspaceView.open("subdir/file.markdown")
+        atom.workspace.open("subdir/file.markdown")
 
       runs ->
         spyOn(atom.workspace, 'open').andCallThrough()
