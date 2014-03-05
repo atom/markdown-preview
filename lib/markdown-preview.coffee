@@ -4,6 +4,12 @@ fs = require 'fs-plus'
 MarkdownPreviewView = require './markdown-preview-view'
 
 module.exports =
+  configDefaults:
+    grammars: [
+      'source.gfm'
+      'text.plain'
+      'text.plain.null-grammar'
+    ]
   activate: ->
     atom.workspaceView.command 'markdown-preview:show', =>
       @show()
@@ -21,6 +27,9 @@ module.exports =
   show: ->
     editor = atom.workspace.getActiveEditor()
     return unless editor?
+
+    grammars = atom.config.get('markdown-preview.grammars') ? []
+    return unless editor.getGrammar().scopeName in grammars
 
     previousActivePane = atom.workspace.getActivePane()
     uri = "markdown-preview://editor/#{editor.id}"
