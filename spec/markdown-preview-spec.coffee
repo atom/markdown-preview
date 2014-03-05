@@ -229,3 +229,17 @@ describe "Markdown preview package", ->
 
       waitsFor ->
         MarkdownPreviewView::renderMarkdown.callCount > 0
+
+  describe "when the editor's grammar it not enabled for preview", ->
+    it "does not open the markdown preview", ->
+      atom.config.set('markdown-preview.grammars', [])
+
+      atom.workspaceView.attachToDom()
+
+      waitsForPromise ->
+        atom.workspaceView.open("subdir/file.markdown")
+
+      runs ->
+        spyOn(atom.workspace, 'open').andCallThrough()
+        atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
+        expect(atom.workspace.open).not.toHaveBeenCalled()
