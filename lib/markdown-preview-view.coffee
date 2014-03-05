@@ -40,7 +40,7 @@ class MarkdownPreviewView extends ScrollView
     if atom.workspace?
       resolve()
     else
-      process.nextTick =>
+      atom.packages.once 'activated', =>
         resolve()
         @renderMarkdown()
 
