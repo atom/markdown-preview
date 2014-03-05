@@ -55,7 +55,6 @@ class MarkdownPreviewView extends ScrollView
     @subscribe this, 'core:move-down', => @scrollDown()
 
     changeHandler = =>
-      console.log 'changed!'
       @renderMarkdown()
       pane = atom.workspace.paneForUri(@getUri())
       if pane? and pane isnt atom.workspace.getActivePane()
@@ -64,7 +63,6 @@ class MarkdownPreviewView extends ScrollView
     if @file?
       @subscribe(@file, 'contents-changed', changeHandler)
     else if @editor?
-      console.log 'listening to buffer'
       @subscribe(@editor.getBuffer(), 'contents-modified', changeHandler)
 
   renderMarkdown: ->

@@ -200,7 +200,7 @@ describe "Markdown preview package", ->
             atom.workspace.getActiveEditor().setText("Hey!")
 
           waitsFor ->
-            MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
+            MarkdownPreviewView::renderMarkdown.callCount > 0
 
           runs ->
             expect(editorPane).toHaveFocus()
@@ -213,3 +213,19 @@ describe "Markdown preview package", ->
 
         waitsFor ->
           MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
+
+  describe "when the markdown preview view is requested by file URI", ->
+    it "opens a preview editor and watches the file for changes", ->
+      waitsForPromise ->
+        atom.workspaceView.open("markdown-preview://#{atom.project.resolve('subdir/file.markdown')}")
+
+      runs ->
+        preview = atom.workspaceView.getActivePaneItem()
+        expect(preview).toBeInstanceOf(MarkdownPreviewView)
+
+        MarkdownPreviewView::renderMarkdown.reset()
+
+        fs.writeFileSync(atom.project.resolve('subdir/file.markdown'), 'changed')
+
+      waitsFor ->
+        MarkdownPreviewView::renderMarkdown.callCount > 0
