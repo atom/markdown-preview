@@ -98,7 +98,7 @@ describe "Markdown preview package", ->
           atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
 
         waitsFor ->
-          MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
+          MarkdownPreviewView::renderMarkdown.callCount > 0
 
         runs ->
           expect(atom.workspaceView.getPanes()).toHaveLength 2
@@ -119,7 +119,7 @@ describe "Markdown preview package", ->
           atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
 
         waitsFor ->
-          MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
+          MarkdownPreviewView::renderMarkdown.callCount > 0
 
         runs ->
           expect(atom.workspaceView.getPanes()).toHaveLength 2
@@ -144,12 +144,12 @@ describe "Markdown preview package", ->
         atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
 
       waitsFor ->
-        MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
+        MarkdownPreviewView::renderMarkdown.callCount > 0
 
       runs ->
         [editorPane, previewPane] = atom.workspaceView.getPanes()
         preview = previewPane.getActiveItem()
-        MarkdownPreviewView.prototype.renderMarkdown.reset()
+        MarkdownPreviewView::renderMarkdown.reset()
 
     it "re-renders and shows the existing preview", ->
       rightPane = previewPane.splitRight()
@@ -163,7 +163,7 @@ describe "Markdown preview package", ->
         atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
 
       waitsFor ->
-        MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
+        MarkdownPreviewView::renderMarkdown.callCount > 0
 
       runs ->
         expect(previewPane.getActiveItem()).toBe preview
@@ -182,7 +182,7 @@ describe "Markdown preview package", ->
             atom.workspace.getActiveEditor().setText("Hey!")
 
           waitsFor ->
-            MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
+            MarkdownPreviewView::renderMarkdown.callCount > 0
 
           runs ->
             expect(previewPane).toHaveFocus()
@@ -212,7 +212,7 @@ describe "Markdown preview package", ->
           atom.packages.activatePackage('language-javascript')
 
         waitsFor ->
-          MarkdownPreviewView.prototype.renderMarkdown.callCount > 0
+          MarkdownPreviewView::renderMarkdown.callCount > 0
 
   describe "when the markdown preview view is requested by file URI", ->
     it "opens a preview editor and watches the file for changes", ->
