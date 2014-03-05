@@ -46,7 +46,7 @@ class MarkdownPreviewView extends ScrollView
 
   editorForId: (editorId) ->
     for editor in atom.workspace.getEditors()
-      return editor if editor.id.toString() is editorId
+      return editor if editor.id?.toString() is editorId.toString()
     null
 
   handleEvents: ->

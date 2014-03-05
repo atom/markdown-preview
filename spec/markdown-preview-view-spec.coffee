@@ -1,10 +1,14 @@
 path = require 'path'
+{WorkspaceView} = require 'atom'
 MarkdownPreviewView = require '../lib/markdown-preview-view'
 
 describe "MarkdownPreviewView", ->
   [file, preview] = []
 
   beforeEach ->
+    atom.workspaceView = new WorkspaceView
+    atom.workspace = atom.workspaceView.model
+
     filePath = atom.project.resolve('subdir/file.markdown')
     preview = new MarkdownPreviewView({filePath})
 
@@ -38,6 +42,19 @@ describe "MarkdownPreviewView", ->
     it "recreates the file when serialized/deserialized", ->
       newPreview = atom.deserializers.deserialize(preview.serialize())
       expect(newPreview.getPath()).toBe preview.getPath()
+
+    it "serializes the editor id when opened for an editor", ->
+      preview.destroy()
+
+      waitsForPromise ->
+        atom.workspace.open('new.markdown')
+
+      runs ->
+        preview = new MarkdownPreviewView({editorId: atom.workspace.getActiveEditor().id})
+        expect(preview.getPath()).toBe atom.workspace.getActiveEditor().getPath()
+
+        newPreview = atom.deserializers.deserialize(preview.serialize())
+        expect(newPreview.getPath()).toBe preview.getPath()
 
   describe "code block tokenization", ->
     beforeEach ->
