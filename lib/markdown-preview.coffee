@@ -16,9 +16,6 @@ module.exports =
     atom.workspaceView.command 'markdown-preview:toggle', =>
       @toggle()
 
-    atom.workspaceView.command 'markdown-preview:show', =>
-      @toggle('show')
-
     atom.workspace.registerOpener (uriToOpen) ->
       {protocol, host, pathname} = url.parse(uriToOpen)
       pathname = decodeURI(pathname) if pathname
@@ -29,7 +26,7 @@ module.exports =
       else
         new MarkdownPreviewView(filePath: pathname)
 
-  toggle: (forceShow) ->
+  toggle: ->
     editor = atom.workspace.getActiveEditor()
     return unless editor?
 
@@ -38,11 +35,10 @@ module.exports =
 
     uri = "markdown-preview://editor/#{editor.id}"
 
-    if not forceShow
-      previewPane = atom.workspace.paneForUri(uri)
-      if previewPane
-        previewPane.destroy()
-        return
+    previewPane = atom.workspace.paneForUri(uri)
+    if previewPane
+      previewPane.destroy()
+      return
 
     previousActivePane = atom.workspace.getActivePane()
     atom.workspace.open(uri, split: 'right', searchAllPanes: true).done (markdownPreviewView) ->

@@ -32,7 +32,7 @@ describe "Markdown preview package", ->
         atom.workspace.open("subdir/file.markdown")
 
       runs ->
-        atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
+        atom.workspaceView.getActiveView().trigger 'markdown-preview:toggle'
 
       waitsFor ->
         MarkdownPreviewView::renderMarkdown.callCount > 0
@@ -53,7 +53,7 @@ describe "Markdown preview package", ->
           atom.workspace.open("new.markdown")
 
         runs ->
-          atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
+          atom.workspaceView.getActiveView().trigger 'markdown-preview:toggle'
 
         waitsFor ->
           MarkdownPreviewView::renderMarkdown.callCount > 0
@@ -74,7 +74,7 @@ describe "Markdown preview package", ->
           atom.workspace.open("")
 
         runs ->
-          atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
+          atom.workspaceView.getActiveView().trigger 'markdown-preview:toggle'
 
         waitsFor ->
           MarkdownPreviewView::renderMarkdown.callCount > 0
@@ -95,7 +95,7 @@ describe "Markdown preview package", ->
           atom.workspace.open("subdir/file with space.md")
 
         runs ->
-          atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
+          atom.workspaceView.getActiveView().trigger 'markdown-preview:toggle'
 
         waitsFor ->
           MarkdownPreviewView::renderMarkdown.callCount > 0
@@ -116,7 +116,7 @@ describe "Markdown preview package", ->
           atom.workspace.open("subdir/áccéntéd.md")
 
         runs ->
-          atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
+          atom.workspaceView.getActiveView().trigger 'markdown-preview:toggle'
 
         waitsFor ->
           MarkdownPreviewView::renderMarkdown.callCount > 0
@@ -141,7 +141,7 @@ describe "Markdown preview package", ->
         atom.workspace.open("subdir/file.markdown")
 
       runs ->
-        atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
+        atom.workspaceView.getActiveView().trigger 'markdown-preview:toggle'
 
       waitsFor ->
         MarkdownPreviewView::renderMarkdown.callCount > 0
@@ -150,25 +150,6 @@ describe "Markdown preview package", ->
         [editorPane, previewPane] = atom.workspaceView.getPanes()
         preview = previewPane.getActiveItem()
         MarkdownPreviewView::renderMarkdown.reset()
-
-    it "show re-renders and shows the existing preview", ->
-      rightPane = previewPane.splitRight()
-
-      waitsForPromise ->
-        previewPane.focus()
-        atom.workspace.open()
-
-      runs ->
-        editorPane.focus()
-        atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
-
-      waitsFor ->
-        MarkdownPreviewView::renderMarkdown.callCount > 0
-
-      runs ->
-        expect(previewPane.getActiveItem()).toBe preview
-        expect(rightPane.getActiveItem()).toBeUndefined()
-        expect(editorPane).toHaveFocus()
 
     it "toggle closes the existing preview", ->
       waitsForPromise ->
@@ -179,7 +160,6 @@ describe "Markdown preview package", ->
         editorPane.focus()
         atom.workspaceView.getActiveView().trigger 'markdown-preview:toggle'
 
-      runs ->
         [editorPane, previewPane] = atom.workspaceView.getPanes()
         expect(editorPane).toHaveFocus()
         expect(previewPane).toBeUndefined()
@@ -255,5 +235,5 @@ describe "Markdown preview package", ->
 
       runs ->
         spyOn(atom.workspace, 'open').andCallThrough()
-        atom.workspaceView.getActiveView().trigger 'markdown-preview:show'
+        atom.workspaceView.getActiveView().trigger 'markdown-preview:toggle'
         expect(atom.workspace.open).not.toHaveBeenCalled()
