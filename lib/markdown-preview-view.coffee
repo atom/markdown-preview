@@ -34,8 +34,14 @@ class MarkdownPreviewView extends ScrollView
   resolveEditor: (editorId) ->
     resolve = =>
       @editor = @editorForId(editorId)
-      @trigger 'title-changed' if @editor?
-      @handleEvents()
+
+      if @editor?
+        @trigger 'title-changed' if @editor?
+        @handleEvents()
+      else
+        # The editor this preview was created for has been closed so close
+        # this preview since a preview cannot be rendered without an editor
+        @parents('.pane').view()?.destroyItem(this) unless @editor?
 
     if atom.workspace?
       resolve()
