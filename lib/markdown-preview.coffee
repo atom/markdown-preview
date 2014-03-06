@@ -7,6 +7,7 @@ module.exports =
   configDefaults:
     grammars: [
       'source.gfm'
+      'source.litcoffee'
       'text.plain'
       'text.plain.null-grammar'
     ]
