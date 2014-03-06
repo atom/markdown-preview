@@ -11,6 +11,8 @@ extensionsByFenceName =
   'json': 'json'
   'less': 'less'
   'mustache': 'mustache'
+  'objc': 'm'
+  'objective-c': 'm'
   'python': 'py'
   'rb': 'rb'
   'ruby': 'rb'
