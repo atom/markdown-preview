@@ -37,7 +37,7 @@ module.exports =
 
     previewPane = atom.workspace.paneForUri(uri)
     if previewPane
-      previewPane.destroy()
+      previewPane.destroyItem(previewPane.itemForUri(uri))
       return
 
     previousActivePane = atom.workspace.getActivePane()
