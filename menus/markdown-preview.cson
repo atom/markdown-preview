@@ -3,8 +3,8 @@
   'submenu': [
     'label': 'Markdown'
     'submenu': [
-      'label': 'Preview Buffer'
-      'command': 'markdown-preview:show'
+      'label': 'Toggle Preview'
+      'command': 'markdown-preview:toggle'
     ]
   ]
 ]

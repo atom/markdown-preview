@@ -1,2 +1,2 @@
 '.workspace':
-  'ctrl-M': 'markdown-preview:show'
+  'ctrl-M': 'markdown-preview:toggle'
