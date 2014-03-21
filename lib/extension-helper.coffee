@@ -5,6 +5,7 @@ extensionsByFenceName =
   'coffee-script': 'coffee'
   'css': 'css'
   'go': 'go'
+  'html': 'html'
   'java': 'java'
   'javascript': 'js'
   'js': 'js'
