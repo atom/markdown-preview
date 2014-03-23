@@ -89,3 +89,24 @@ describe "MarkdownPreviewView", ->
       it "doesn't change the URL", ->
         image = preview.find("img[alt=Image3]")
         expect(image.attr('src')).toBe 'http://github.com/image3.png'
+
+  describe "gfm newlines", ->
+    describe "when gfm newlines are not enabled", ->
+      it "creates a single paragraph with <br>", ->
+        atom.config.set('markdown-preview.gfmNewlines', false)
+
+        waitsForPromise ->
+          preview.renderMarkdown()
+
+        runs ->
+          expect(preview.find("p:last-child br").length).toBe 0
+
+    describe "when gfm newlines are enabled", ->
+      it "creates a single paragraph with no <br>", ->
+        atom.config.set('markdown-preview.gfmNewlines', true)
+
+        waitsForPromise ->
+          preview.renderMarkdown()
+
+        runs ->
+          expect(preview.find("p:last-child br").length).toBe 1

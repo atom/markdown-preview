@@ -29,6 +29,7 @@ class MarkdownPreviewView extends ScrollView
     editorId: @editorId
 
   destroy: ->
+    atom.config.unobserve 'markdown-preview.gfmNewlines'
     @unsubscribe()
 
   resolveEditor: (editorId) ->
@@ -71,6 +72,8 @@ class MarkdownPreviewView extends ScrollView
     else if @editor?
       @subscribe(@editor.getBuffer(), 'contents-modified', changeHandler)
 
+    atom.config.observe 'markdown-preview.gfmNewlines', callNow: false, changeHandler
+
   renderMarkdown: ->
     @showLoading()
     if @file?
@@ -81,7 +84,8 @@ class MarkdownPreviewView extends ScrollView
   renderMarkdownText: (text) ->
     roaster = require 'roaster'
     sanitize = true
-    roaster text, {sanitize}, (error, html) =>
+    breaks = atom.config.get('markdown-preview.gfmNewlines')
+    roaster text, {sanitize, breaks}, (error, html) =>
       if error
         @showError(error)
       else

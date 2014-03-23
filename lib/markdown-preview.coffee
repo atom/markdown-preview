@@ -5,6 +5,7 @@ MarkdownPreviewView = require './markdown-preview-view'
 
 module.exports =
   configDefaults:
+    gfmNewlines: false,
     grammars: [
       'source.gfm'
       'source.litcoffee'
@@ -15,6 +16,9 @@ module.exports =
   activate: ->
     atom.workspaceView.command 'markdown-preview:toggle', =>
       @toggle()
+
+    atom.workspaceView.command 'markdown-preview:toggle-gfm-newlines', =>
+      atom.config.toggle('markdown-preview.gfmNewlines')
 
     atom.workspace.registerOpener (uriToOpen) ->
       {protocol, host, pathname} = url.parse(uriToOpen)
