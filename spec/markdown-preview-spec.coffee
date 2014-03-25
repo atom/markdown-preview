@@ -231,3 +231,28 @@ describe "Markdown preview package", ->
         spyOn(atom.workspace, 'open').andCallThrough()
         atom.workspaceView.getActiveView().trigger 'markdown-preview:toggle'
         expect(atom.workspace.open).not.toHaveBeenCalled()
+
+  describe "when the editor's path changes", ->
+    it "updates the preview's title", ->
+      titleChangedCallback = jasmine.createSpy('titleChangedCallback')
+
+      waitsForPromise ->
+        atom.workspace.open("subdir/file.markdown")
+
+      runs ->
+        atom.workspaceView.getActiveView().trigger 'markdown-preview:toggle'
+
+      waitsFor ->
+        MarkdownPreviewView::renderMarkdown.callCount > 0
+
+      runs ->
+        [editorPane, previewPane] = atom.workspaceView.getPanes()
+        preview = previewPane.getActiveItem()
+        expect(preview.getTitle()).toBe 'file.markdown Preview'
+
+        titleChangedCallback.reset()
+        preview.one('title-changed', titleChangedCallback)
+        fs.renameSync(atom.workspace.getActiveEditor().getPath(), path.join(path.dirname(atom.workspace.getActiveEditor().getPath()), 'file2.md'))
+
+      waitsFor ->
+        titleChangedCallback.callCount is 1

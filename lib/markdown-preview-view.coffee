@@ -70,6 +70,7 @@ class MarkdownPreviewView extends ScrollView
       @subscribe(@file, 'contents-changed', changeHandler)
     else if @editor?
       @subscribe(@editor.getBuffer(), 'contents-modified', changeHandler)
+      @subscribe @editor, 'path-changed', => @trigger 'title-changed'
 
   renderMarkdown: ->
     @showLoading()
