@@ -60,6 +60,17 @@ class MarkdownPreviewView extends ScrollView
     @subscribe this, 'core:move-up', => @scrollUp()
     @subscribe this, 'core:move-down', => @scrollDown()
 
+    @subscribeToCommand atom.workspaceView, 'markdown-preview:zoom-in', =>
+      zoomLevel = parseFloat(@css('zoom')) or 1
+      @css('zoom', zoomLevel + .1)
+
+    @subscribeToCommand atom.workspaceView, 'markdown-preview:zoom-out', =>
+      zoomLevel = parseFloat(@css('zoom')) or 1
+      @css('zoom', zoomLevel - .1)
+
+    @subscribeToCommand atom.workspaceView, 'markdown-preview:reset-zoom', =>
+      @css('zoom', 1)
+
     changeHandler = =>
       @renderMarkdown()
       pane = atom.workspace.paneForUri(@getUri())
