@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "fs-plus": "2.x",
-    "pathwatcher": "0.19.0",
+    "pathwatcher": "^1.0",
     "roaster": ">=1.0.3 <2.0",
     "temp": "0.6.x",
     "underscore-plus": "1.x",
