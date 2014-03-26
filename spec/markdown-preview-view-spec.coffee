@@ -93,7 +93,7 @@ describe "MarkdownPreviewView", ->
   describe "gfm newlines", ->
     describe "when gfm newlines are not enabled", ->
       it "creates a single paragraph with <br>", ->
-        atom.config.set('markdown-preview.lineBreaksOnSingleNewlines', false)
+        atom.config.set('markdown-preview.breakOnSingleNewline', false)
 
         waitsForPromise ->
           preview.renderMarkdown()
@@ -103,7 +103,7 @@ describe "MarkdownPreviewView", ->
 
     describe "when gfm newlines are enabled", ->
       it "creates a single paragraph with no <br>", ->
-        atom.config.set('markdown-preview.lineBreaksOnSingleNewlines', true)
+        atom.config.set('markdown-preview.breakOnSingleNewline', true)
 
         waitsForPromise ->
           preview.renderMarkdown()
