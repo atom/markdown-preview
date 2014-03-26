@@ -83,6 +83,8 @@ class MarkdownPreviewView extends ScrollView
       @subscribe(@editor.getBuffer(), 'contents-modified', changeHandler)
       @subscribe @editor, 'path-changed', => @trigger 'title-changed'
 
+    @subscribe atom.config.observe 'markdown-preview.breakOnSingleNewline', callNow: false, changeHandler
+
   renderMarkdown: ->
     @showLoading()
     if @file?
@@ -93,7 +95,8 @@ class MarkdownPreviewView extends ScrollView
   renderMarkdownText: (text) ->
     roaster = require 'roaster'
     sanitize = true
-    roaster text, {sanitize}, (error, html) =>
+    breaks = atom.config.get('markdown-preview.breakOnSingleNewline')
+    roaster text, {sanitize, breaks}, (error, html) =>
       if error
         @showError(error)
       else

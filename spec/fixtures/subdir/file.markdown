@@ -24,3 +24,6 @@ drink-that-stuff:
 ![Image2](/tmp/image2.png)
 
 ![Image3](http://github.com/image3.png)
+
+lorem
+ipsum
