@@ -5,7 +5,7 @@ MarkdownPreviewView = require './markdown-preview-view'
 
 module.exports =
   configDefaults:
-    lineBreaksOnSingleNewlines: false,
+    lineBreaksOnSingleNewlines: false
     grammars: [
       'source.gfm'
       'source.litcoffee'
@@ -17,7 +17,7 @@ module.exports =
     atom.workspaceView.command 'markdown-preview:toggle', =>
       @toggle()
 
-    atom.workspaceView.command 'markdown-preview:toggle-line-breaks-on-single-newlines', =>
+    atom.workspaceView.command 'markdown-preview:toggle-line-breaks-on-single-newlines', ->
       atom.config.toggle('markdown-preview.lineBreaksOnSingleNewlines')
 
     atom.workspace.registerOpener (uriToOpen) ->

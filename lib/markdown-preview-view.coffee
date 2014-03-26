@@ -29,7 +29,6 @@ class MarkdownPreviewView extends ScrollView
     editorId: @editorId
 
   destroy: ->
-    atom.config.unobserve 'markdown-preview.lineBreaksOnSingleNewlines'
     @unsubscribe()
 
   resolveEditor: (editorId) ->
@@ -72,7 +71,7 @@ class MarkdownPreviewView extends ScrollView
     else if @editor?
       @subscribe(@editor.getBuffer(), 'contents-modified', changeHandler)
 
-    atom.config.observe 'markdown-preview.lineBreaksOnSingleNewlines', callNow: false, changeHandler
+    @subscribe atom.config.observe 'markdown-preview.lineBreaksOnSingleNewlines', callNow: false, changeHandler
 
   renderMarkdown: ->
     @showLoading()
