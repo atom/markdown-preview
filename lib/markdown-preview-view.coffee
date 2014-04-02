@@ -101,6 +101,7 @@ class MarkdownPreviewView extends ScrollView
         @showError(error)
       else
         @html(@tokenizeCodeBlocks(@resolveImagePaths(html)))
+        @trigger('markdown-preview:markdown-changed')
 
   getTitle: ->
     if @file?
