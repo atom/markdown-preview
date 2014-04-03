@@ -208,6 +208,7 @@ describe "Markdown preview package", ->
         atom.workspace.open("markdown-preview://#{atom.project.resolve('subdir/file.markdown')}")
 
       runs ->
+        expect(MarkdownPreviewView::renderMarkdown.callCount).toBeGreaterThan 0
         preview = atom.workspaceView.getActivePaneItem()
         expect(preview).toBeInstanceOf(MarkdownPreviewView)
 

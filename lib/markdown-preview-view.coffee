@@ -22,6 +22,7 @@ class MarkdownPreviewView extends ScrollView
     else
       @file = new File(filePath)
       @handleEvents()
+      @renderMarkdown()
 
   serialize: ->
     deserializer: 'MarkdownPreviewView'
