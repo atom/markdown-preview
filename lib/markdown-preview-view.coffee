@@ -166,7 +166,7 @@ class MarkdownPreviewView extends ScrollView
       codeBlock.empty()
 
       for tokens in grammar.tokenizeLines(text).slice(0, -1)
-        lineText = (token.value for token in tokens).join('')
+        lineText = _.pluck(tokens, 'value').join('')
         htmlEolInvisibles = ''
         codeBlock.append(EditorView.buildLineHtml({tokens, text: lineText, htmlEolInvisibles}))
 
