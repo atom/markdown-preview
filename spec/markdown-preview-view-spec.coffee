@@ -70,6 +70,13 @@ describe "MarkdownPreviewView", ->
         expect(preview.find("pre code:not([class])").children().length).toBe 0
         expect(preview.find("pre code.lang-kombucha").children().length).toBe 0
 
+    describe "when the code block contains empty lines", ->
+      it "doesn't remove the empty lines", ->
+        expect(preview.find("pre code.lang-python").children().length).toBe 6
+        expect(preview.find("pre code.lang-python div:nth-child(2)").html()).toBe '&nbsp;'
+        expect(preview.find("pre code.lang-python div:nth-child(4)").html()).toBe '&nbsp;'
+        expect(preview.find("pre code.lang-python div:nth-child(5)").html()).toBe '&nbsp;'
+
   describe "image resolving", ->
     beforeEach ->
       waitsForPromise ->

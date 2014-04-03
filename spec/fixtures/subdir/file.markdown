@@ -19,6 +19,15 @@ drink-that-stuff:
   tastes-weird~
 ```
 
+```python
+def foo()
+
+  bar
+
+
+  baz
+```
+
 ![Image1](image1.png)
 
 ![Image2](/tmp/image2.png)

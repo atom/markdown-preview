@@ -165,7 +165,10 @@ class MarkdownPreviewView extends ScrollView
       grammar = atom.syntax.selectGrammar("foo.#{extension}", text)
 
       codeBlock.empty()
-      for tokens in grammar.tokenizeLines(text)
-        codeBlock.append(EditorView.buildLineHtml({ tokens, text }))
+
+      for tokens in grammar.tokenizeLines(text).slice(0, -1)
+        lineText = _.pluck(tokens, 'value').join('')
+        htmlEolInvisibles = ''
+        codeBlock.append(EditorView.buildLineHtml({tokens, text: lineText, htmlEolInvisibles}))
 
     html
