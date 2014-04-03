@@ -20,9 +20,11 @@ class MarkdownPreviewView extends ScrollView
     if @editorId?
       @resolveEditor(@editorId)
     else
-      @file = new File(filePath)
-      @handleEvents()
-      @renderMarkdown()
+      if atom.workspace?
+        @subscribeToFilePath(filePath)
+      else
+        @subscribe atom.packages.once 'activated', =>
+          @subscribeToFilePath(filePath)
 
   serialize: ->
     deserializer: 'MarkdownPreviewView'
@@ -31,6 +33,12 @@ class MarkdownPreviewView extends ScrollView
 
   destroy: ->
     @unsubscribe()
+
+  subscribeToFilePath: (filePath) ->
+    @file = new File(filePath)
+    @trigger 'title-changed'
+    @handleEvents()
+    @renderMarkdown()
 
   resolveEditor: (editorId) ->
     resolve = =>
@@ -47,7 +55,7 @@ class MarkdownPreviewView extends ScrollView
     if atom.workspace?
       resolve()
     else
-      atom.packages.once 'activated', =>
+      @subscribe atom.packages.once 'activated', =>
         resolve()
         @renderMarkdown()
 
