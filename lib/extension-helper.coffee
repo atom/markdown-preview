@@ -20,6 +20,8 @@ extensionsByFenceName =
   'sh': 'sh'
   'toml': 'toml'
   'xml': 'xml'
+  'yaml': 'yaml'
+  'yml': 'yaml'
 
 module.exports =
   extensionForFenceName: (fenceName) ->
