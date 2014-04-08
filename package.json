@@ -1,6 +1,6 @@
 {
   "name": "markdown-preview",
-  "version": "0.59.0",
+  "version": "0.60.0",
   "main": "./lib/markdown-preview",
   "description": "Open a rendered version of the Markdown in the current editor with `ctrl-shift-m`.",
   "repository": "https://github.com/atom/markdown-preview",
