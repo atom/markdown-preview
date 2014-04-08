@@ -145,9 +145,7 @@ class MarkdownPreviewView extends ScrollView
 
   resolveImagePaths: (html) =>
     html = $(html)
-    imgList = html.find("img")
-
-    for imgElement in imgList
+    for imgElement in html.find("img")
       img = $(imgElement)
       src = img.attr('src')
       continue if src.match /^(https?:\/\/)/
@@ -157,9 +155,7 @@ class MarkdownPreviewView extends ScrollView
 
   tokenizeCodeBlocks: (html) =>
     html = $(html)
-    preList = $(html.filter("pre"))
-
-    for preElement in preList.toArray()
+    for preElement in html.filter("pre")
       $(preElement).addClass("editor-colors")
       codeBlock = $(preElement.firstChild)
 
