@@ -155,6 +155,10 @@ class MarkdownPreviewView extends ScrollView
 
   tokenizeCodeBlocks: (html) =>
     html = $(html)
+
+    if fontFamily = atom.config.get('editor.fontFamily')
+      $(html).find('code').css('font-family', fontFamily)
+
     for preElement in html.filter("pre")
       $(preElement).addClass("editor-colors")
       codeBlock = $(preElement.firstChild)
