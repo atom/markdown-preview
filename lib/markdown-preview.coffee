@@ -21,9 +21,17 @@ module.exports =
       atom.config.toggle('markdown-preview.breakOnSingleNewline')
 
     atom.workspace.registerOpener (uriToOpen) ->
-      {protocol, host, pathname} = url.parse(uriToOpen)
-      pathname = decodeURI(pathname) if pathname
+      try
+        {protocol, host, pathname} = url.parse(uriToOpen)
+      catch error
+        return
+
       return unless protocol is 'markdown-preview:'
+
+      try
+        pathname = decodeURI(pathname) if pathname
+      catch error
+        return
 
       if host is 'editor'
         new MarkdownPreviewView(editorId: pathname.substring(1))

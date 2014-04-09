@@ -257,3 +257,12 @@ describe "Markdown preview package", ->
 
       waitsFor ->
         titleChangedCallback.callCount is 1
+
+
+  describe "when the URI opened does not have a markdown-preview protocol", ->
+    it "does not throw an error trying to decode the URI (regression)", ->
+      waitsForPromise ->
+        atom.workspace.open('%')
+
+      runs ->
+        expect(atom.workspace.getActiveEditor()).toBeTruthy()
