@@ -103,7 +103,7 @@ class MarkdownPreviewView extends ScrollView
 
   renderMarkdownText: (text) ->
     roaster = require 'roaster'
-    sanitize = true
+    sanitize = false
     breaks = atom.config.get('markdown-preview.breakOnSingleNewline')
     roaster text, {sanitize, breaks}, (error, html) =>
       if error
