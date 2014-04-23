@@ -156,6 +156,7 @@ class MarkdownPreviewView extends ScrollView
     selection = window.getSelection()
     selectedText = selection.toString()
     return false if selectedText and selection.baseNode? and selection.baseNode isnt @[0] and not $.contains(@[0], selection.baseNode)
+
     atom.clipboard.write(@[0].innerHTML)
     true
 
