@@ -16,7 +16,7 @@ exports.toHtml = (text, filePath, callback) ->
     else
       callback(null, tokenizeCodeBlocks(resolveImagePaths(html, filePath)))
 
-exports.toString = (text, filePath, callback) ->
+exports.toText = (text, filePath, callback) ->
   exports.toHtml text, filePath, (error, html) ->
     if error
       callback(error)
