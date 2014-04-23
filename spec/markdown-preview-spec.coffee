@@ -266,3 +266,21 @@ describe "Markdown preview package", ->
 
       runs ->
         expect(atom.workspace.getActiveEditor()).toBeTruthy()
+
+  describe "when markdown-preview:copy-html is triggered", ->
+    it "copies the HTML to the clipboard", ->
+      waitsForPromise ->
+        atom.workspace.open("subdir/simple.md")
+
+      runs ->
+        atom.workspaceView.getActiveView().trigger 'markdown-preview:copy-html'
+        expect(atom.clipboard.read()).toBe """
+          <p><em>italic</em></p>
+          <p><strong>bold</strong></p>
+        """
+
+        atom.workspace.getActiveEditor().setSelectedBufferRange [[0, 0], [1, 0]]
+        atom.workspaceView.getActiveView().trigger 'markdown-preview:copy-html'
+        expect(atom.clipboard.read()).toBe """
+          <p><em>italic</em></p>
+        """

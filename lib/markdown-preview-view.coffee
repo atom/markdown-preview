@@ -1,8 +1,11 @@
 path = require 'path'
-{$, $$$, EditorView, ScrollView} = require 'atom'
+
+{$, $$$, ScrollView} = require 'atom'
 _ = require 'underscore-plus'
+fs = require 'fs-plus'
 {File} = require 'pathwatcher'
-{extensionForFenceName} = require './extension-helper'
+
+renderer = require './renderer'
 
 module.exports =
 class MarkdownPreviewView extends ScrollView
@@ -68,6 +71,11 @@ class MarkdownPreviewView extends ScrollView
     @subscribe atom.syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
     @subscribe this, 'core:move-up', => @scrollUp()
     @subscribe this, 'core:move-down', => @scrollDown()
+    @subscribe this, 'core:save-as', =>
+      @saveAs()
+      false
+    @subscribe this, 'core:copy', =>
+      return false if @copyToClipboard()
 
     @subscribeToCommand atom.workspaceView, 'markdown-preview:zoom-in', =>
       zoomLevel = parseFloat(@css('zoom')) or 1
@@ -102,14 +110,12 @@ class MarkdownPreviewView extends ScrollView
       @renderMarkdownText(@editor.getText())
 
   renderMarkdownText: (text) ->
-    roaster = require 'roaster'
-    sanitize = true
-    breaks = atom.config.get('markdown-preview.breakOnSingleNewline')
-    roaster text, {sanitize, breaks}, (error, html) =>
+    renderer.toHtml text, @getPath(), (error, html) =>
       if error
         @showError(error)
       else
-        @html(@tokenizeCodeBlocks(@resolveImagePaths(html)))
+        @loading = false
+        @html(html)
         @trigger('markdown-preview:markdown-changed')
 
   getTitle: ->
@@ -140,44 +146,31 @@ class MarkdownPreviewView extends ScrollView
       @h3 failureMessage if failureMessage?
 
   showLoading: ->
+    @loading = true
     @html $$$ ->
       @div class: 'markdown-spinner', 'Loading Markdown\u2026'
 
-  resolveImagePaths: (html) =>
-    html = $(html)
-    for imgElement in html.find("img")
-      img = $(imgElement)
-      src = img.attr('src')
-      continue if src.match /^(https?:\/\/)/
-      img.attr('src', path.resolve(path.dirname(@getPath()), src))
+  copyToClipboard: ->
+    return false if @loading
 
-    html
+    selection = window.getSelection()
+    selectedText = selection.toString()
+    return false if selectedText and selection.baseNode? and selection.baseNode isnt @[0] and not $.contains(@[0], selection.baseNode)
 
-  tokenizeCodeBlocks: (html) =>
-    html = $(html)
+    atom.clipboard.write(@[0].innerHTML)
+    true
 
-    if fontFamily = atom.config.get('editor.fontFamily')
-      $(html).find('code').css('font-family', fontFamily)
+  saveAs: ->
+    return if @loading
 
-    for preElement in html.filter("pre")
-      $(preElement).addClass("editor-colors")
-      codeBlock = $(preElement.firstChild)
+    filePath = @getPath()
+    if filePath
+      filePath += '.html'
+    else
+      filePath = 'untitled.md.html'
+      if projectPath = atom.project.getPath()
+        filePath = path.join(projectPath, filePath)
 
-      # go to next block unless this one has a class
-      continue unless className = codeBlock.attr('class')
-
-      fenceName = className.replace(/^lang-/, '')
-      # go to next block unless the class name matches `lang`
-      continue unless extension = extensionForFenceName(fenceName)
-      text = codeBlock.text()
-
-      grammar = atom.syntax.selectGrammar("foo.#{extension}", text)
-
-      codeBlock.empty()
-
-      for tokens in grammar.tokenizeLines(text).slice(0, -1)
-        lineText = _.pluck(tokens, 'value').join('')
-        htmlEolInvisibles = ''
-        codeBlock.append(EditorView.buildLineHtml({tokens, text: lineText, htmlEolInvisibles}))
-
-    html
+    if htmlFilePath = atom.showSaveDialogSync(filePath)
+      fs.writeFileSync(htmlFilePath, @[0].innerHTML)
+      atom.workspace.open(htmlFilePath)

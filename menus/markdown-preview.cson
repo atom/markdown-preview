@@ -8,3 +8,8 @@
     ]
   ]
 ]
+
+'context-menu':
+  '.markdown-preview':
+    'Copy': 'core:copy'
+    'Save As HTML\u2026': 'core:save-as'
