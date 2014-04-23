@@ -2,6 +2,7 @@ path = require 'path'
 
 {$$$, ScrollView} = require 'atom'
 _ = require 'underscore-plus'
+fs = require 'fs-plus'
 {File} = require 'pathwatcher'
 
 renderer = require './renderer'
@@ -70,6 +71,7 @@ class MarkdownPreviewView extends ScrollView
     @subscribe atom.syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
     @subscribe this, 'core:move-up', => @scrollUp()
     @subscribe this, 'core:move-down', => @scrollDown()
+    @subscribe this, 'core:save-as', => @saveAs(); false
 
     @subscribeToCommand atom.workspaceView, 'markdown-preview:zoom-in', =>
       zoomLevel = parseFloat(@css('zoom')) or 1
@@ -108,6 +110,7 @@ class MarkdownPreviewView extends ScrollView
       if error
         @showError(error)
       else
+        @loading = false
         @html(html)
         @trigger('markdown-preview:markdown-changed')
 
@@ -139,5 +142,21 @@ class MarkdownPreviewView extends ScrollView
       @h3 failureMessage if failureMessage?
 
   showLoading: ->
+    @loading = true
     @html $$$ ->
       @div class: 'markdown-spinner', 'Loading Markdown\u2026'
+
+  saveAs: ->
+    return if @loading
+
+    filePath = @getPath()
+    if filePath
+      filePath += '.html'
+    else
+      filePath = 'untitled.md.html'
+      if projectPath = atom.project.getPath()
+        filePath = path.join(projectPath, filePath)
+
+    if htmlFilePath = atom.showSaveDialogSync(filePath)
+      fs.writeFileSync(htmlFilePath, @[0].innerHTML)
+      atom.workspace.open(htmlFilePath)

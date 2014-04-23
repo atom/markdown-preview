@@ -1,5 +1,7 @@
 path = require 'path'
 {WorkspaceView} = require 'atom'
+fs = require 'fs-plus'
+temp = require 'temp'
 MarkdownPreviewView = require '../lib/markdown-preview-view'
 
 describe "MarkdownPreviewView", ->
@@ -117,3 +119,23 @@ describe "MarkdownPreviewView", ->
 
         runs ->
           expect(preview.find("p:last-child br").length).toBe 1
+
+  describe "when core:save-as is triggered", ->
+    it "saves the rendered HTML and opens it", ->
+      outputPath = temp.path(suffix: '.html')
+      expect(fs.isFileSync(outputPath)).toBe false
+
+      waitsForPromise ->
+        preview.renderMarkdown()
+
+      runs ->
+        spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
+        preview.trigger 'core:save-as'
+        outputPath = fs.realpathSync(outputPath)
+        expect(fs.isFileSync(outputPath)).toBe true
+
+      waitsFor ->
+        atom.workspace.getActiveEditor()?.getPath() is outputPath
+
+      runs ->
+        expect(atom.workspace.getActiveEditor().getText().length).toBeGreaterThan 0
