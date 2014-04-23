@@ -278,3 +278,9 @@ describe "Markdown preview package", ->
           <p><em>italic</em></p>
           <p><strong>bold</strong></p>
         """
+
+        atom.workspace.getActiveEditor().setSelectedBufferRange [[0, 0], [1, 0]]
+        atom.workspaceView.getActiveView().trigger 'markdown-preview:copy-html'
+        expect(atom.clipboard.read()).toBe """
+          <p><em>italic</em></p>
+        """

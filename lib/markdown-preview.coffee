@@ -67,7 +67,8 @@ module.exports =
     return unless editor?
 
     renderer ?= require './renderer'
-    renderer.toString editor.getText(), editor.getPath(), (error, html) =>
+    text = editor.getSelectedText() or editor.getText()
+    renderer.toString text, editor.getPath(), (error, html) =>
       if error
         console.warn('Copying Markdown as HTML failed', error)
       else
