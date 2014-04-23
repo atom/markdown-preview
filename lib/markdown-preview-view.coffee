@@ -1,6 +1,6 @@
 path = require 'path'
 
-{$$$, ScrollView} = require 'atom'
+{$, $$$, ScrollView} = require 'atom'
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
 {File} = require 'pathwatcher'
@@ -71,7 +71,11 @@ class MarkdownPreviewView extends ScrollView
     @subscribe atom.syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
     @subscribe this, 'core:move-up', => @scrollUp()
     @subscribe this, 'core:move-down', => @scrollDown()
-    @subscribe this, 'core:save-as', => @saveAs(); false
+    @subscribe this, 'core:save-as', =>
+      @saveAs()
+      false
+    @subscribe this, 'core:copy', =>
+      return false if @copyToClipboard()
 
     @subscribeToCommand atom.workspaceView, 'markdown-preview:zoom-in', =>
       zoomLevel = parseFloat(@css('zoom')) or 1
@@ -145,6 +149,15 @@ class MarkdownPreviewView extends ScrollView
     @loading = true
     @html $$$ ->
       @div class: 'markdown-spinner', 'Loading Markdown\u2026'
+
+  copyToClipboard: ->
+    return false if @loading
+
+    selection = window.getSelection()
+    selectedText = selection.toString()
+    return false if selectedText and selection.baseNode? and selection.baseNode isnt @[0] and not $.contains(@[0], selection.baseNode)
+    atom.clipboard.write(@[0].innerHTML)
+    true
 
   saveAs: ->
     return if @loading
