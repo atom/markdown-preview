@@ -275,5 +275,6 @@ describe "Markdown preview package", ->
       runs ->
         atom.workspaceView.getActiveView().trigger 'markdown-preview:copy-html'
         expect(atom.clipboard.read()).toBe """
-          <p><em>italic</em></p><p><strong>bold</strong></p>
+          <p><em>italic</em></p>
+          <p><strong>bold</strong></p>
         """

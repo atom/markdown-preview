@@ -21,8 +21,7 @@ exports.toString = (text, filePath, callback) ->
     if error
       callback(error)
     else
-      string = ''
-      string += node.outerHTML ? '' for node in html
+      string = $(document.createElement('div')).append(html)[0].innerHTML
       callback(error, string)
 
 resolveImagePaths = (html, filePath) ->
