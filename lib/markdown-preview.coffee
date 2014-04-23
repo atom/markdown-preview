@@ -2,6 +2,7 @@ url = require 'url'
 fs = require 'fs-plus'
 
 MarkdownPreviewView = require './markdown-preview-view'
+renderer = null # Defer until used
 
 module.exports =
   configDefaults:
@@ -16,6 +17,9 @@ module.exports =
   activate: ->
     atom.workspaceView.command 'markdown-preview:toggle', =>
       @toggle()
+
+    atom.workspaceView.command 'markdown-preview:copy-html', =>
+      @copyHtml()
 
     atom.workspaceView.command 'markdown-preview:toggle-break-on-single-newline', ->
       atom.config.toggle('markdown-preview.breakOnSingleNewline')
@@ -57,3 +61,14 @@ module.exports =
       if markdownPreviewView instanceof MarkdownPreviewView
         markdownPreviewView.renderMarkdown()
         previousActivePane.activate()
+
+  copyHtml: ->
+    editor = atom.workspace.getActiveEditor()
+    return unless editor?
+
+    renderer ?= require './renderer'
+    renderer.toString editor.getText(), editor.getPath(), (error, html) =>
+      if error
+        console.warn('Copying Markdown as HTML failed', error)
+      else
+        atom.clipboard.write(html)
