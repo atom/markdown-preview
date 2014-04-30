@@ -1,4 +1,4 @@
-# Markdown Preview package
+# Markdown Preview package [![Build Status](https://travis-ci.org/atom/markdown-preview.svg?branch=master)](https://travis-ci.org/atom/markdown-preview)
 
 Show the rendered HTML markdown to the right of the current editor using
 `ctrl-shift-m`
