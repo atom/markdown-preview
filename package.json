@@ -11,7 +11,7 @@
   "dependencies": {
     "fs-plus": "2.x",
     "pathwatcher": "^1.0",
-    "roaster": "^1.0.4",
+    "roaster": "^1.0.6",
     "temp": "0.6.x",
     "underscore-plus": "1.x",
     "wrench": "1.5.x"
