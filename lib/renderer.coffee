@@ -1,5 +1,6 @@
 path = require 'path'
 _ = require 'underscore-plus'
+cheerio = require 'cheerio'
 {$, EditorView} = require 'atom'
 roaster = null # Defer until used
 {extensionForFenceName} = require './extension-helper'
@@ -7,14 +8,17 @@ roaster = null # Defer until used
 exports.toHtml = (text, filePath, callback) ->
   roaster ?= require 'roaster'
   options =
-    sanitize: true
+    sanitize: false
     breaks: atom.config.get('markdown-preview.breakOnSingleNewline')
 
   roaster text, options, (error, html) =>
     if error
       callback(error)
     else
-      callback(null, tokenizeCodeBlocks(resolveImagePaths(html, filePath)))
+      html = sanitize(html)
+      html = resolveImagePaths(html, filePath)
+      html = tokenizeCodeBlocks(html)
+      callback(null, html)
 
 exports.toText = (text, filePath, callback) ->
   exports.toHtml text, filePath, (error, html) ->
@@ -24,13 +28,43 @@ exports.toText = (text, filePath, callback) ->
       string = $(document.createElement('div')).append(html)[0].innerHTML
       callback(error, string)
 
+sanitize = (html) ->
+  o = cheerio.load(html)
+  o('script').remove()
+  attributesToRemove = [
+    'onabort'
+    'onblur'
+    'onchange'
+    'onclick'
+    'ondbclick'
+    'onerror'
+    'onfocus'
+    'onkeydown'
+    'onkeypress'
+    'onkeyup'
+    'onload'
+    'onmousedown'
+    'onmousemove'
+    'onmouseover'
+    'onmouseout'
+    'onmouseup'
+    'onreset'
+    'onresize'
+    'onscroll'
+    'onselect'
+    'onsubmit'
+    'onunload'
+  ]
+  o('*').removeAttr(attribute) for attribute in attributesToRemove
+  o.html()
+
 resolveImagePaths = (html, filePath) ->
   html = $(html)
   for imgElement in html.find("img")
     img = $(imgElement)
-    src = img.attr('src')
-    continue if src.match /^(https?:\/\/)/
-    img.attr('src', path.resolve(path.dirname(filePath), src))
+    if src = img.attr('src')
+      continue if src.match /^(https?:\/\/)/
+      img.attr('src', path.resolve(path.dirname(filePath), src))
 
   html
 

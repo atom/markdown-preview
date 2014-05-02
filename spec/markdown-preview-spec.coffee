@@ -15,7 +15,7 @@ describe "Markdown preview package", ->
 
     atom.workspaceView = new WorkspaceView
     atom.workspace = atom.workspaceView.model
-    spyOn(MarkdownPreviewView.prototype, 'renderMarkdown')
+    spyOn(MarkdownPreviewView.prototype, 'renderMarkdown').andCallThrough()
 
     waitsForPromise ->
       atom.packages.activatePackage("markdown-preview")
@@ -283,4 +283,26 @@ describe "Markdown preview package", ->
         atom.workspaceView.getActiveView().trigger 'markdown-preview:copy-html'
         expect(atom.clipboard.read()).toBe """
           <p><em>italic</em></p>
+        """
+
+  describe "sanitization", ->
+    it "removes script tags and attributes that commonly contain inline scripts", ->
+      waitsForPromise ->
+        atom.workspace.open("subdir/evil.md")
+
+      runs ->
+        atom.workspaceView.getActiveView().trigger 'markdown-preview:toggle'
+
+      waitsFor ->
+        MarkdownPreviewView::renderMarkdown.callCount > 0
+
+      runs ->
+        [editorPane, previewPane] = atom.workspaceView.getPanes()
+        preview = previewPane.getActiveItem()
+        expect(preview[0].innerHTML).toBe """
+          <p>hello</p>
+          <p></p>
+          <p>
+          <img>
+          world</p>
         """
