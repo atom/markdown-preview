@@ -29,7 +29,33 @@ exports.toText = (text, filePath, callback) ->
 sanitize = (html) ->
   o = cheerio.load(html)
   o('script').remove()
-  o('img').removeAttr('onload').removeAttr('onerror')
+
+  attributesToRemove = [
+    'onabort'
+    'onblur'
+    'onchange'
+    'onclick'
+    'ondbclick'
+    'onerror'
+    'onfocus'
+    'onkeydown'
+    'onkeypress'
+    'onkeyup'
+    'onload'
+    'onmousedown'
+    'onmousemove'
+    'onmouseover'
+    'onmouseout'
+    'onmouseup'
+    'onreset'
+    'onresize'
+    'onscroll'
+    'onselect'
+    'onsubmit'
+    'onunload'
+  ]
+  o('*').removeAttr(attribute) for attribute in attributesToRemove
+
   o.html()
 
 resolveImagePaths = (html, filePath) ->
