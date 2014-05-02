@@ -9,6 +9,7 @@
     "atom": "*"
   },
   "dependencies": {
+    "cheerio": "0.15.0",
     "fs-plus": "2.x",
     "pathwatcher": "^1.0",
     "roaster": "^1.0.6",

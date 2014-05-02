@@ -1,20 +1,22 @@
 path = require 'path'
 _ = require 'underscore-plus'
+cheerio = require 'cheerio'
 {$, EditorView} = require 'atom'
 roaster = null # Defer until used
 {extensionForFenceName} = require './extension-helper'
 
 exports.toHtml = (text, filePath, callback) ->
   roaster ?= require 'roaster'
-  options =
-    sanitize: true
-    breaks: atom.config.get('markdown-preview.breakOnSingleNewline')
+  options = breaks: atom.config.get('markdown-preview.breakOnSingleNewline')
 
   roaster text, options, (error, html) =>
     if error
       callback(error)
     else
-      callback(null, tokenizeCodeBlocks(resolveImagePaths(html, filePath)))
+      html = sanitize(html)
+      html = resolveImagePaths(html, filePath)
+      html = tokenizeCodeBlocks(html)
+      callback(null, html)
 
 exports.toText = (text, filePath, callback) ->
   exports.toHtml text, filePath, (error, html) ->
@@ -23,6 +25,12 @@ exports.toText = (text, filePath, callback) ->
     else
       string = $(document.createElement('div')).append(html)[0].innerHTML
       callback(error, string)
+
+sanitize = (html) ->
+  o = cheerio.load(html)
+  o('script').remove()
+  o('img').removeAttr('onload').removeAttr('onerror')
+  o.html()
 
 resolveImagePaths = (html, filePath) ->
   html = $(html)
