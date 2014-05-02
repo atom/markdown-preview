@@ -7,7 +7,9 @@ roaster = null # Defer until used
 
 exports.toHtml = (text, filePath, callback) ->
   roaster ?= require 'roaster'
-  options = breaks: atom.config.get('markdown-preview.breakOnSingleNewline')
+  options =
+    sanitize: false
+    breaks: atom.config.get('markdown-preview.breakOnSingleNewline')
 
   roaster text, options, (error, html) =>
     if error
