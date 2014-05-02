@@ -126,6 +126,9 @@ class MarkdownPreviewView extends ScrollView
     else
       "Markdown Preview"
 
+  getIconName: ->
+    "markdown"
+
   getUri: ->
     if @file?
       "markdown-preview://#{@getPath()}"
