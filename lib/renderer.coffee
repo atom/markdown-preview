@@ -29,7 +29,6 @@ exports.toText = (text, filePath, callback) ->
 sanitize = (html) ->
   o = cheerio.load(html)
   o('script').remove()
-
   attributesToRemove = [
     'onabort'
     'onblur'
@@ -55,7 +54,6 @@ sanitize = (html) ->
     'onunload'
   ]
   o('*').removeAttr(attribute) for attribute in attributesToRemove
-
   o.html()
 
 resolveImagePaths = (html, filePath) ->
