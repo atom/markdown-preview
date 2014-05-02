@@ -60,9 +60,9 @@ resolveImagePaths = (html, filePath) ->
   html = $(html)
   for imgElement in html.find("img")
     img = $(imgElement)
-    src = img.attr('src')
-    continue if src.match /^(https?:\/\/)/
-    img.attr('src', path.resolve(path.dirname(filePath), src))
+    if src = img.attr('src')
+      continue if src.match /^(https?:\/\/)/
+      img.attr('src', path.resolve(path.dirname(filePath), src))
 
   html
 
