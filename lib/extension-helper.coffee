@@ -14,6 +14,7 @@ extensionsByFenceName =
   'mustache': 'mustache'
   'objc': 'm'
   'objective-c': 'm'
+  'php': 'php'
   'python': 'py'
   'rb': 'rb'
   'ruby': 'rb'
