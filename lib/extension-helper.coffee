@@ -6,6 +6,7 @@ extensionsByFenceName =
   'cs': 'cs'
   'csharp': 'cs'
   'css': 'css'
+  'erlang': 'erl'
   'go': 'go'
   'html': 'html'
   'java': 'java'
