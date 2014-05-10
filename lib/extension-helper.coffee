@@ -3,6 +3,8 @@ extensionsByFenceName =
   'coffee': 'coffee'
   'coffeescript': 'coffee'
   'coffee-script': 'coffee'
+  'cs': 'cs'
+  'csharp': 'cs'
   'css': 'css'
   'go': 'go'
   'html': 'html'
