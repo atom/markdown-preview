@@ -74,7 +74,7 @@ tokenizeCodeBlocks = (html) ->
   if fontFamily = atom.config.get('editor.fontFamily')
     $(html).find('code').css('font-family', fontFamily)
 
-  for preElement in html.filter("pre")
+  for preElement in $.merge(html.filter("pre"), html.find("pre"))
     $(preElement).addClass("editor-colors")
     codeBlock = $(preElement.firstChild)
 
