@@ -79,6 +79,10 @@ describe "MarkdownPreviewView", ->
         expect(preview.find("pre code.lang-python div:nth-child(4)").html()).toBe '&nbsp;'
         expect(preview.find("pre code.lang-python div:nth-child(5)").html()).toBe '&nbsp;'
 
+    describe "when the code block is nested", ->
+      it "detects and styles the block", ->
+        expect(preview.find("pre:has(code.lang-javascript)")).toHaveClass 'editor-colors'
+
   describe "image resolving", ->
     beforeEach ->
       waitsForPromise ->
