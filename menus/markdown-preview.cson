@@ -1,7 +1,7 @@
 'menu': [
   'label': 'Packages'
   'submenu': [
-    'label': 'Markdown'
+    'label': 'Markdown Preview'
     'submenu': [
       'label': 'Toggle Preview'
       'command': 'markdown-preview:toggle'
