@@ -18,7 +18,7 @@ exports.toHtml = (text, filePath, callback) ->
       html = sanitize(html)
       html = resolveImagePaths(html, filePath)
       html = tokenizeCodeBlocks(html)
-      callback(null, html)
+      callback(null, html.html().trim())
 
 exports.toText = (text, filePath, callback) ->
   exports.toHtml text, filePath, (error, html) ->
@@ -29,7 +29,7 @@ exports.toText = (text, filePath, callback) ->
       callback(error, string)
 
 sanitize = (html) ->
-  o = cheerio.load(html)
+  o = cheerio.load("<div>#{html}</div>")
   o('script').remove()
   attributesToRemove = [
     'onabort'

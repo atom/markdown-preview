@@ -306,3 +306,19 @@ describe "Markdown preview package", ->
           <img>
           world</p>
         """
+
+  describe "when the markdown contains an <html> tag", ->
+    it "does not throw an exception", ->
+      waitsForPromise ->
+        atom.workspace.open("subdir/html-tag.md")
+
+      runs ->
+        atom.workspaceView.getActiveView().trigger 'markdown-preview:toggle'
+
+      waitsFor ->
+        MarkdownPreviewView::renderMarkdown.callCount > 0
+
+      runs ->
+        [editorPane, previewPane] = atom.workspaceView.getPanes()
+        preview = previewPane.getActiveItem()
+        expect(preview[0].innerHTML).toBe "content"
