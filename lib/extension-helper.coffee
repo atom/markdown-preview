@@ -1,8 +1,11 @@
 extensionsByFenceName =
   'bash': 'sh'
+  'c': 'c'
+  'c++': 'cpp'
   'coffee': 'coffee'
   'coffeescript': 'coffee'
   'coffee-script': 'coffee'
+  'cpp': 'cpp'
   'cs': 'cs'
   'csharp': 'cs'
   'css': 'css'
