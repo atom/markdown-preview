@@ -96,7 +96,7 @@ describe "MarkdownPreviewView", ->
     describe "when the image uses an absolute path", ->
       it "doesn't change the path", ->
         image = preview.find("img[alt=Image2]")
-        expect(image.attr('src')).toBe path.resolve('/tmp/image2.png')
+        expect(image.attr('src')).toBe path.normalize(path.resolve('/tmp/image2.png'))
 
     describe "when the image uses a web URL", ->
       it "doesn't change the URL", ->
