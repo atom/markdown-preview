@@ -97,8 +97,11 @@ class MarkdownPreviewView extends ScrollView
     if @file?
       @subscribe(@file, 'contents-changed', changeHandler)
     else if @editor?
-      @subscribe(@editor.getBuffer(), 'contents-modified', changeHandler)
+      @subscribe @editor.getBuffer(), 'contents-modified', =>
+        changeHandler() if atom.config.get 'markdown-preview.liveUpdate'
       @subscribe @editor, 'path-changed', => @trigger 'title-changed'
+      @subscribe @editor.getBuffer(), 'reloaded saved', =>
+        changeHandler() unless atom.config.get 'markdown-preview.liveUpdate'
 
     @subscribe atom.config.observe 'markdown-preview.breakOnSingleNewline', callNow: false, changeHandler
 

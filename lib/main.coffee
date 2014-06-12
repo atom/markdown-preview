@@ -7,6 +7,7 @@ renderer = null # Defer until used
 module.exports =
   configDefaults:
     breakOnSingleNewline: false
+    liveUpdate: true
     grammars: [
       'source.gfm'
       'source.litcoffee'

@@ -194,6 +194,22 @@ describe "Markdown preview package", ->
             expect(editorPane).toHaveFocus()
             expect(previewPane.getActiveItem()).toBe preview
 
+      describe "when the liveUpdate config is set to false", ->
+        it "only re-renders the markdown when the editor is saved, not when the contents are modified", ->
+          atom.config.set 'markdown-preview.liveUpdate', false
+
+          contentsModifiedHandler = jasmine.createSpy('contents-modified')
+          atom.workspace.getActiveEditor().getBuffer().on 'contents-modified', contentsModifiedHandler
+          atom.workspace.getActiveEditor().setText('ch ch changes')
+
+          waitsFor ->
+            contentsModifiedHandler.callCount > 0
+
+          runs ->
+            expect(MarkdownPreviewView::renderMarkdown.callCount).toBe 0
+            atom.workspace.getActiveEditor().save()
+            expect(MarkdownPreviewView::renderMarkdown.callCount).toBe 1
+
     describe "when a new grammar is loaded", ->
       it "re-renders the preview", ->
         waitsForPromise ->
