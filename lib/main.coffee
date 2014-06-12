@@ -11,6 +11,7 @@ module.exports =
     grammars: [
       'source.gfm'
       'source.litcoffee'
+      'text.html.basic'
       'text.plain'
       'text.plain.null-grammar'
     ]
