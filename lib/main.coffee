@@ -58,11 +58,10 @@ module.exports =
       previewPane.destroyItem(previewPane.itemForUri(uri))
       return
 
-    previousActivePane = atom.workspace.getActivePane()
     atom.workspace.open(uri, split: 'right', searchAllPanes: true).done (markdownPreviewView) ->
       if markdownPreviewView instanceof MarkdownPreviewView
         markdownPreviewView.renderMarkdown()
-        previousActivePane.activate()
+        atom.workspace.activatePreviousPane()
 
   copyHtml: ->
     editor = atom.workspace.getActiveEditor()
