@@ -220,7 +220,7 @@ describe "Markdown preview package", ->
 
   describe "when the markdown preview view is requested by file URI", ->
     it "opens a preview editor and watches the file for changes", ->
-      waitsForPromise ->
+      waitsForPromise "atom.workspace.open promise to be resolved", ->
         atom.workspace.open("markdown-preview://#{atom.project.resolve('subdir/file.markdown')}")
 
       runs ->
@@ -232,7 +232,7 @@ describe "Markdown preview package", ->
 
         fs.writeFileSync(atom.project.resolve('subdir/file.markdown'), 'changed')
 
-      waitsFor ->
+      waitsFor "renderMarkdown to be called", ->
         MarkdownPreviewView::renderMarkdown.callCount > 0
 
   describe "when the editor's grammar it not enabled for preview", ->
