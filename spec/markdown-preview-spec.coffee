@@ -229,8 +229,7 @@ describe "Markdown preview package", ->
         expect(preview).toBeInstanceOf(MarkdownPreviewView)
 
         MarkdownPreviewView::renderMarkdown.reset()
-
-        fs.writeFileSync(atom.project.resolve('subdir/file.markdown'), 'changed')
+        preview.file.emit('contents-changed')
 
       waitsFor "renderMarkdown to be called", ->
         MarkdownPreviewView::renderMarkdown.callCount > 0
