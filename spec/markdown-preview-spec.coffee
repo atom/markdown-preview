@@ -38,13 +38,13 @@ describe "Markdown preview package", ->
         MarkdownPreviewView::renderMarkdown.callCount > 0
 
       runs ->
-        expect(atom.workspaceView.getPanes()).toHaveLength 2
-        [editorPane, previewPane] = atom.workspaceView.getPanes()
+        expect(atom.workspaceView.getPaneViews()).toHaveLength 2
+        [editorPane, previewPane] = atom.workspaceView.getPaneViews()
 
         expect(editorPane.items).toHaveLength 1
         preview = previewPane.getActiveItem()
         expect(preview).toBeInstanceOf(MarkdownPreviewView)
-        expect(preview.getPath()).toBe atom.workspaceView.getActivePaneItem().getPath()
+        expect(preview.getPath()).toBe atom.workspace.getActivePaneItem().getPath()
         expect(editorPane).toHaveFocus()
 
     describe "when the editor's path does not exist", ->
@@ -59,13 +59,13 @@ describe "Markdown preview package", ->
           MarkdownPreviewView::renderMarkdown.callCount > 0
 
         runs ->
-          expect(atom.workspaceView.getPanes()).toHaveLength 2
-          [editorPane, previewPane] = atom.workspaceView.getPanes()
+          expect(atom.workspaceView.getPaneViews()).toHaveLength 2
+          [editorPane, previewPane] = atom.workspaceView.getPaneViews()
 
           expect(editorPane.items).toHaveLength 1
           preview = previewPane.getActiveItem()
           expect(preview).toBeInstanceOf(MarkdownPreviewView)
-          expect(preview.getPath()).toBe atom.workspaceView.getActivePaneItem().getPath()
+          expect(preview.getPath()).toBe atom.workspace.getActivePaneItem().getPath()
           expect(editorPane).toHaveFocus()
 
     describe "when the editor does not have a path", ->
@@ -80,13 +80,13 @@ describe "Markdown preview package", ->
           MarkdownPreviewView::renderMarkdown.callCount > 0
 
         runs ->
-          expect(atom.workspaceView.getPanes()).toHaveLength 2
-          [editorPane, previewPane] = atom.workspaceView.getPanes()
+          expect(atom.workspaceView.getPaneViews()).toHaveLength 2
+          [editorPane, previewPane] = atom.workspaceView.getPaneViews()
 
           expect(editorPane.items).toHaveLength 1
           preview = previewPane.getActiveItem()
           expect(preview).toBeInstanceOf(MarkdownPreviewView)
-          expect(preview.getPath()).toBe atom.workspaceView.getActivePaneItem().getPath()
+          expect(preview.getPath()).toBe atom.workspace.getActivePaneItem().getPath()
           expect(editorPane).toHaveFocus()
 
     describe "when the path contains a space", ->
@@ -101,13 +101,13 @@ describe "Markdown preview package", ->
           MarkdownPreviewView::renderMarkdown.callCount > 0
 
         runs ->
-          expect(atom.workspaceView.getPanes()).toHaveLength 2
-          [editorPane, previewPane] = atom.workspaceView.getPanes()
+          expect(atom.workspaceView.getPaneViews()).toHaveLength 2
+          [editorPane, previewPane] = atom.workspaceView.getPaneViews()
 
           expect(editorPane.items).toHaveLength 1
           preview = previewPane.getActiveItem()
           expect(preview).toBeInstanceOf(MarkdownPreviewView)
-          expect(preview.getPath()).toBe atom.workspaceView.getActivePaneItem().getPath()
+          expect(preview.getPath()).toBe atom.workspace.getActivePaneItem().getPath()
           expect(editorPane).toHaveFocus()
 
     describe "when the path contains accented characters", ->
@@ -122,13 +122,13 @@ describe "Markdown preview package", ->
           MarkdownPreviewView::renderMarkdown.callCount > 0
 
         runs ->
-          expect(atom.workspaceView.getPanes()).toHaveLength 2
-          [editorPane, previewPane] = atom.workspaceView.getPanes()
+          expect(atom.workspaceView.getPaneViews()).toHaveLength 2
+          [editorPane, previewPane] = atom.workspaceView.getPaneViews()
 
           expect(editorPane.items).toHaveLength 1
           preview = previewPane.getActiveItem()
           expect(preview).toBeInstanceOf(MarkdownPreviewView)
-          expect(preview.getPath()).toBe atom.workspaceView.getActivePaneItem().getPath()
+          expect(preview.getPath()).toBe atom.workspace.getActivePaneItem().getPath()
           expect(editorPane).toHaveFocus()
 
   describe "when a preview has been created for the file", ->
@@ -147,14 +147,14 @@ describe "Markdown preview package", ->
         MarkdownPreviewView::renderMarkdown.callCount > 0
 
       runs ->
-        [editorPane, previewPane] = atom.workspaceView.getPanes()
+        [editorPane, previewPane] = atom.workspaceView.getPaneViews()
         preview = previewPane.getActiveItem()
         MarkdownPreviewView::renderMarkdown.reset()
 
     it "closes the existing preview when toggle is triggered a second time", ->
       atom.workspaceView.getActiveView().trigger 'markdown-preview:toggle'
 
-      [editorPane, previewPane] = atom.workspaceView.getPanes()
+      [editorPane, previewPane] = atom.workspaceView.getPaneViews()
       expect(editorPane).toHaveFocus()
       expect(previewPane?.activeItem).toBeUndefined()
 
@@ -225,7 +225,7 @@ describe "Markdown preview package", ->
 
       runs ->
         expect(MarkdownPreviewView::renderMarkdown.callCount).toBeGreaterThan 0
-        preview = atom.workspaceView.getActivePaneItem()
+        preview = atom.workspace.getActivePaneItem()
         expect(preview).toBeInstanceOf(MarkdownPreviewView)
 
         MarkdownPreviewView::renderMarkdown.reset()
@@ -262,7 +262,7 @@ describe "Markdown preview package", ->
         MarkdownPreviewView::renderMarkdown.callCount > 0
 
       runs ->
-        [editorPane, previewPane] = atom.workspaceView.getPanes()
+        [editorPane, previewPane] = atom.workspaceView.getPaneViews()
         preview = previewPane.getActiveItem()
         expect(preview.getTitle()).toBe 'file.markdown Preview'
 
@@ -313,7 +313,7 @@ describe "Markdown preview package", ->
         MarkdownPreviewView::renderMarkdown.callCount > 0
 
       runs ->
-        [editorPane, previewPane] = atom.workspaceView.getPanes()
+        [editorPane, previewPane] = atom.workspaceView.getPaneViews()
         preview = previewPane.getActiveItem()
         expect(preview[0].innerHTML).toBe """
           <p>hello</p>
@@ -335,6 +335,6 @@ describe "Markdown preview package", ->
         MarkdownPreviewView::renderMarkdown.callCount > 0
 
       runs ->
-        [editorPane, previewPane] = atom.workspaceView.getPanes()
+        [editorPane, previewPane] = atom.workspaceView.getPaneViews()
         preview = previewPane.getActiveItem()
         expect(preview[0].innerHTML).toBe "content"
