@@ -292,6 +292,7 @@ describe "Markdown preview package", ->
         expect(atom.clipboard.read()).toBe """
           <p><em>italic</em></p>
           <p><strong>bold</strong></p>
+          <p>encoding \u2192 issue</p>
         """
 
         atom.workspace.getActiveEditor().setSelectedBufferRange [[0, 0], [1, 0]]

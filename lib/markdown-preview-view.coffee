@@ -181,5 +181,9 @@ class MarkdownPreviewView extends ScrollView
         filePath = path.join(projectPath, filePath)
 
     if htmlFilePath = atom.showSaveDialogSync(filePath)
-      fs.writeFileSync(htmlFilePath, @[0].innerHTML)
+      # Hack to prevent encoding issues
+      # https://github.com/atom/markdown-preview/issues/96
+      html = @[0].innerHTML.split('').join('')
+
+      fs.writeFileSync(htmlFilePath, html)
       atom.workspace.open(htmlFilePath)

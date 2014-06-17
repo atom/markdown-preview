@@ -150,6 +150,7 @@ describe "MarkdownPreviewView", ->
         expect(atom.workspace.getActiveEditor().getText()).toBe """
           <p><em>italic</em></p>
           <p><strong>bold</strong></p>
+          <p>encoding \u2192 issue</p>
         """
 
   describe "when core:copy is triggered", ->
@@ -167,4 +168,5 @@ describe "MarkdownPreviewView", ->
         expect(atom.clipboard.read()).toBe """
           <p><em>italic</em></p>
           <p><strong>bold</strong></p>
+          <p>encoding \u2192 issue</p>
         """
