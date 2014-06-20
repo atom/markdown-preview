@@ -161,13 +161,14 @@ describe "Markdown preview package", ->
     describe "when the editor is modified", ->
       describe "when the preview is in the active pane but is not the active item", ->
         it "re-renders the preview but does not make it active", ->
+          markdownEditor = atom.workspace.getActiveEditor()
           previewPane.focus()
 
           waitsForPromise ->
             atom.workspace.open()
 
           runs ->
-            atom.workspace.getActiveEditor().setText("Hey!")
+            markdownEditor.setText("Hey!")
 
           waitsFor ->
             MarkdownPreviewView::renderMarkdown.callCount > 0
