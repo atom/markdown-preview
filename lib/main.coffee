@@ -1,8 +1,18 @@
 url = require 'url'
 fs = require 'fs-plus'
 
-MarkdownPreviewView = require './markdown-preview-view'
+MarkdownPreviewView = null # Defer until used
 renderer = null # Defer until used
+
+createMarkdownPreviewView = (state) ->
+  MarkdownPreviewView ?= require './markdown-preview-view'
+  new MarkdownPreviewView(state)
+
+deserializer =
+  name: 'MarkdownPreviewView'
+  deserialize: (state) ->
+    createMarkdownPreviewView(state) if state.constructor is Object
+atom.deserializers.add(deserializer)
 
 module.exports =
   configDefaults:
@@ -40,9 +50,9 @@ module.exports =
         return
 
       if host is 'editor'
-        new MarkdownPreviewView(editorId: pathname.substring(1))
+        createMarkdownPreviewView(editorId: pathname.substring(1))
       else
-        new MarkdownPreviewView(filePath: pathname)
+        createMarkdownPreviewView(filePath: pathname)
 
   toggle: ->
     editor = atom.workspace.getActiveEditor()

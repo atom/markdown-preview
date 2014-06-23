@@ -9,11 +9,6 @@ renderer = require './renderer'
 
 module.exports =
 class MarkdownPreviewView extends ScrollView
-  atom.deserializers.add(this)
-
-  @deserialize: (state) ->
-    new MarkdownPreviewView(state)
-
   @content: ->
     @div class: 'markdown-preview native-key-bindings', tabindex: -1
 
