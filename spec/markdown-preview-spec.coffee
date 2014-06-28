@@ -168,6 +168,7 @@ describe "Markdown preview package", ->
             atom.workspace.open()
 
           runs ->
+            MarkdownPreviewView::renderMarkdown.reset()
             markdownEditor.setText("Hey!")
 
           waitsFor ->
@@ -186,6 +187,7 @@ describe "Markdown preview package", ->
             atom.workspace.open()
 
           runs ->
+            MarkdownPreviewView::renderMarkdown.reset()
             editorPane.focus()
             markdownEditor.setText("Hey!")
 
