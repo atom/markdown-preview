@@ -151,11 +151,18 @@ describe "Markdown preview package", ->
         preview = previewPane.getActiveItem()
         MarkdownPreviewView::renderMarkdown.reset()
 
-    it "closes the existing preview when toggle is triggered a second time", ->
+    it "closes the existing preview when toggle is triggered a second time on the editor", ->
       atom.workspaceView.getActiveView().trigger 'markdown-preview:toggle'
 
       [editorPane, previewPane] = atom.workspaceView.getPaneViews()
       expect(editorPane).toHaveFocus()
+      expect(previewPane?.activeItem).toBeUndefined()
+
+    it "closes the existing preview when toggle is triggered on it and it has focus", ->
+      previewPane.focus()
+      atom.workspaceView.getActiveView().trigger 'markdown-preview:toggle'
+
+      [editorPane, previewPane] = atom.workspaceView.getPaneViews()
       expect(previewPane?.activeItem).toBeUndefined()
 
     describe "when the editor is modified", ->

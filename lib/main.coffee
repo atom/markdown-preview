@@ -9,6 +9,10 @@ createMarkdownPreviewView = (state) ->
   MarkdownPreviewView ?= require './markdown-preview-view'
   new MarkdownPreviewView(state)
 
+isMarkdownPreviewView = (object) ->
+  MarkdownPreviewView ?= require './markdown-preview-view'
+  object instanceof MarkdownPreviewView
+
 deserializer =
   name: 'MarkdownPreviewView'
   deserialize: (state) ->
@@ -59,6 +63,10 @@ module.exports =
         createMarkdownPreviewView(filePath: pathname)
 
   toggle: ->
+    if isMarkdownPreviewView(atom.workspace.activePaneItem)
+      atom.workspace.destroyActivePaneItem()
+      return
+
     editor = atom.workspace.getActiveEditor()
     return unless editor?
 
@@ -83,7 +91,7 @@ module.exports =
     uri = @uriForEditor(editor)
     previousActivePane = atom.workspace.getActivePane()
     atom.workspace.open(uri, split: 'right', searchAllPanes: true).done (markdownPreviewView) ->
-      if markdownPreviewView instanceof MarkdownPreviewView
+      if isMarkdownPreviewView(markdownPreviewView)
         markdownPreviewView.renderMarkdown()
         previousActivePane.activate()
 
