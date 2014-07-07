@@ -5,11 +5,15 @@ cheerio = require 'cheerio'
 roaster = null # Defer until used
 {extensionForFenceName} = require './extension-helper'
 
-exports.toHtml = (text, filePath, callback) ->
+exports.toHtml = (text='', filePath, callback) ->
   roaster ?= require 'roaster'
   options =
     sanitize: false
     breaks: atom.config.get('markdown-preview.breakOnSingleNewline')
+
+  # Remove the <!doctype> since otherwise marked will escape it
+  # https://github.com/chjj/marked/issues/354
+  text = text.replace(/^\s*<!doctype(\s+.*)?>\s*/i, '')
 
   roaster text, options, (error, html) =>
     if error

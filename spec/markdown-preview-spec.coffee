@@ -327,6 +327,24 @@ describe "Markdown preview package", ->
           world</p>
         """
 
+    it "remove the first <!doctype> tag at the beginning of the file", ->
+      waitsForPromise ->
+        atom.workspace.open("subdir/doctype-tag.md")
+
+      runs ->
+        atom.workspaceView.getActiveView().trigger 'markdown-preview:toggle'
+
+      waitsFor ->
+        MarkdownPreviewView::renderMarkdown.callCount > 0
+
+      runs ->
+        [editorPane, previewPane] = atom.workspaceView.getPaneViews()
+        preview = previewPane.getActiveItem()
+        expect(preview[0].innerHTML).toBe """
+          <p>content
+          &lt;!doctype html&gt;</p>
+        """
+
   describe "when the markdown contains an <html> tag", ->
     it "does not throw an exception", ->
       waitsForPromise ->
