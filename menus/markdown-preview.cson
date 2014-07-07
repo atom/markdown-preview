@@ -13,3 +13,5 @@
   '.markdown-preview':
     'Copy': 'core:copy'
     'Save As HTML\u2026': 'core:save-as'
+  '.tree-view li.file':
+    'Markdown Preview': 'markdown-preview:preview-file'
