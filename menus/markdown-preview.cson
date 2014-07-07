@@ -13,5 +13,17 @@
   '.markdown-preview':
     'Copy': 'core:copy'
     'Save As HTML\u2026': 'core:save-as'
-  '.tree-view li.file':
+  '.tree-view .file .name[data-name$=\\.markdown]':
+    'Markdown Preview': 'markdown-preview:preview-file'
+  '.tree-view .file .name[data-name$=\\.md]':
+    'Markdown Preview': 'markdown-preview:preview-file'
+  '.tree-view .file .name[data-name$=\\.mdown]':
+    'Markdown Preview': 'markdown-preview:preview-file'
+  '.tree-view .file .name[data-name$=\\.mkd]':
+    'Markdown Preview': 'markdown-preview:preview-file'
+  '.tree-view .file .name[data-name$=\\.mkdown]':
+    'Markdown Preview': 'markdown-preview:preview-file'
+  '.tree-view .file .name[data-name$=\\.ron]':
+    'Markdown Preview': 'markdown-preview:preview-file'
+  '.tree-view .file .name[data-name$=\\.txt]':
     'Markdown Preview': 'markdown-preview:preview-file'
