@@ -182,3 +182,6 @@ class MarkdownPreviewView extends ScrollView
 
       fs.writeFileSync(htmlFilePath, html)
       atom.workspace.open(htmlFilePath)
+
+  isEqual: (other) ->
+    @[0] is other?[0] # Compare DOM elements
