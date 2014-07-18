@@ -11,7 +11,7 @@
   "dependencies": {
     "cheerio": "0.15.0",
     "fs-plus": "2.x",
-    "pathwatcher": "^1.0",
+    "pathwatcher": "^2.0",
     "roaster": "^1.1.2",
     "temp": "0.6.x",
     "underscore-plus": "1.x",
