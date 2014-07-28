@@ -1,6 +1,6 @@
 {
   "name": "markdown-preview",
-  "version": "0.93.0",
+  "version": "1.0.0",
   "main": "./lib/main",
   "description": "Open a rendered version of the Markdown in the current editor with `ctrl-shift-m`.",
   "repository": "https://github.com/atom/markdown-preview",
@@ -11,7 +11,7 @@
   "dependencies": {
     "cheerio": "0.15.0",
     "fs-plus": "2.x",
-    "pathwatcher": "^1.0",
+    "pathwatcher": "^2.0",
     "roaster": "^1.1.2",
     "temp": "0.6.x",
     "underscore-plus": "1.x",
