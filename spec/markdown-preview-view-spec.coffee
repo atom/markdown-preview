@@ -69,18 +69,18 @@ describe "MarkdownPreviewView", ->
 
     describe "when the code block's fence name doesn't have a matching grammar", ->
       it "does not tokenize the code block", ->
-        expect(preview.find("pre code.lang-kombucha .line .null-grammar").children().length).toBe 2
+        expect(preview.find("pre.lang-kombucha .line .null-grammar").children().length).toBe 2
 
     describe "when the code block contains empty lines", ->
       it "doesn't remove the empty lines", ->
-        expect(preview.find("pre code.lang-python").children().length).toBe 6
-        expect(preview.find("pre code.lang-python div:nth-child(2)").text().trim()).toBe ''
-        expect(preview.find("pre code.lang-python div:nth-child(4)").text().trim()).toBe ''
-        expect(preview.find("pre code.lang-python div:nth-child(5)").text().trim()).toBe ''
+        expect(preview.find("pre.lang-python").children().length).toBe 6
+        expect(preview.find("pre.lang-python div:nth-child(2)").text().trim()).toBe ''
+        expect(preview.find("pre.lang-python div:nth-child(4)").text().trim()).toBe ''
+        expect(preview.find("pre.lang-python div:nth-child(5)").text().trim()).toBe ''
 
     describe "when the code block is nested", ->
       it "detects and styles the block", ->
-        expect(preview.find("pre:has(code.lang-javascript)")).toHaveClass 'editor-colors'
+        expect(preview.find("pre.lang-javascript")).toHaveClass 'editor-colors'
 
   describe "image resolving", ->
     beforeEach ->

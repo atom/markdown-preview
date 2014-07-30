@@ -93,9 +93,7 @@ tokenizeCodeBlocks = (html) ->
 
     highlightedBlock = $(highlightedHtml)
     # The `editor` class messes things up as `.editor` has absolutely positioned lines
-    highlightedBlock.removeClass('editor')
-    codeBlock.html(highlightedBlock.children())
-    highlightedBlock.html(codeBlock)
+    highlightedBlock.removeClass('editor').addClass("lang-#{fenceName}")
     highlightedBlock.insertAfter(preElement)
     preElement.remove()
 
