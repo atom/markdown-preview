@@ -6,6 +6,8 @@ Highlights = require 'highlights'
 roaster = null # Defer until used
 {scopeForFenceName} = require './extension-helper'
 
+highlighter = null
+
 exports.toHtml = (text='', filePath, callback) ->
   roaster ?= require 'roaster'
   options =
@@ -86,7 +88,7 @@ tokenizeCodeBlocks = (html) ->
 
     fenceName = className.replace(/^lang-/, '')
 
-    highlighter = new Highlights(registry: atom.syntax)
+    highlighter ?= new Highlights(registry: atom.syntax)
     highlightedHtml = highlighter.highlightSync
       fileContents: codeBlock.text()
       scopeName: scopeForFenceName(fenceName)

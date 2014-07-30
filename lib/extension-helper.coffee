@@ -35,4 +35,4 @@ scopesByFenceName =
 
 module.exports =
   scopeForFenceName: (fenceName) ->
-    scopesByFenceName[fenceName] or "source.#{fenceName}"
+    scopesByFenceName[fenceName] ? "source.#{fenceName}"
