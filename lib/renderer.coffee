@@ -1,9 +1,10 @@
 path = require 'path'
 _ = require 'underscore-plus'
 cheerio = require 'cheerio'
-{$, EditorView} = require 'atom'
+Highlights = require 'highlights'
+{$} = require 'atom'
 roaster = null # Defer until used
-{extensionForFenceName} = require './extension-helper'
+{scopeForFenceName} = require './extension-helper'
 
 exports.toHtml = (text='', filePath, callback) ->
   roaster ?= require 'roaster'
@@ -79,24 +80,23 @@ tokenizeCodeBlocks = (html) ->
     $(html).find('code').css('font-family', fontFamily)
 
   for preElement in $.merge(html.filter("pre"), html.find("pre"))
-    $(preElement).addClass("editor-colors")
-    codeBlock = $(preElement.firstChild)
-
     # go to next block unless this one has a class
+    codeBlock = $(preElement.firstChild)
     continue unless className = codeBlock.attr('class')
 
     fenceName = className.replace(/^lang-/, '')
-    # go to next block unless the class name matches `lang`
-    continue unless extension = extensionForFenceName(fenceName)
-    text = codeBlock.text()
 
-    grammar = atom.syntax.selectGrammar("foo.#{extension}", text)
+    highlighter = new Highlights(registry: atom.syntax)
+    highlightedHtml = highlighter.highlightSync
+      fileContents: codeBlock.text()
+      scopeName: scopeForFenceName(fenceName)
 
-    codeBlock.empty()
-
-    for tokens in grammar.tokenizeLines(text).slice(0, -1)
-      lineText = _.pluck(tokens, 'value').join('')
-      htmlEolInvisibles = ''
-      codeBlock.append(EditorView.buildLineHtml({tokens, text: lineText, htmlEolInvisibles}))
+    highlightedBlock = $(highlightedHtml)
+    # The `editor` class messes things up as `.editor` has absolutely positioned lines
+    highlightedBlock.removeClass('editor')
+    codeBlock.html(highlightedBlock.children())
+    highlightedBlock.html(codeBlock)
+    highlightedBlock.insertAfter(preElement)
+    preElement.remove()
 
   html
