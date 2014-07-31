@@ -11,7 +11,7 @@
 
 'context-menu':
   '.markdown-preview':
-    'Copy': 'core:copy'
+    'Copy As HTML': 'core:copy'
     'Save As HTML\u2026': 'core:save-as'
   '.tree-view .file .name[data-name$=\\.markdown]':
     'Markdown Preview': 'markdown-preview:preview-file'
