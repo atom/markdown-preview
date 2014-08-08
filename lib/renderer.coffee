@@ -82,7 +82,6 @@ tokenizeCodeBlocks = (html) ->
     $(html).find('code').css('font-family', fontFamily)
 
   for preElement in $.merge(html.filter("pre"), html.find("pre"))
-    # go to next block unless this one has a class
     codeBlock = $(preElement.firstChild)
     fenceName = codeBlock.attr('class')?.replace(/^lang-/, '') ? 'text'
 
