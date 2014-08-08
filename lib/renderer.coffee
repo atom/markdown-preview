@@ -84,9 +84,7 @@ tokenizeCodeBlocks = (html) ->
   for preElement in $.merge(html.filter("pre"), html.find("pre"))
     # go to next block unless this one has a class
     codeBlock = $(preElement.firstChild)
-    continue unless className = codeBlock.attr('class')
-
-    fenceName = className.replace(/^lang-/, '')
+    fenceName = codeBlock.attr('class')?.replace(/^lang-/, '') ? 'text'
 
     highlighter ?= new Highlights(registry: atom.syntax)
     highlightedHtml = highlighter.highlightSync

@@ -28,6 +28,7 @@ scopesByFenceName =
   'python': 'source.python'
   'rb': 'source.ruby'
   'ruby': 'source.ruby'
+  'text': 'text.plain'
   'toml': 'source.toml'
   'xml': 'text.xml'
   'yaml': 'source.yaml'
