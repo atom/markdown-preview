@@ -3,7 +3,7 @@
 @font-family: "Helvetica Neue", Helvetica, sans-serif;
 .markdown-preview {
   font-family: @font-family;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.6;
   background-color: #fff;
   overflow: scroll;
@@ -75,7 +75,7 @@
   // Headings
   h1, h2, h3, h4, h5, h6 {
     font-family: @font-family;
-    margin: 20px 0 10px;
+    margin: 20px 0 16px;
     padding: 0 0 10px 0;
     font-weight: bold;
     -webkit-font-smoothing: antialiased;
@@ -104,13 +104,13 @@
   }
 
   h1 {
-    font-size: 28px;
+    font-size: 36px;
     border-bottom: 1px solid #ddd;
     color: #000;
   }
 
   h2 {
-    font-size: 24px;
+    font-size: 28px;
     border-bottom: 1px solid #eee;
     color: #000;
   }
@@ -257,6 +257,7 @@
     p {
       font-size: 16px;
       line-height: 1.5;
+      font-weight: normal;
     }
   }
 
@@ -381,9 +382,9 @@
   // Inline code snippets
   code, tt {
     margin: 0 2px;
-    padding: 0 5px;
-    border: 1px solid #eaeaea;
-    background-color: #f8f8f8;
+    padding: .15em .5em;
+    font-size: 85%;
+    background-color: rgba(0,0,0,0.04);
     border-radius:3px;
     text-shadow: none;
   }
@@ -401,18 +402,13 @@
   }
 
   pre {
-    background: #f8f8f8;
-    border: 1px solid #ccc;
-    font-size: 13px;
-    line-height: 19px;
+    background: #f7f7f7;
+    font-size: 90%;
+    line-height: 1.45;
     overflow: auto;
-    padding: 6px 10px;
+    padding: 16px;
     border-radius:3px;
-  }
-
-  pre.editor-colors {
-    background: @syntax-background-color;
-    border: 1px solid darken(@syntax-background-color, 10%);
+    color: @syntax-text-color;
   }
 
   pre code, pre tt {
