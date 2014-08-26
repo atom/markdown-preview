@@ -259,7 +259,7 @@ describe "Markdown preview package", ->
         atom.workspaceView.getActiveView().trigger 'markdown-preview:toggle'
         expect(atom.workspace.open).not.toHaveBeenCalled()
 
-  describe "when the editor's path changes", ->
+  describe "when the editor's path changes on #win32 and #darwin", ->
     it "updates the preview's title", ->
       titleChangedCallback = jasmine.createSpy('titleChangedCallback')
 
@@ -283,7 +283,6 @@ describe "Markdown preview package", ->
 
       waitsFor ->
         titleChangedCallback.callCount is 1
-
 
   describe "when the URI opened does not have a markdown-preview protocol", ->
     it "does not throw an error trying to decode the URI (regression)", ->
