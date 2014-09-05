@@ -21,13 +21,13 @@ exports.toHtml = (text='', filePath, callback) ->
   roaster text, options, (error, html) =>
     return callback(error) if error
 
-    defaultLanguage = if path.extname(filePath) is '.litcoffee'
-      'coffeescript'
+    scopeName = atom.syntax.selectGrammar(filePath, text)?.scopeName
+    defaultCodeLanguage = if scopeName is 'source.litcoffee' then 'coffeescript'
     else 'text'
 
     html = sanitize(html)
     html = resolveImagePaths(html, filePath)
-    html = tokenizeCodeBlocks(html,defaultLanguage)
+    html = tokenizeCodeBlocks(html,defaultCodeLanguage)
     callback(null, html.html().trim())
 
 exports.toText = (text, filePath, callback) ->
