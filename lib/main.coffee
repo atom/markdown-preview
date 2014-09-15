@@ -96,7 +96,7 @@ module.exports =
         previousActivePane.activate()
 
   previewFile: ({target}) ->
-    filePath = $(target).view()?.getPath?()
+    filePath = target.dataset.path
     return unless filePath
 
     for editor in atom.workspace.getEditors() when editor.getPath() is filePath
