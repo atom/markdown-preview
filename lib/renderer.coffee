@@ -21,13 +21,15 @@ exports.toHtml = (text='', filePath, callback) ->
   roaster text, options, (error, html) =>
     return callback(error) if error
 
-    scopeName = atom.syntax.selectGrammar(filePath, text)?.scopeName
-    defaultCodeLanguage = if scopeName is 'source.litcoffee' then 'coffeescript'
-    else 'text'
+    {scopeName} = atom.syntax.selectGrammar(filePath, text)
+    if scopeName is 'source.litcoffee'
+      defaultCodeLanguage = 'coffee'
+    else
+      defaultCodeLanguage = 'text'
 
     html = sanitize(html)
     html = resolveImagePaths(html, filePath)
-    html = tokenizeCodeBlocks(html,defaultCodeLanguage)
+    html = tokenizeCodeBlocks(html, defaultCodeLanguage)
     callback(null, html.html().trim())
 
 exports.toText = (text, filePath, callback) ->
@@ -78,7 +80,7 @@ resolveImagePaths = (html, filePath) ->
 
   html
 
-tokenizeCodeBlocks = (html,defaultLanguage='text') ->
+tokenizeCodeBlocks = (html, defaultLanguage='text') ->
   html = $(html)
 
   if fontFamily = atom.config.get('editor.fontFamily')
