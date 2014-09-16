@@ -108,7 +108,7 @@ class MarkdownPreviewView extends ScrollView
       @renderMarkdownText(@editor.getText())
 
   renderMarkdownText: (text) ->
-    renderer.toHtml text, @getPath(), (error, html) =>
+    renderer.toHtml text, @getPath(), @getGrammar(), (error, html) =>
       if error
         @showError(error)
       else
@@ -138,6 +138,9 @@ class MarkdownPreviewView extends ScrollView
       @file.getPath()
     else if @editor?
       @editor.getPath()
+
+  getGrammar: ->
+    @editor?.getGrammar()
 
   showError: (result) ->
     failureMessage = result?.message

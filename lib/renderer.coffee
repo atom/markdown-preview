@@ -8,7 +8,7 @@ roaster = null # Defer until used
 
 highlighter = null
 
-exports.toHtml = (text='', filePath, callback) ->
+exports.toHtml = (text='', filePath, grammar, callback) ->
   roaster ?= require 'roaster'
   options =
     sanitize: false
@@ -21,19 +21,17 @@ exports.toHtml = (text='', filePath, callback) ->
   roaster text, options, (error, html) =>
     return callback(error) if error
 
-    {scopeName} = atom.syntax.selectGrammar(filePath, text)
-    if scopeName is 'source.litcoffee'
-      defaultCodeLanguage = 'coffee'
-    else
-      defaultCodeLanguage = 'text'
+    grammar ?= atom.syntax.selectGrammar(filePath, text)
+    # Default code blocks to be coffee in Literate CoffeeScript files
+    defaultCodeLanguage = 'coffee' if grammar.scopeName is 'source.litcoffee'
 
     html = sanitize(html)
     html = resolveImagePaths(html, filePath)
     html = tokenizeCodeBlocks(html, defaultCodeLanguage)
     callback(null, html.html().trim())
 
-exports.toText = (text, filePath, callback) ->
-  exports.toHtml text, filePath, (error, html) ->
+exports.toText = (text, filePath, grammar, callback) ->
+  exports.toHtml text, filePath, grammar, (error, html) ->
     if error
       callback(error)
     else
