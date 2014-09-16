@@ -19,13 +19,16 @@ exports.toHtml = (text='', filePath, callback) ->
   text = text.replace(/^\s*<!doctype(\s+.*)?>\s*/i, '')
 
   roaster text, options, (error, html) =>
-    if error
-      callback(error)
-    else
-      html = sanitize(html)
-      html = resolveImagePaths(html, filePath)
-      html = tokenizeCodeBlocks(html)
-      callback(null, html.html().trim())
+    return callback(error) if error
+
+    scopeName = atom.syntax.selectGrammar(filePath, text)?.scopeName
+    defaultCodeLanguage = if scopeName is 'source.litcoffee' then 'coffeescript'
+    else 'text'
+
+    html = sanitize(html)
+    html = resolveImagePaths(html, filePath)
+    html = tokenizeCodeBlocks(html,defaultCodeLanguage)
+    callback(null, html.html().trim())
 
 exports.toText = (text, filePath, callback) ->
   exports.toHtml text, filePath, (error, html) ->
@@ -75,7 +78,7 @@ resolveImagePaths = (html, filePath) ->
 
   html
 
-tokenizeCodeBlocks = (html) ->
+tokenizeCodeBlocks = (html,defaultLanguage='text') ->
   html = $(html)
 
   if fontFamily = atom.config.get('editor.fontFamily')
@@ -83,7 +86,7 @@ tokenizeCodeBlocks = (html) ->
 
   for preElement in $.merge(html.filter("pre"), html.find("pre"))
     codeBlock = $(preElement.firstChild)
-    fenceName = codeBlock.attr('class')?.replace(/^lang-/, '') ? 'text'
+    fenceName = codeBlock.attr('class')?.replace(/^lang-/, '') ? defaultLanguage
 
     highlighter ?= new Highlights(registry: atom.syntax)
     highlightedHtml = highlighter.highlightSync
