@@ -1,4 +1,4 @@
-'.workspace':
+'.workspace, .workspace .editor':
   'ctrl-M': 'markdown-preview:toggle'
 
 '.platform-darwin .markdown-preview':
