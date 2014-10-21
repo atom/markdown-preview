@@ -15,6 +15,7 @@ describe "Markdown preview package", ->
 
     atom.workspaceView = new WorkspaceView
     atom.workspace = atom.workspaceView.model
+
     spyOn(MarkdownPreviewView.prototype, 'renderMarkdown').andCallThrough()
 
     waitsForPromise ->

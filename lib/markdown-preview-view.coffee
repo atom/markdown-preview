@@ -12,17 +12,24 @@ class MarkdownPreviewView extends ScrollView
   @content: ->
     @div class: 'markdown-preview native-key-bindings', tabindex: -1
 
-  constructor: ({@editorId, filePath}) ->
+  constructor: ({@editorId, @filePath}) ->
     super
 
+  afterAttach: ->
+    return if @attached
+
+    @attached = true
     if @editorId?
       @resolveEditor(@editorId)
     else
-      if atom.workspace?
-        @subscribeToFilePath(filePath)
+      if atom.workspace? and atom.workspaceView?
+        @subscribeToFilePath(@filePath)
       else
         @subscribe atom.packages.once 'activated', =>
-          @subscribeToFilePath(filePath)
+          @subscribeToFilePath(@filePath)
+
+  beforeRemove: ->
+    @attached = false
 
   serialize: ->
     deserializer: 'MarkdownPreviewView'
@@ -50,7 +57,7 @@ class MarkdownPreviewView extends ScrollView
         # this preview since a preview cannot be rendered without an editor
         @parents('.pane').view()?.destroyItem(this)
 
-    if atom.workspace?
+    if atom.workspace? and atom.workspaceView?
       resolve()
     else
       @subscribe atom.packages.once 'activated', =>
