@@ -74,7 +74,10 @@ resolveImagePaths = (html, filePath) ->
     img = $(imgElement)
     if src = img.attr('src')
       continue if src.match /^(https?:\/\/)/
-      img.attr('src', path.resolve(path.dirname(filePath), src))
+      if src[0] is '/'
+        img.attr('src', atom.project.resolve(src.substring(1)))
+      else
+        img.attr('src', path.resolve(path.dirname(filePath), src))
 
   html
 
