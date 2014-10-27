@@ -100,9 +100,9 @@ describe "MarkdownPreviewView", ->
         expect(image.attr('src')).toBe atom.project.resolve('subdir/image1.png')
 
     describe "when the image uses an absolute path", ->
-      it "doesn't change the path", ->
+      it "resolves to a path relative to the project root", ->
         image = preview.find("img[alt=Image2]")
-        expect(image.attr('src')).toBe path.normalize(path.resolve('/tmp/image2.png'))
+        expect(image.attr('src')).toBe atom.project.resolve('tmp/image2.png')
 
     describe "when the image uses a web URL", ->
       it "doesn't change the URL", ->
