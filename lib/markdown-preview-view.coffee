@@ -52,6 +52,7 @@ class MarkdownPreviewView extends ScrollView
       if @editor?
         @trigger 'title-changed' if @editor?
         @handleEvents()
+        @renderMarkdown()
       else
         # The editor this preview was created for has been closed so close
         # this preview since a preview cannot be rendered without an editor
@@ -60,9 +61,7 @@ class MarkdownPreviewView extends ScrollView
     if atom.workspace? and atom.workspaceView?
       resolve()
     else
-      @subscribe atom.packages.once 'activated', =>
-        resolve()
-        @renderMarkdown()
+      @subscribe atom.packages.once('activated', resolve)
 
   editorForId: (editorId) ->
     for editor in atom.workspace.getEditors()
