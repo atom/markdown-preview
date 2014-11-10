@@ -189,6 +189,7 @@ describe "Markdown preview package", ->
       describe "when the preview is not the active item and not in the active pane", ->
         it "re-renders the preview and makes it active", ->
           markdownEditor = atom.workspace.getActiveEditor()
+          atom.commands.dispatch(previewPane[0], 'pane:split-right')
           previewPane.focus()
 
           waitsForPromise ->

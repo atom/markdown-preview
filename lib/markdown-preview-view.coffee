@@ -91,7 +91,9 @@ class MarkdownPreviewView extends ScrollView
 
     changeHandler = =>
       @renderMarkdown()
-      pane = atom.workspace.paneForUri(@getUri())
+
+      # TODO: Remove paneForUri call when ::paneForItem is released
+      pane = atom.workspace.paneForItem?(this) ? atom.workspace.paneForUri(@getUri())
       if pane? and pane isnt atom.workspace.getActivePane()
         pane.activateItem(this)
 
