@@ -1,6 +1,7 @@
 path = require 'path'
 _ = require 'underscore-plus'
 cheerio = require 'cheerio'
+fs = require 'fs-plus'
 Highlights = require 'highlights'
 {$} = require 'atom'
 roaster = null # Defer until used
@@ -81,7 +82,8 @@ resolveImagePaths = (html, filePath) ->
       continue if src.startsWith(packagePath)
 
       if src[0] is '/'
-        img.attr('src', atom.project.resolve(src.substring(1)))
+        unless fs.isFileSync(src)
+          img.attr('src', atom.project.resolve(src.substring(1)))
       else
         img.attr('src', path.resolve(path.dirname(filePath), src))
 

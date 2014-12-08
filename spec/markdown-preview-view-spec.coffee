@@ -99,10 +99,25 @@ describe "MarkdownPreviewView", ->
         image = preview.find("img[alt=Image1]")
         expect(image.attr('src')).toBe atom.project.resolve('subdir/image1.png')
 
-    describe "when the image uses an absolute path", ->
+    describe "when the image uses an absolute path that does not exist", ->
       it "resolves to a path relative to the project root", ->
         image = preview.find("img[alt=Image2]")
         expect(image.attr('src')).toBe atom.project.resolve('tmp/image2.png')
+
+    describe "when the image uses an absolute path that exists", ->
+      it "doesn't change the URL", ->
+        preview.destroy()
+
+        filePath = path.join(temp.mkdirSync('atom'), 'foo.md')
+        fs.writeFileSync(filePath, "![absolute](#{filePath})")
+        preview = new MarkdownPreviewView({filePath})
+        preview.attachToDom()
+
+        waitsForPromise ->
+          preview.renderMarkdown()
+
+        runs ->
+          expect(preview.find("img[alt=absolute]").attr('src')).toBe filePath
 
     describe "when the image uses a web URL", ->
       it "doesn't change the URL", ->
