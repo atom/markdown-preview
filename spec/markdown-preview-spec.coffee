@@ -10,7 +10,7 @@ describe "Markdown preview package", ->
     fixturesPath = path.join(__dirname, 'fixtures')
     tempPath = temp.mkdirSync('atom')
     wrench.copyDirSyncRecursive(fixturesPath, tempPath, forceDelete: true)
-    atom.project.setPath(tempPath)
+    atom.project.setPaths([tempPath])
     jasmine.unspy(window, 'setTimeout')
 
     atom.workspaceView = new WorkspaceView
@@ -169,7 +169,7 @@ describe "Markdown preview package", ->
     describe "when the editor is modified", ->
       describe "when the preview is in the active pane but is not the active item", ->
         it "re-renders the preview but does not make it active", ->
-          markdownEditor = atom.workspace.getActiveEditor()
+          markdownEditor = atom.workspace.getActiveTextEditor()
           previewPane.focus()
 
           waitsForPromise ->
@@ -188,7 +188,7 @@ describe "Markdown preview package", ->
 
       describe "when the preview is not the active item and not in the active pane", ->
         it "re-renders the preview and makes it active", ->
-          markdownEditor = atom.workspace.getActiveEditor()
+          markdownEditor = atom.workspace.getActiveTextEditor()
           atom.commands.dispatch(previewPane[0], 'pane:split-right')
           previewPane.focus()
 
@@ -212,15 +212,15 @@ describe "Markdown preview package", ->
           atom.config.set 'markdown-preview.liveUpdate', false
 
           contentsModifiedHandler = jasmine.createSpy('contents-modified')
-          atom.workspace.getActiveEditor().getBuffer().on 'contents-modified', contentsModifiedHandler
-          atom.workspace.getActiveEditor().setText('ch ch changes')
+          atom.workspace.getActiveTextEditor().getBuffer().on 'contents-modified', contentsModifiedHandler
+          atom.workspace.getActiveTextEditor().setText('ch ch changes')
 
           waitsFor ->
             contentsModifiedHandler.callCount > 0
 
           runs ->
             expect(MarkdownPreviewView::renderMarkdown.callCount).toBe 0
-            atom.workspace.getActiveEditor().save()
+            atom.workspace.getActiveTextEditor().save()
             expect(MarkdownPreviewView::renderMarkdown.callCount).toBe 1
 
     describe "when a new grammar is loaded", ->
@@ -281,7 +281,7 @@ describe "Markdown preview package", ->
 
         titleChangedCallback.reset()
         preview.one('title-changed', titleChangedCallback)
-        fs.renameSync(atom.workspace.getActiveEditor().getPath(), path.join(path.dirname(atom.workspace.getActiveEditor().getPath()), 'file2.md'))
+        fs.renameSync(atom.workspace.getActiveTextEditor().getPath(), path.join(path.dirname(atom.workspace.getActiveTextEditor().getPath()), 'file2.md'))
 
       waitsFor ->
         titleChangedCallback.callCount is 1
@@ -292,7 +292,7 @@ describe "Markdown preview package", ->
         atom.workspace.open('%')
 
       runs ->
-        expect(atom.workspace.getActiveEditor()).toBeTruthy()
+        expect(atom.workspace.getActiveTextEditor()).toBeTruthy()
 
   describe "when markdown-preview:copy-html is triggered", ->
     it "copies the HTML to the clipboard", ->
@@ -307,7 +307,7 @@ describe "Markdown preview package", ->
           <p>encoding \u2192 issue</p>
         """
 
-        atom.workspace.getActiveEditor().setSelectedBufferRange [[0, 0], [1, 0]]
+        atom.workspace.getActiveTextEditor().setSelectedBufferRange [[0, 0], [1, 0]]
         atom.workspaceView.getActiveView().trigger 'markdown-preview:copy-html'
         expect(atom.clipboard.read()).toBe """
           <p><em>italic</em></p>

@@ -57,9 +57,9 @@ describe "MarkdownPreviewView", ->
         atom.workspace.open('new.markdown')
 
       runs ->
-        preview = new MarkdownPreviewView({editorId: atom.workspace.getActiveEditor().id})
+        preview = new MarkdownPreviewView({editorId: atom.workspace.getActiveTextEditor().id})
         preview.attachToDom()
-        expect(preview.getPath()).toBe atom.workspace.getActiveEditor().getPath()
+        expect(preview.getPath()).toBe atom.workspace.getActiveTextEditor().getPath()
 
         newPreview = atom.deserializers.deserialize(preview.serialize())
         newPreview.attachToDom()
@@ -166,10 +166,10 @@ describe "MarkdownPreviewView", ->
         expect(fs.isFileSync(outputPath)).toBe true
 
       waitsFor ->
-        atom.workspace.getActiveEditor()?.getPath() is outputPath
+        atom.workspace.getActiveTextEditor()?.getPath() is outputPath
 
       runs ->
-        expect(atom.workspace.getActiveEditor().getText()).toBe """
+        expect(atom.workspace.getActiveTextEditor().getText()).toBe """
           <p><em>italic</em></p>
           <p><strong>bold</strong></p>
           <p>encoding \u2192 issue</p>

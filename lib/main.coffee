@@ -72,11 +72,11 @@ module.exports =
         createMarkdownPreviewView(filePath: pathname)
 
   toggle: ->
-    if isMarkdownPreviewView(atom.workspace.activePaneItem)
+    if isMarkdownPreviewView(atom.workspace.getActivePaneItem())
       atom.workspace.destroyActivePaneItem()
       return
 
-    editor = atom.workspace.getActiveEditor()
+    editor = atom.workspace.getActiveTextEditor()
     return unless editor?
 
     grammars = atom.config.get('markdown-preview.grammars') ? []
@@ -107,14 +107,14 @@ module.exports =
     filePath = target.dataset.path
     return unless filePath
 
-    for editor in atom.workspace.getEditors() when editor.getPath() is filePath
+    for editor in atom.workspace.getTextEditors() when editor.getPath() is filePath
       @addPreviewForEditor(editor)
       return
 
     atom.workspace.open "markdown-preview://#{encodeURI(filePath)}", searchAllPanes: true
 
   copyHtml: ->
-    editor = atom.workspace.getActiveEditor()
+    editor = atom.workspace.getActiveTextEditor()
     return unless editor?
 
     renderer ?= require './renderer'
