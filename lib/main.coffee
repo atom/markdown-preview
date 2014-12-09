@@ -13,11 +13,10 @@ isMarkdownPreviewView = (object) ->
   MarkdownPreviewView ?= require './markdown-preview-view'
   object instanceof MarkdownPreviewView
 
-deserializer =
+atom.deserializers.add
   name: 'MarkdownPreviewView'
   deserialize: (state) ->
     createMarkdownPreviewView(state) if state.constructor is Object
-atom.deserializers.add(deserializer)
 
 module.exports =
   config:
