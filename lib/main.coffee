@@ -32,17 +32,16 @@ module.exports =
     ]
 
   activate: ->
-    atom.workspaceView.command 'markdown-preview:toggle', =>
-      @toggle()
-
-    atom.workspaceView.command 'markdown-preview:copy-html', =>
-      @copyHtml()
+    atom.commands.add 'atom-workspace',
+      'markdown-preview:toggle': =>
+        @toggle()
+      'markdown-preview:copy-html': =>
+        @copyHtml()
+      'markdown-preview:toggle-break-on-single-newline': ->
+        atom.config.toggle('markdown-preview.breakOnSingleNewline')
 
     atom.workspaceView.on 'markdown-preview:preview-file', (event) =>
       @previewFile(event)
-
-    atom.workspaceView.command 'markdown-preview:toggle-break-on-single-newline', ->
-      atom.config.toggle('markdown-preview.breakOnSingleNewline')
 
     atom.workspace.registerOpener (uriToOpen) ->
       try
