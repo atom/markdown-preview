@@ -53,7 +53,7 @@ module.exports =
     atom.commands.add '.tree-view .file .name[data-name$=\\.ron]', 'markdown-preview:preview-file', previewFile
     atom.commands.add '.tree-view .file .name[data-name$=\\.text]', 'markdown-preview:preview-file', previewFile
 
-    atom.workspace.registerOpener (uriToOpen) ->
+    atom.workspace.addOpener (uriToOpen) ->
       try
         {protocol, host, pathname} = url.parse(uriToOpen)
       catch error
