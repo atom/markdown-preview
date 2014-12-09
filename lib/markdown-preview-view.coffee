@@ -1,5 +1,6 @@
 path = require 'path'
 
+{CompositeDisposable} = require 'atom'
 {$, $$$, ScrollView} = require 'atom'
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
@@ -15,18 +16,21 @@ class MarkdownPreviewView extends ScrollView
   constructor: ({@editorId, @filePath}) ->
     super
 
+    @disposables = new CompositeDisposable
+
+    unless @editorId?
+      if atom.workspace?
+        @subscribeToFilePath(@filePath)
+      else
+        @disposables.add atom.packages.onDidActivateAll =>
+          @subscribeToFilePath(@filePath)
+
   afterAttach: ->
     return if @attached
 
     @attached = true
     if @editorId?
       @resolveEditor(@editorId)
-    else
-      if atom.workspace? and atom.workspaceView?
-        @subscribeToFilePath(@filePath)
-      else
-        @subscribe atom.packages.once 'activated', =>
-          @subscribeToFilePath(@filePath)
 
   beforeRemove: ->
     @attached = false
@@ -37,7 +41,7 @@ class MarkdownPreviewView extends ScrollView
     editorId: @editorId
 
   destroy: ->
-    @unsubscribe()
+    @disposables.dispose()
 
   subscribeToFilePath: (filePath) ->
     @file = new File(filePath)
@@ -61,7 +65,7 @@ class MarkdownPreviewView extends ScrollView
     if atom.workspace? and atom.workspaceView?
       resolve()
     else
-      @subscribe atom.packages.onDidActivateAll(resolve)
+      @disposables.add atom.packages.onDidActivateAll(resolve)
 
   editorForId: (editorId) ->
     for editor in atom.workspace.getTextEditors()
@@ -69,8 +73,8 @@ class MarkdownPreviewView extends ScrollView
     null
 
   handleEvents: ->
-    @subscribe atom.grammars.onDidAddGrammar _.debounce((=> @renderMarkdown()), 250)
-    @subscribe atom.grammars.onDidUpdateGrammar _.debounce((=> @renderMarkdown()), 250)
+    @disposables.add atom.grammars.onDidAddGrammar _.debounce((=> @renderMarkdown()), 250)
+    @disposables.add atom.grammars.onDidUpdateGrammar _.debounce((=> @renderMarkdown()), 250)
 
     atom.commands.add @element,
       'core:move-up': =>
@@ -100,17 +104,17 @@ class MarkdownPreviewView extends ScrollView
         pane.activateItem(this)
 
     if @file?
-      @subscribe @file.onDidChange(changeHandler)
+      @disposables.add @file.onDidChange(changeHandler)
     else if @editor?
-      @subscribe @editor.getBuffer().onDidStopChanging =>
+      @disposables.add @editor.getBuffer().onDidStopChanging =>
         changeHandler() if atom.config.get 'markdown-preview.liveUpdate'
-      @subscribe @editor.onDidChangePath => @trigger 'title-changed'
-      @subscribe @editor.getBuffer().onDidSave =>
+      @disposables.add @editor.onDidChangePath => @trigger 'title-changed'
+      @disposables.add @editor.getBuffer().onDidSave =>
         changeHandler() unless atom.config.get 'markdown-preview.liveUpdate'
-      @subscribe @editor.getBuffer().onDidReload =>
+      @disposables.add @editor.getBuffer().onDidReload =>
         changeHandler() unless atom.config.get 'markdown-preview.liveUpdate'
 
-    @subscribe atom.config.onDidChange 'markdown-preview.breakOnSingleNewline', changeHandler
+    @disposables.add atom.config.onDidChange 'markdown-preview.breakOnSingleNewline', changeHandler
 
   renderMarkdown: ->
     @showLoading()
