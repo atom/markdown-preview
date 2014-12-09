@@ -20,16 +20,22 @@ deserializer =
 atom.deserializers.add(deserializer)
 
 module.exports =
-  configDefaults:
-    breakOnSingleNewline: false
-    liveUpdate: true
-    grammars: [
-      'source.gfm'
-      'source.litcoffee'
-      'text.html.basic'
-      'text.plain'
-      'text.plain.null-grammar'
-    ]
+  config:
+    breakOnSingleNewline:
+      type: 'boolean'
+      default: false
+    liveUpdate:
+      type: 'boolean'
+      default: true
+    grammars:
+      type: 'array'
+      default: [
+        'source.gfm'
+        'source.litcoffee'
+        'text.html.basic'
+        'text.plain'
+        'text.plain.null-grammar'
+      ]
 
   activate: ->
     atom.commands.add 'atom-workspace',
