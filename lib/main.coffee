@@ -40,8 +40,13 @@ module.exports =
       'markdown-preview:toggle-break-on-single-newline': ->
         atom.config.toggle('markdown-preview.breakOnSingleNewline')
 
-    atom.workspaceView.on 'markdown-preview:preview-file', (event) =>
-      @previewFile(event)
+    previewFile = @previewFile.bind(this)
+    atom.commands.add '.tree-view .file .name[data-name$=\\.md]', 'markdown-preview:preview-file', previewFile
+    atom.commands.add '.tree-view .file .name[data-name$=\\.mdown]', 'markdown-preview:preview-file', previewFile
+    atom.commands.add '.tree-view .file .name[data-name$=\\.mkd]', 'markdown-preview:preview-file', previewFile
+    atom.commands.add '.tree-view .file .name[data-name$=\\.mkdown]', 'markdown-preview:preview-file', previewFile
+    atom.commands.add '.tree-view .file .name[data-name$=\\.ron]', 'markdown-preview:preview-file', previewFile
+    atom.commands.add '.tree-view .file .name[data-name$=\\.text]', 'markdown-preview:preview-file', previewFile
 
     atom.workspace.registerOpener (uriToOpen) ->
       try
