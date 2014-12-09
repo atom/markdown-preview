@@ -69,25 +69,27 @@ class MarkdownPreviewView extends ScrollView
     null
 
   handleEvents: ->
-    @subscribe atom.syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
-    @subscribe this, 'core:move-up', => @scrollUp()
-    @subscribe this, 'core:move-down', => @scrollDown()
-    @subscribe this, 'core:save-as', =>
-      @saveAs()
-      false
-    @subscribe this, 'core:copy', =>
-      return false if @copyToClipboard()
+    @subscribe atom.grammars.onDidAddGrammar _.debounce((=> @renderMarkdown()), 250)
+    @subscribe atom.grammars.onDidUpdateGrammar _.debounce((=> @renderMarkdown()), 250)
 
-    @subscribeToCommand atom.workspaceView, 'markdown-preview:zoom-in', =>
-      zoomLevel = parseFloat(@css('zoom')) or 1
-      @css('zoom', zoomLevel + .1)
-
-    @subscribeToCommand atom.workspaceView, 'markdown-preview:zoom-out', =>
-      zoomLevel = parseFloat(@css('zoom')) or 1
-      @css('zoom', zoomLevel - .1)
-
-    @subscribeToCommand atom.workspaceView, 'markdown-preview:reset-zoom', =>
-      @css('zoom', 1)
+    atom.commands.add @element,
+      'core:move-up': =>
+        @scrollUp()
+      'core:move-down': =>
+        @scrollDown()
+      'core:save-as': (event) =>
+        event.stopPropagation()
+        @saveAs()
+      'core:copy': (event) =>
+        event.stopPropagation() if @copyToClipboard()
+      'markdown-preview:zoom-in': =>
+        zoomLevel = parseFloat(@css('zoom')) or 1
+        @css('zoom', zoomLevel + .1)
+      'markdown-preview:zoom-out': =>
+        zoomLevel = parseFloat(@css('zoom')) or 1
+        @css('zoom', zoomLevel - .1)
+      'markdown-preview:reset-zoom': =>
+        @css('zoom', 1)
 
     changeHandler = =>
       @renderMarkdown()
