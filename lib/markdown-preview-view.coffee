@@ -100,7 +100,7 @@ class MarkdownPreviewView extends ScrollView
         pane.activateItem(this)
 
     if @file?
-      @subscribe(@file, 'contents-changed', changeHandler)
+      @subscribe @file.onDidChange(changeHandler)
     else if @editor?
       @subscribe @editor.getBuffer().onDidStopChanging =>
         changeHandler() if atom.config.get 'markdown-preview.liveUpdate'

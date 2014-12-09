@@ -242,7 +242,7 @@ describe "Markdown preview package", ->
         expect(preview).toBeInstanceOf(MarkdownPreviewView)
 
         MarkdownPreviewView::renderMarkdown.reset()
-        preview.file.emit('contents-changed')
+        preview.file.emitter.emit('did-change')
 
       waitsFor "renderMarkdown to be called", ->
         MarkdownPreviewView::renderMarkdown.callCount > 0
