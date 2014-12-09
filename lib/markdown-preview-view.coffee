@@ -61,7 +61,7 @@ class MarkdownPreviewView extends ScrollView
     if atom.workspace? and atom.workspaceView?
       resolve()
     else
-      @subscribe atom.packages.once('activated', resolve)
+      @subscribe atom.packages.onDidActivateAll(resolve)
 
   editorForId: (editorId) ->
     for editor in atom.workspace.getEditors()
