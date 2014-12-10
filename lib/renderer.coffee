@@ -24,7 +24,7 @@ exports.toHtml = (text='', filePath, grammar, callback) ->
   roaster text, options, (error, html) =>
     return callback(error) if error
 
-    grammar ?= atom.syntax.selectGrammar(filePath, text)
+    grammar ?= atom.grammars.selectGrammar(filePath, text)
     # Default code blocks to be coffee in Literate CoffeeScript files
     defaultCodeLanguage = 'coffee' if grammar.scopeName is 'source.litcoffee'
 
@@ -99,7 +99,7 @@ tokenizeCodeBlocks = (html, defaultLanguage='text') ->
     codeBlock = $(preElement.firstChild)
     fenceName = codeBlock.attr('class')?.replace(/^lang-/, '') ? defaultLanguage
 
-    highlighter ?= new Highlights(registry: atom.syntax)
+    highlighter ?= new Highlights(registry: atom.grammars)
     highlightedHtml = highlighter.highlightSync
       fileContents: codeBlock.text()
       scopeName: scopeForFenceName(fenceName)
