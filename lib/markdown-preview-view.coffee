@@ -1,6 +1,6 @@
 path = require 'path'
 
-{CompositeDisposable} = require 'atom'
+{Emitter, Disposable, CompositeDisposable} = require 'atom'
 {$, $$$, ScrollView} = require 'atom-space-pen-views'
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
@@ -15,6 +15,7 @@ class MarkdownPreviewView extends ScrollView
 
   constructor: ({@editorId, @filePath}) ->
     super
+    @emitter = new Emitter
     @disposables = new CompositeDisposable
 
   attached: ->
@@ -38,9 +39,16 @@ class MarkdownPreviewView extends ScrollView
   destroy: ->
     @disposables.dispose()
 
+  onDidChangeTitle: (callback) ->
+    @emitter.on 'did-change-title', callback
+
+  onDidChangeModified: (callback) ->
+    # No op to suppress deprecation warning
+    new Disposable
+
   subscribeToFilePath: (filePath) ->
     @file = new File(filePath)
-    @trigger 'title-changed'
+    @emitter.emit 'did-change-title'
     @handleEvents()
     @renderMarkdown()
 
@@ -49,7 +57,7 @@ class MarkdownPreviewView extends ScrollView
       @editor = @editorForId(editorId)
 
       if @editor?
-        @trigger 'title-changed' if @editor?
+        @emitter.emit 'did-change-title' if @editor?
         @handleEvents()
         @renderMarkdown()
       else
@@ -103,7 +111,7 @@ class MarkdownPreviewView extends ScrollView
     else if @editor?
       @disposables.add @editor.getBuffer().onDidStopChanging =>
         changeHandler() if atom.config.get 'markdown-preview.liveUpdate'
-      @disposables.add @editor.onDidChangePath => @trigger 'title-changed'
+      @disposables.add @editor.onDidChangePath => @emitter.emit 'did-change-title'
       @disposables.add @editor.getBuffer().onDidSave =>
         changeHandler() unless atom.config.get 'markdown-preview.liveUpdate'
       @disposables.add @editor.getBuffer().onDidReload =>

@@ -274,7 +274,7 @@ describe "Markdown preview package", ->
         expect(preview.getTitle()).toBe 'file.markdown Preview'
 
         titleChangedCallback.reset()
-        preview.one('title-changed', titleChangedCallback)
+        preview.onDidChangeTitle(titleChangedCallback)
         fs.renameSync(atom.workspace.getActiveTextEditor().getPath(), path.join(path.dirname(atom.workspace.getActiveTextEditor().getPath()), 'file2.md'))
 
       waitsFor ->
