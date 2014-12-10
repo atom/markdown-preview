@@ -143,7 +143,7 @@ class MarkdownPreviewView extends ScrollView
         @loading = false
         @html(html)
         @emitter.emit 'did-change-markdown'
-        @trigger('markdown-preview:markdown-changed')
+        @originalTrigger('markdown-preview:markdown-changed')
 
   getTitle: ->
     if @file?
