@@ -3,7 +3,7 @@ _ = require 'underscore-plus'
 cheerio = require 'cheerio'
 fs = require 'fs-plus'
 Highlights = require 'highlights'
-{$} = require 'atom'
+{$} = require 'atom-space-pen-views'
 roaster = null # Defer until used
 {scopeForFenceName} = require './extension-helper'
 

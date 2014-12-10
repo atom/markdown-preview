@@ -15,6 +15,7 @@ describe "Markdown preview package", ->
     jasmine.unspy(window, 'setTimeout')
 
     workspaceElement = atom.views.getView(atom.workspace)
+    jasmine.attachToDOM(workspaceElement)
 
     spyOn(MarkdownPreviewView.prototype, 'renderMarkdown').andCallThrough()
 
@@ -25,9 +26,6 @@ describe "Markdown preview package", ->
       atom.packages.activatePackage('language-gfm')
 
   describe "when a preview has not been created for the file", ->
-    beforeEach ->
-      jasmine.attachToDOM(workspaceElement)
-
     it "splits the current pane to the right with a markdown preview for the file", ->
       waitsForPromise ->
         atom.workspace.open("subdir/file.markdown")
@@ -136,8 +134,6 @@ describe "Markdown preview package", ->
     [editorPane, previewPane, preview] = []
 
     beforeEach ->
-      jasmine.attachToDOM(workspaceElement)
-
       waitsForPromise ->
         atom.workspace.open("subdir/file.markdown")
 
@@ -250,8 +246,6 @@ describe "Markdown preview package", ->
   describe "when the editor's grammar it not enabled for preview", ->
     it "does not open the markdown preview", ->
       atom.config.set('markdown-preview.grammars', [])
-
-      jasmine.attachToDOM(workspaceElement)
 
       waitsForPromise ->
         atom.workspace.open("subdir/file.markdown")

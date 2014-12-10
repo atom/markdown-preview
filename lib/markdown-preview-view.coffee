@@ -1,7 +1,7 @@
 path = require 'path'
 
 {CompositeDisposable} = require 'atom'
-{$, $$$, ScrollView} = require 'atom'
+{$, $$$, ScrollView} = require 'atom-space-pen-views'
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
 {File} = require 'pathwatcher'
@@ -15,25 +15,20 @@ class MarkdownPreviewView extends ScrollView
 
   constructor: ({@editorId, @filePath}) ->
     super
-
     @disposables = new CompositeDisposable
 
-    unless @editorId?
+  attached: ->
+    return if @isAttached
+    @isAttached = true
+
+    if @editorId?
+      @resolveEditor(@editorId)
+    else
       if atom.workspace?
         @subscribeToFilePath(@filePath)
       else
         @disposables.add atom.packages.onDidActivateAll =>
           @subscribeToFilePath(@filePath)
-
-  afterAttach: ->
-    return if @attached
-
-    @attached = true
-    if @editorId?
-      @resolveEditor(@editorId)
-
-  beforeRemove: ->
-    @attached = false
 
   serialize: ->
     deserializer: 'MarkdownPreviewView'
