@@ -1,16 +1,12 @@
 path = require 'path'
-{WorkspaceView} = require 'atom'
 fs = require 'fs-plus'
 temp = require 'temp'
 MarkdownPreviewView = require '../lib/markdown-preview-view'
 
 describe "MarkdownPreviewView", ->
-  [file, preview] = []
+  [file, preview, workspaceElement] = []
 
   beforeEach ->
-    atom.workspaceView = new WorkspaceView
-    atom.workspace = atom.workspaceView.model
-
     filePath = atom.project.resolve('subdir/file.markdown')
     preview = new MarkdownPreviewView({filePath})
     preview.attachToDom()
