@@ -2,6 +2,7 @@ path = require 'path'
 
 {Emitter, Disposable, CompositeDisposable} = require 'atom'
 {$, $$$, ScrollView} = require 'atom-space-pen-views'
+Grim = require 'grim'
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
 {File} = require 'pathwatcher'
@@ -45,6 +46,14 @@ class MarkdownPreviewView extends ScrollView
   onDidChangeModified: (callback) ->
     # No op to suppress deprecation warning
     new Disposable
+
+  onDidChangeMarkdown: (callback) ->
+    @emitter.on 'did-change-markdown', callback
+
+  on: (eventName) ->
+    if eventName is 'markdown-preview:markdown-changed'
+      Grim.deprecate("Use MarkdownPreviewView::onDidChangeMarkdown instead of the 'markdown-preview:markdown-changed' jQuery event")
+    super
 
   subscribeToFilePath: (filePath) ->
     @file = new File(filePath)
@@ -133,6 +142,7 @@ class MarkdownPreviewView extends ScrollView
       else
         @loading = false
         @html(html)
+        @emitter.emit 'did-change-markdown'
         @trigger('markdown-preview:markdown-changed')
 
   getTitle: ->

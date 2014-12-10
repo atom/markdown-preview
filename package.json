@@ -12,6 +12,7 @@
     "atom-space-pen-views": "^0.20.0",
     "cheerio": "0.15.0",
     "fs-plus": "2.x",
+    "grim": "^0.12.0",
     "highlights": "0.13.0",
     "pathwatcher": "^2.0",
     "roaster": "^1.1.2",

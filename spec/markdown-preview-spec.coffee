@@ -163,6 +163,21 @@ describe "Markdown preview package", ->
       expect(previewPane.getActiveItem()).toBeUndefined()
 
     describe "when the editor is modified", ->
+      it "invokes ::onDidChangeMarkdown listeners", ->
+        markdownEditor = atom.workspace.getActiveTextEditor()
+        preview = previewPane.getActiveItem()
+        preview.onDidChangeMarkdown(listener = jasmine.createSpy('didChangeMarkdownListener'))
+
+        runs ->
+          MarkdownPreviewView::renderMarkdown.reset()
+          markdownEditor.setText("Hey!")
+
+        waitsFor ->
+          MarkdownPreviewView::renderMarkdown.callCount > 0
+
+        runs ->
+          expect(listener).toHaveBeenCalled()
+
       describe "when the preview is in the active pane but is not the active item", ->
         it "re-renders the preview but does not make it active", ->
           markdownEditor = atom.workspace.getActiveTextEditor()
