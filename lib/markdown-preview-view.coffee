@@ -1,6 +1,8 @@
 path = require 'path'
 
-{$, $$$, ScrollView} = require 'atom'
+{Emitter, Disposable, CompositeDisposable} = require 'atom'
+{$, $$$, ScrollView} = require 'atom-space-pen-views'
+Grim = require 'grim'
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
 {File} = require 'pathwatcher'
@@ -14,22 +16,21 @@ class MarkdownPreviewView extends ScrollView
 
   constructor: ({@editorId, @filePath}) ->
     super
+    @emitter = new Emitter
+    @disposables = new CompositeDisposable
 
-  afterAttach: ->
-    return if @attached
+  attached: ->
+    return if @isAttached
+    @isAttached = true
 
-    @attached = true
     if @editorId?
       @resolveEditor(@editorId)
     else
-      if atom.workspace? and atom.workspaceView?
+      if atom.workspace?
         @subscribeToFilePath(@filePath)
       else
-        @subscribe atom.packages.once 'activated', =>
+        @disposables.add atom.packages.onDidActivateAll =>
           @subscribeToFilePath(@filePath)
-
-  beforeRemove: ->
-    @attached = false
 
   serialize: ->
     deserializer: 'MarkdownPreviewView'
@@ -37,11 +38,26 @@ class MarkdownPreviewView extends ScrollView
     editorId: @editorId
 
   destroy: ->
-    @unsubscribe()
+    @disposables.dispose()
+
+  onDidChangeTitle: (callback) ->
+    @emitter.on 'did-change-title', callback
+
+  onDidChangeModified: (callback) ->
+    # No op to suppress deprecation warning
+    new Disposable
+
+  onDidChangeMarkdown: (callback) ->
+    @emitter.on 'did-change-markdown', callback
+
+  on: (eventName) ->
+    if eventName is 'markdown-preview:markdown-changed'
+      Grim.deprecate("Use MarkdownPreviewView::onDidChangeMarkdown instead of the 'markdown-preview:markdown-changed' jQuery event")
+    super
 
   subscribeToFilePath: (filePath) ->
     @file = new File(filePath)
-    @trigger 'title-changed'
+    @emitter.emit 'did-change-title'
     @handleEvents()
     @renderMarkdown()
 
@@ -50,7 +66,7 @@ class MarkdownPreviewView extends ScrollView
       @editor = @editorForId(editorId)
 
       if @editor?
-        @trigger 'title-changed' if @editor?
+        @emitter.emit 'did-change-title' if @editor?
         @handleEvents()
         @renderMarkdown()
       else
@@ -58,36 +74,38 @@ class MarkdownPreviewView extends ScrollView
         # this preview since a preview cannot be rendered without an editor
         @parents('.pane').view()?.destroyItem(this)
 
-    if atom.workspace? and atom.workspaceView?
+    if atom.workspace?
       resolve()
     else
-      @subscribe atom.packages.once('activated', resolve)
+      @disposables.add atom.packages.onDidActivateAll(resolve)
 
   editorForId: (editorId) ->
-    for editor in atom.workspace.getEditors()
+    for editor in atom.workspace.getTextEditors()
       return editor if editor.id?.toString() is editorId.toString()
     null
 
   handleEvents: ->
-    @subscribe atom.syntax, 'grammar-added grammar-updated', _.debounce((=> @renderMarkdown()), 250)
-    @subscribe this, 'core:move-up', => @scrollUp()
-    @subscribe this, 'core:move-down', => @scrollDown()
-    @subscribe this, 'core:save-as', =>
-      @saveAs()
-      false
-    @subscribe this, 'core:copy', =>
-      return false if @copyToClipboard()
+    @disposables.add atom.grammars.onDidAddGrammar _.debounce((=> @renderMarkdown()), 250)
+    @disposables.add atom.grammars.onDidUpdateGrammar _.debounce((=> @renderMarkdown()), 250)
 
-    @subscribeToCommand atom.workspaceView, 'markdown-preview:zoom-in', =>
-      zoomLevel = parseFloat(@css('zoom')) or 1
-      @css('zoom', zoomLevel + .1)
-
-    @subscribeToCommand atom.workspaceView, 'markdown-preview:zoom-out', =>
-      zoomLevel = parseFloat(@css('zoom')) or 1
-      @css('zoom', zoomLevel - .1)
-
-    @subscribeToCommand atom.workspaceView, 'markdown-preview:reset-zoom', =>
-      @css('zoom', 1)
+    atom.commands.add @element,
+      'core:move-up': =>
+        @scrollUp()
+      'core:move-down': =>
+        @scrollDown()
+      'core:save-as': (event) =>
+        event.stopPropagation()
+        @saveAs()
+      'core:copy': (event) =>
+        event.stopPropagation() if @copyToClipboard()
+      'markdown-preview:zoom-in': =>
+        zoomLevel = parseFloat(@css('zoom')) or 1
+        @css('zoom', zoomLevel + .1)
+      'markdown-preview:zoom-out': =>
+        zoomLevel = parseFloat(@css('zoom')) or 1
+        @css('zoom', zoomLevel - .1)
+      'markdown-preview:reset-zoom': =>
+        @css('zoom', 1)
 
     changeHandler = =>
       @renderMarkdown()
@@ -98,15 +116,17 @@ class MarkdownPreviewView extends ScrollView
         pane.activateItem(this)
 
     if @file?
-      @subscribe(@file, 'contents-changed', changeHandler)
+      @disposables.add @file.onDidChange(changeHandler)
     else if @editor?
-      @subscribe @editor.getBuffer(), 'contents-modified', =>
+      @disposables.add @editor.getBuffer().onDidStopChanging =>
         changeHandler() if atom.config.get 'markdown-preview.liveUpdate'
-      @subscribe @editor, 'path-changed', => @trigger 'title-changed'
-      @subscribe @editor.getBuffer(), 'reloaded saved', =>
+      @disposables.add @editor.onDidChangePath => @emitter.emit 'did-change-title'
+      @disposables.add @editor.getBuffer().onDidSave =>
+        changeHandler() unless atom.config.get 'markdown-preview.liveUpdate'
+      @disposables.add @editor.getBuffer().onDidReload =>
         changeHandler() unless atom.config.get 'markdown-preview.liveUpdate'
 
-    @subscribe atom.config.observe 'markdown-preview.breakOnSingleNewline', callNow: false, changeHandler
+    @disposables.add atom.config.onDidChange 'markdown-preview.breakOnSingleNewline', changeHandler
 
   renderMarkdown: ->
     @showLoading()
@@ -122,7 +142,8 @@ class MarkdownPreviewView extends ScrollView
       else
         @loading = false
         @html(html)
-        @trigger('markdown-preview:markdown-changed')
+        @emitter.emit 'did-change-markdown'
+        @originalTrigger('markdown-preview:markdown-changed')
 
   getTitle: ->
     if @file?

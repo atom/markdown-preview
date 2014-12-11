@@ -1,6 +1,6 @@
 url = require 'url'
 fs = require 'fs-plus'
-{$} = require 'atom'
+{$} = require 'atom-space-pen-views'
 
 MarkdownPreviewView = null # Defer until used
 renderer = null # Defer until used
@@ -13,38 +13,48 @@ isMarkdownPreviewView = (object) ->
   MarkdownPreviewView ?= require './markdown-preview-view'
   object instanceof MarkdownPreviewView
 
-deserializer =
+atom.deserializers.add
   name: 'MarkdownPreviewView'
   deserialize: (state) ->
     createMarkdownPreviewView(state) if state.constructor is Object
-atom.deserializers.add(deserializer)
 
 module.exports =
-  configDefaults:
-    breakOnSingleNewline: false
-    liveUpdate: true
-    grammars: [
-      'source.gfm'
-      'source.litcoffee'
-      'text.html.basic'
-      'text.plain'
-      'text.plain.null-grammar'
-    ]
+  config:
+    breakOnSingleNewline:
+      type: 'boolean'
+      default: false
+    liveUpdate:
+      type: 'boolean'
+      default: true
+    grammars:
+      type: 'array'
+      default: [
+        'source.gfm'
+        'source.litcoffee'
+        'text.html.basic'
+        'text.plain'
+        'text.plain.null-grammar'
+      ]
 
   activate: ->
-    atom.workspaceView.command 'markdown-preview:toggle', =>
-      @toggle()
+    atom.commands.add 'atom-workspace',
+      'markdown-preview:toggle': =>
+        @toggle()
+      'markdown-preview:copy-html': =>
+        @copyHtml()
+      'markdown-preview:toggle-break-on-single-newline': ->
+        keyPath = 'markdown-preview.breakOnSingleNewline'
+        atom.config.set(keyPath, !atom.config.get(keyPath))
 
-    atom.workspaceView.command 'markdown-preview:copy-html', =>
-      @copyHtml()
+    previewFile = @previewFile.bind(this)
+    atom.commands.add '.tree-view .file .name[data-name$=\\.md]', 'markdown-preview:preview-file', previewFile
+    atom.commands.add '.tree-view .file .name[data-name$=\\.mdown]', 'markdown-preview:preview-file', previewFile
+    atom.commands.add '.tree-view .file .name[data-name$=\\.mkd]', 'markdown-preview:preview-file', previewFile
+    atom.commands.add '.tree-view .file .name[data-name$=\\.mkdown]', 'markdown-preview:preview-file', previewFile
+    atom.commands.add '.tree-view .file .name[data-name$=\\.ron]', 'markdown-preview:preview-file', previewFile
+    atom.commands.add '.tree-view .file .name[data-name$=\\.text]', 'markdown-preview:preview-file', previewFile
 
-    atom.workspaceView.on 'markdown-preview:preview-file', (event) =>
-      @previewFile(event)
-
-    atom.workspaceView.command 'markdown-preview:toggle-break-on-single-newline', ->
-      atom.config.toggle('markdown-preview.breakOnSingleNewline')
-
-    atom.workspace.registerOpener (uriToOpen) ->
+    atom.workspace.addOpener (uriToOpen) ->
       try
         {protocol, host, pathname} = url.parse(uriToOpen)
       catch error
@@ -63,11 +73,11 @@ module.exports =
         createMarkdownPreviewView(filePath: pathname)
 
   toggle: ->
-    if isMarkdownPreviewView(atom.workspace.activePaneItem)
+    if isMarkdownPreviewView(atom.workspace.getActivePaneItem())
       atom.workspace.destroyActivePaneItem()
       return
 
-    editor = atom.workspace.getActiveEditor()
+    editor = atom.workspace.getActiveTextEditor()
     return unless editor?
 
     grammars = atom.config.get('markdown-preview.grammars') ? []
@@ -98,14 +108,14 @@ module.exports =
     filePath = target.dataset.path
     return unless filePath
 
-    for editor in atom.workspace.getEditors() when editor.getPath() is filePath
+    for editor in atom.workspace.getTextEditors() when editor.getPath() is filePath
       @addPreviewForEditor(editor)
       return
 
     atom.workspace.open "markdown-preview://#{encodeURI(filePath)}", searchAllPanes: true
 
   copyHtml: ->
-    editor = atom.workspace.getActiveEditor()
+    editor = atom.workspace.getActiveTextEditor()
     return unless editor?
 
     renderer ?= require './renderer'

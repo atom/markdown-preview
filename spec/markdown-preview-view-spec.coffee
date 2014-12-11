@@ -1,19 +1,15 @@
 path = require 'path'
-{WorkspaceView} = require 'atom'
 fs = require 'fs-plus'
 temp = require 'temp'
 MarkdownPreviewView = require '../lib/markdown-preview-view'
 
 describe "MarkdownPreviewView", ->
-  [file, preview] = []
+  [file, preview, workspaceElement] = []
 
   beforeEach ->
-    atom.workspaceView = new WorkspaceView
-    atom.workspace = atom.workspaceView.model
-
     filePath = atom.project.resolve('subdir/file.markdown')
     preview = new MarkdownPreviewView({filePath})
-    preview.attachToDom()
+    jasmine.attachToDOM(preview.element)
 
     waitsForPromise ->
       atom.packages.activatePackage('language-ruby')
@@ -47,7 +43,7 @@ describe "MarkdownPreviewView", ->
 
     it "recreates the file when serialized/deserialized", ->
       newPreview = atom.deserializers.deserialize(preview.serialize())
-      newPreview.attachToDom()
+      jasmine.attachToDOM(newPreview.element)
       expect(newPreview.getPath()).toBe preview.getPath()
 
     it "serializes the editor id when opened for an editor", ->
@@ -57,12 +53,13 @@ describe "MarkdownPreviewView", ->
         atom.workspace.open('new.markdown')
 
       runs ->
-        preview = new MarkdownPreviewView({editorId: atom.workspace.getActiveEditor().id})
-        preview.attachToDom()
-        expect(preview.getPath()).toBe atom.workspace.getActiveEditor().getPath()
+        preview = new MarkdownPreviewView({editorId: atom.workspace.getActiveTextEditor().id})
+
+        jasmine.attachToDOM(preview.element)
+        expect(preview.getPath()).toBe atom.workspace.getActiveTextEditor().getPath()
 
         newPreview = atom.deserializers.deserialize(preview.serialize())
-        newPreview.attachToDom()
+        jasmine.attachToDOM(newPreview.element)
         expect(newPreview.getPath()).toBe preview.getPath()
 
   describe "code block tokenization", ->
@@ -111,7 +108,7 @@ describe "MarkdownPreviewView", ->
         filePath = path.join(temp.mkdirSync('atom'), 'foo.md')
         fs.writeFileSync(filePath, "![absolute](#{filePath})")
         preview = new MarkdownPreviewView({filePath})
-        preview.attachToDom()
+        jasmine.attachToDOM(preview.element)
 
         waitsForPromise ->
           preview.renderMarkdown()
@@ -150,7 +147,7 @@ describe "MarkdownPreviewView", ->
       preview.destroy()
       filePath = atom.project.resolve('subdir/simple.md')
       preview = new MarkdownPreviewView({filePath})
-      preview.attachToDom()
+      jasmine.attachToDOM(preview.element)
 
     it "saves the rendered HTML and opens it", ->
       outputPath = temp.path(suffix: '.html')
@@ -161,15 +158,15 @@ describe "MarkdownPreviewView", ->
 
       runs ->
         spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
-        preview.trigger 'core:save-as'
+        atom.commands.dispatch preview.element, 'core:save-as'
         outputPath = fs.realpathSync(outputPath)
         expect(fs.isFileSync(outputPath)).toBe true
 
       waitsFor ->
-        atom.workspace.getActiveEditor()?.getPath() is outputPath
+        atom.workspace.getActiveTextEditor()?.getPath() is outputPath
 
       runs ->
-        expect(atom.workspace.getActiveEditor().getText()).toBe """
+        expect(atom.workspace.getActiveTextEditor().getText()).toBe """
           <p><em>italic</em></p>
           <p><strong>bold</strong></p>
           <p>encoding \u2192 issue</p>
@@ -180,14 +177,14 @@ describe "MarkdownPreviewView", ->
       preview.destroy()
       filePath = atom.project.resolve('subdir/simple.md')
       preview = new MarkdownPreviewView({filePath})
-      preview.attachToDom()
+      jasmine.attachToDOM(preview.element)
 
     it "writes the rendered HTML to the clipboard", ->
       waitsForPromise ->
         preview.renderMarkdown()
 
       runs ->
-        preview.trigger 'core:copy'
+        atom.commands.dispatch preview.element, 'core:copy'
         expect(atom.clipboard.read()).toBe """
           <p><em>italic</em></p>
           <p><strong>bold</strong></p>
