@@ -43,7 +43,8 @@ module.exports =
       'markdown-preview:copy-html': =>
         @copyHtml()
       'markdown-preview:toggle-break-on-single-newline': ->
-        atom.config.toggle('markdown-preview.breakOnSingleNewline')
+        keyPath = 'markdown-preview.breakOnSingleNewline'
+        atom.config.set(keyPath, !atom.config.get(keyPath))
 
     previewFile = @previewFile.bind(this)
     atom.commands.add '.tree-view .file .name[data-name$=\\.md]', 'markdown-preview:preview-file', previewFile
