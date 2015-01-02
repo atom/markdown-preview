@@ -11,13 +11,13 @@
   "dependencies": {
     "atom-space-pen-views": "^0.21.0",
     "cheerio": "0.15.0",
-    "fs-plus": "2.x",
+    "fs-plus": "^2.0.0",
     "grim": "^0.12.0",
     "highlights": "0.13.0",
     "pathwatcher": "^2.0",
     "roaster": "^1.1.2",
-    "temp": "0.6.x",
-    "underscore-plus": "1.x",
-    "wrench": "1.5.x"
+    "temp": "^0.6.0",
+    "underscore-plus": "^1.0.0",
+    "wrench": "^1.5.0"
   }
 }
