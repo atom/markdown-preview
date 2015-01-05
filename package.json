@@ -9,7 +9,7 @@
     "atom": "*"
   },
   "dependencies": {
-    "atom-space-pen-views": "^1.0.0",
+    "atom-space-pen-views": "^2.0.0",
     "cheerio": "0.15.0",
     "fs-plus": "^2.0.0",
     "grim": "^1.0.0",
