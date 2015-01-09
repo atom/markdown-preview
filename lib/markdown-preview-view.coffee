@@ -29,7 +29,7 @@ class MarkdownPreviewView extends ScrollView
       if atom.workspace?
         @subscribeToFilePath(@filePath)
       else
-        @disposables.add atom.packages.onDidActivateAll =>
+        @disposables.add atom.packages.onDidActivateInitialPackages =>
           @subscribeToFilePath(@filePath)
 
   serialize: ->
@@ -77,7 +77,7 @@ class MarkdownPreviewView extends ScrollView
     if atom.workspace?
       resolve()
     else
-      @disposables.add atom.packages.onDidActivateAll(resolve)
+      @disposables.add atom.packages.onDidActivateInitialPackages(resolve)
 
   editorForId: (editorId) ->
     for editor in atom.workspace.getTextEditors()
