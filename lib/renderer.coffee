@@ -11,7 +11,7 @@ highlighter = null
 {resourcePath} = atom.getLoadSettings()
 packagePath = path.dirname(__dirname)
 
-exports.toHtml = (text='', filePath, grammar, callback) ->
+exports.toDOMFragment = (text='', filePath, grammar, callback) ->
   roaster ?= require 'roaster'
   options =
     sanitize: false
@@ -33,7 +33,7 @@ exports.toHtml = (text='', filePath, grammar, callback) ->
     html = tokenizeCodeBlocks(html, defaultCodeLanguage)
     callback(null, html)
 
-exports.toText = (text, filePath, grammar, callback) ->
+exports.toHTML = (text, filePath, grammar, callback) ->
   exports.toHtml text, filePath, grammar, (error, html) ->
     if error
       callback(error)
