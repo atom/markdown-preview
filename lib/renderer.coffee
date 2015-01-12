@@ -31,7 +31,7 @@ exports.toHtml = (text='', filePath, grammar, callback) ->
     html = sanitize(html)
     html = resolveImagePaths(html, filePath)
     html = tokenizeCodeBlocks(html, defaultCodeLanguage)
-    callback(null, html.html().trim())
+    callback(null, html)
 
 exports.toText = (text, filePath, grammar, callback) ->
   exports.toHtml text, filePath, grammar, (error, html) ->
@@ -99,15 +99,17 @@ tokenizeCodeBlocks = (html, defaultLanguage='text') ->
     codeBlock = $(preElement.firstChild)
     fenceName = codeBlock.attr('class')?.replace(/^lang-/, '') ? defaultLanguage
 
-    highlighter ?= new Highlights(registry: atom.grammars)
-    highlightedHtml = highlighter.highlightSync
-      fileContents: codeBlock.text()
-      scopeName: scopeForFenceName(fenceName)
+    editorElement = document.createElement('atom-text-editor')
+    editorElement.setAttributeNode(document.createAttribute('gutter-hidden'))
+    editorElement.removeAttribute('tabindex') # make read-only
 
-    highlightedBlock = $(highlightedHtml)
-    # The `editor` class messes things up as `.editor` has absolutely positioned lines
-    highlightedBlock.removeClass('editor').addClass("lang-#{fenceName}")
-    highlightedBlock.insertAfter(preElement)
+    $(editorElement).insertAfter(preElement)
+
+    editor = editorElement.getModel()
+    editor.setText(codeBlock.text().trim())
+    if grammar = atom.grammars.grammarForScopeName(scopeForFenceName(fenceName))
+      editor.setGrammar(grammar)
+
     preElement.remove()
 
   html

@@ -141,7 +141,9 @@ class MarkdownPreviewView extends ScrollView
         @showError(error)
       else
         @loading = false
-        @html(html)
+        @empty()
+        console.log html
+        @append(html)
         @emitter.emit 'did-change-markdown'
         @originalTrigger('markdown-preview:markdown-changed')
 

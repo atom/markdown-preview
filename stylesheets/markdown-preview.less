@@ -29,9 +29,9 @@
 // container with .markdown-preview on it should render generally well. It also
 // includes some GitHub Flavored Markdown specific styling (like @mentions)
 .markdown-preview {
-  pre,
   code,
-  tt {
+  tt,
+  atom-text-editor {
     font-size: 12px;
     font-family: Consolas, "Liberation Mono", Courier, monospace;
   }
@@ -46,6 +46,16 @@
 
   ul > li {
     list-style-type: disc;
+  }
+
+  li > atom-text-editor {
+    display: inline-block;
+    vertical-align: top;
+    width: 100%;
+  }
+
+  li:last-child > atom-text-editor {
+    margin-bottom: 0;
   }
 
   & > *:first-child {
@@ -136,7 +146,7 @@
   blockquote,
   ul, ol, dl,
   table,
-  pre {
+  atom-text-editor {
     margin: 15px 0;
   }
 
@@ -390,17 +400,7 @@
 
   code { white-space: nowrap; }
 
-  // Code tags within code blocks (<pre>s)
-  pre > code {
-    margin: 0;
-    padding: 0;
-    white-space: pre;
-    border: none;
-    background: transparent;
-    word-wrap: normal;
-  }
-
-  pre {
+  atom-text-editor {
     background: #f8f8f8;
     border: 1px solid #ccc;
     font-size: 13px;
@@ -408,18 +408,8 @@
     overflow: auto;
     padding: 6px 10px;
     border-radius:3px;
-  }
-
-  pre.editor-colors {
     background: @syntax-background-color;
     border: 1px solid darken(@syntax-background-color, 10%);
-  }
-
-  pre code, pre tt {
-    margin: 0;
-    padding: 0;
-    background-color: transparent;
-    border: none;
   }
 
   kbd {
