@@ -3,6 +3,7 @@ fs = require 'fs-plus'
 temp = require 'temp'
 wrench = require 'wrench'
 MarkdownPreviewView = require '../lib/markdown-preview-view'
+{$} = require 'atom-space-pen-views'
 
 describe "Markdown preview package", ->
   workspaceElement = null
@@ -321,6 +322,43 @@ describe "Markdown preview package", ->
         expect(atom.clipboard.read()).toBe """
           <p><em>italic</em></p>
         """
+
+    describe "code block tokenization", ->
+      preview = null
+
+      beforeEach ->
+        waitsForPromise ->
+          atom.packages.activatePackage('language-ruby')
+
+        waitsForPromise ->
+          atom.packages.activatePackage('markdown-preview')
+
+        waitsForPromise ->
+          atom.workspace.open("subdir/file.markdown")
+
+        runs ->
+          workspaceElement = atom.views.getView(atom.workspace)
+          atom.commands.dispatch workspaceElement, 'markdown-preview:copy-html'
+          preview = $('<div>').append(atom.clipboard.read())
+
+      describe "when the code block's fence name has a matching grammar", ->
+        it "tokenizes the code block with the grammar", ->
+          expect(preview.find("pre span.entity.name.function.ruby")).toExist()
+
+      describe "when the code block's fence name doesn't have a matching grammar", ->
+        it "does not tokenize the code block", ->
+          expect(preview.find("pre.lang-kombucha .line .null-grammar").children().length).toBe 2
+
+      describe "when the code block contains empty lines", ->
+        it "doesn't remove the empty lines", ->
+          expect(preview.find("pre.lang-python").children().length).toBe 6
+          expect(preview.find("pre.lang-python div:nth-child(2)").text().trim()).toBe ''
+          expect(preview.find("pre.lang-python div:nth-child(4)").text().trim()).toBe ''
+          expect(preview.find("pre.lang-python div:nth-child(5)").text().trim()).toBe ''
+
+      describe "when the code block is nested in a list", ->
+        it "detects and styles the block", ->
+          expect(preview.find("pre.lang-javascript")).toHaveClass 'editor-colors'
 
   describe "sanitization", ->
     it "removes script tags and attributes that commonly contain inline scripts", ->
