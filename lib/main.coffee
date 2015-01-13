@@ -35,6 +35,9 @@ module.exports =
         'text.plain'
         'text.plain.null-grammar'
       ]
+    mermaidPath:
+      type: 'string'
+      default: 'node_modules/mermaid/dist/mermaid.full.min.js'
 
   activate: ->
     atom.commands.add 'atom-workspace',

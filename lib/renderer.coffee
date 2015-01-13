@@ -6,6 +6,7 @@ Highlights = require 'highlights'
 {$} = require 'atom-space-pen-views'
 roaster = null # Defer until used
 {scopeForFenceName} = require './extension-helper'
+{allowUnsafeEval} = require 'loophole'
 
 highlighter = null
 {resourcePath} = atom.getLoadSettings()
@@ -13,9 +14,11 @@ packagePath = path.dirname(__dirname)
 
 exports.toHtml = (text='', filePath, grammar, callback) ->
   roaster ?= require 'roaster'
+  mermaidPath = resolvePath(atom.config.get('markdown-preview.mermaidPath'), filePath)
   options =
     sanitize: false
     breaks: atom.config.get('markdown-preview.breakOnSingleNewline')
+    mermaidPath: mermaidPath
 
   # Remove the <!doctype> since otherwise marked will escape it
   # https://github.com/chjj/marked/issues/354
@@ -31,7 +34,8 @@ exports.toHtml = (text='', filePath, grammar, callback) ->
     html = sanitize(html)
     html = resolveImagePaths(html, filePath)
     html = tokenizeCodeBlocks(html, defaultCodeLanguage)
-    callback(null, html.html().trim())
+    allowUnsafeEval ->
+      callback(null, html.html().trim())
 
 exports.toText = (text, filePath, grammar, callback) ->
   exports.toHtml text, filePath, grammar, (error, html) ->
@@ -43,7 +47,7 @@ exports.toText = (text, filePath, grammar, callback) ->
 
 sanitize = (html) ->
   o = cheerio.load("<div>#{html}</div>")
-  o('script').remove()
+  removeNonMermaidScripts(o)
   attributesToRemove = [
     'onabort'
     'onblur'
@@ -71,23 +75,35 @@ sanitize = (html) ->
   o('*').removeAttr(attribute) for attribute in attributesToRemove
   o.html()
 
+removeNonMermaidScripts = (o) ->
+  scripts = o('script')
+  scripts = scripts.filter ->
+    !cheerio(this).attr('src').match(/mermaid/)
+  scripts.remove()
+
 resolveImagePaths = (html, filePath) ->
   html = $(html)
   for imgElement in html.find('img')
     img = $(imgElement)
     if src = img.attr('src')
-      continue if src.match(/^(https?|atom):\/\//)
-      continue if src.startsWith(process.resourcesPath)
-      continue if src.startsWith(resourcePath)
-      continue if src.startsWith(packagePath)
-
-      if src[0] is '/'
-        unless fs.isFileSync(src)
-          img.attr('src', atom.project.resolve(src.substring(1)))
-      else
-        img.attr('src', path.resolve(path.dirname(filePath), src))
+      img.attr('src', resolvePath(src, filePath))
 
   html
+
+resolvePath = (src, filePath) ->
+  return src unless src
+  return src if src.match(/^(https?|atom):\/\//)
+  return src if src.startsWith(process.resourcesPath)
+  return src if src.startsWith(resourcePath)
+  return src if src.startsWith(packagePath)
+
+  if src[0] is '/'
+    unless fs.isFileSync(src)
+      src = atom.project.resolve(src.substring(1))
+  else
+    src = path.resolve(path.dirname(filePath), src)
+
+  src
 
 tokenizeCodeBlocks = (html, defaultLanguage='text') ->
   html = $(html)

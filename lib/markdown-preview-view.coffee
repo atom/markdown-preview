@@ -142,6 +142,11 @@ class MarkdownPreviewView extends ScrollView
       else
         @loading = false
         @html(html)
+        try
+          window.mermaid.init() if window.mermaid
+        catch error
+          @showError(error)
+          return
         @emitter.emit 'did-change-markdown'
         @originalTrigger('markdown-preview:markdown-changed')
 
