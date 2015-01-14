@@ -136,12 +136,13 @@ class MarkdownPreviewView extends ScrollView
       @renderMarkdownText(@editor.getText())
 
   renderMarkdownText: (text) ->
-    renderer.toHtml text, @getPath(), @getGrammar(), (error, html) =>
+    renderer.toDOMFragment text, @getPath(), @getGrammar(), (error, domFragment) =>
       if error
         @showError(error)
       else
         @loading = false
-        @html(html)
+        @empty()
+        @append(domFragment)
         @emitter.emit 'did-change-markdown'
         @originalTrigger('markdown-preview:markdown-changed')
 

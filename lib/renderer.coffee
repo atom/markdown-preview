@@ -11,7 +11,28 @@ highlighter = null
 {resourcePath} = atom.getLoadSettings()
 packagePath = path.dirname(__dirname)
 
-exports.toHtml = (text='', filePath, grammar, callback) ->
+exports.toDOMFragment = (text='', filePath, grammar, callback) ->
+  render text, filePath, grammar, (error, html) ->
+    return callback(error) if error?
+
+    template = document.createElement('template')
+    template.innerHTML = html
+    domFragment = template.content.cloneNode(true)
+
+    # Default code blocks to be coffee in Literate CoffeeScript files
+    defaultCodeLanguage = 'coffee' if grammar?.scopeName is 'source.litcoffee'
+    convertCodeBlocksToAtomEditors(domFragment, defaultCodeLanguage)
+    callback(null, domFragment)
+
+exports.toHTML = (text='', filePath, grammar, callback) ->
+  render text, filePath, grammar, (error, html) ->
+    return callback(error) if error?
+    # Default code blocks to be coffee in Literate CoffeeScript files
+    defaultCodeLanguage = 'coffee' if grammar?.scopeName is 'source.litcoffee'
+    html = tokenizeCodeBlocks(html, defaultCodeLanguage)
+    callback(null, html)
+
+render = (text, filePath, grammar, callback) ->
   roaster ?= require 'roaster'
   options =
     sanitize: false
@@ -24,25 +45,12 @@ exports.toHtml = (text='', filePath, grammar, callback) ->
   roaster text, options, (error, html) =>
     return callback(error) if error
 
-    grammar ?= atom.grammars.selectGrammar(filePath, text)
-    # Default code blocks to be coffee in Literate CoffeeScript files
-    defaultCodeLanguage = 'coffee' if grammar.scopeName is 'source.litcoffee'
-
     html = sanitize(html)
     html = resolveImagePaths(html, filePath)
-    html = tokenizeCodeBlocks(html, defaultCodeLanguage)
-    callback(null, html.html().trim())
-
-exports.toText = (text, filePath, grammar, callback) ->
-  exports.toHtml text, filePath, grammar, (error, html) ->
-    if error
-      callback(error)
-    else
-      string = $(document.createElement('div')).append(html)[0].innerHTML
-      callback(error, string)
+    callback(null, html.trim())
 
 sanitize = (html) ->
-  o = cheerio.load("<div>#{html}</div>")
+  o = cheerio.load(html)
   o('script').remove()
   attributesToRemove = [
     'onabort'
@@ -72,9 +80,9 @@ sanitize = (html) ->
   o.html()
 
 resolveImagePaths = (html, filePath) ->
-  html = $(html)
-  for imgElement in html.find('img')
-    img = $(imgElement)
+  o = cheerio.load(html)
+  for imgElement in o('img')
+    img = o(imgElement)
     if src = img.attr('src')
       continue if src.match(/^(https?|atom):\/\//)
       continue if src.startsWith(process.resourcesPath)
@@ -87,16 +95,40 @@ resolveImagePaths = (html, filePath) ->
       else
         img.attr('src', path.resolve(path.dirname(filePath), src))
 
-  html
+  o.html()
+
+convertCodeBlocksToAtomEditors = (domFragment, defaultLanguage='text') ->
+  if fontFamily = atom.config.get('editor.fontFamily')
+
+    for codeElement in domFragment.querySelectorAll('code')
+      codeElement.style.fontFamily = fontFamily
+
+  for preElement in domFragment.querySelectorAll('pre')
+    codeBlock = preElement.firstChild
+    fenceName = codeBlock.getAttribute('class')?.replace(/^lang-/, '') ? defaultLanguage
+
+    editorElement = document.createElement('atom-text-editor')
+    editorElement.setAttributeNode(document.createAttribute('gutter-hidden'))
+    editorElement.removeAttribute('tabindex') # make read-only
+
+    preElement.parentNode.insertBefore(editorElement, preElement)
+    preElement.remove()
+
+    editor = editorElement.getModel()
+    editor.setText(codeBlock.textContent.trim())
+    if grammar = atom.grammars.grammarForScopeName(scopeForFenceName(fenceName))
+      editor.setGrammar(grammar)
+
+  domFragment
 
 tokenizeCodeBlocks = (html, defaultLanguage='text') ->
-  html = $(html)
+  o = cheerio.load(html)
 
   if fontFamily = atom.config.get('editor.fontFamily')
-    $(html).find('code').css('font-family', fontFamily)
+    o('code').css('font-family', fontFamily)
 
-  for preElement in $.merge(html.filter("pre"), html.find("pre"))
-    codeBlock = $(preElement.firstChild)
+  for preElement in o("pre")
+    codeBlock = o(preElement).children().first()
     fenceName = codeBlock.attr('class')?.replace(/^lang-/, '') ? defaultLanguage
 
     highlighter ?= new Highlights(registry: atom.grammars)
@@ -104,10 +136,10 @@ tokenizeCodeBlocks = (html, defaultLanguage='text') ->
       fileContents: codeBlock.text()
       scopeName: scopeForFenceName(fenceName)
 
-    highlightedBlock = $(highlightedHtml)
+    highlightedBlock = o(highlightedHtml)
     # The `editor` class messes things up as `.editor` has absolutely positioned lines
     highlightedBlock.removeClass('editor').addClass("lang-#{fenceName}")
-    highlightedBlock.insertAfter(preElement)
-    preElement.remove()
 
-  html
+    o(preElement).replaceWith(highlightedBlock)
+
+  o.html()
