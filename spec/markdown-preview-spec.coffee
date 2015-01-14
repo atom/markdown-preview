@@ -141,7 +141,7 @@ describe "Markdown preview package", ->
       runs ->
         atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
 
-      waitsFor ->
+      waitsFor "initial render", ->
         MarkdownPreviewView::renderMarkdown.callCount > 0
 
       runs ->
@@ -240,7 +240,7 @@ describe "Markdown preview package", ->
         waitsForPromise ->
           atom.packages.activatePackage('language-javascript')
 
-        waitsFor ->
+        waitsFor "render after a new grammar is loaded", ->
           MarkdownPreviewView::renderMarkdown.callCount > 0
 
   describe "when the markdown preview view is requested by file URI", ->
