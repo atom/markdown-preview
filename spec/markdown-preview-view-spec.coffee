@@ -7,7 +7,7 @@ describe "MarkdownPreviewView", ->
   [file, preview, workspaceElement] = []
 
   beforeEach ->
-    filePath = atom.project.resolve('subdir/file.markdown')
+    filePath = atom.project.getDirectories()[0].resolve('subdir/file.markdown')
     preview = new MarkdownPreviewView({filePath})
     jasmine.attachToDOM(preview.element)
 
@@ -107,12 +107,12 @@ describe "MarkdownPreviewView", ->
     describe "when the image uses a relative path", ->
       it "resolves to a path relative to the file", ->
         image = preview.find("img[alt=Image1]")
-        expect(image.attr('src')).toBe atom.project.resolve('subdir/image1.png')
+        expect(image.attr('src')).toBe atom.project.getDirectories()[0].resolve('subdir/image1.png')
 
     describe "when the image uses an absolute path that does not exist", ->
       it "resolves to a path relative to the project root", ->
         image = preview.find("img[alt=Image2]")
-        expect(image.attr('src')).toBe atom.project.resolve('tmp/image2.png')
+        expect(image.attr('src')).toBe atom.project.getDirectories()[0].resolve('tmp/image2.png')
 
     describe "when the image uses an absolute path that exists", ->
       it "doesn't change the URL", ->
@@ -158,7 +158,7 @@ describe "MarkdownPreviewView", ->
   describe "when core:save-as is triggered", ->
     beforeEach ->
       preview.destroy()
-      filePath = atom.project.resolve('subdir/simple.md')
+      filePath = atom.project.getDirectories()[0].resolve('subdir/simple.md')
       preview = new MarkdownPreviewView({filePath})
       jasmine.attachToDOM(preview.element)
 
@@ -188,7 +188,7 @@ describe "MarkdownPreviewView", ->
   describe "when core:copy is triggered", ->
     beforeEach ->
       preview.destroy()
-      filePath = atom.project.resolve('subdir/simple.md')
+      filePath = atom.project.getDirectories()[0].resolve('subdir/simple.md')
       preview = new MarkdownPreviewView({filePath})
       jasmine.attachToDOM(preview.element)
 

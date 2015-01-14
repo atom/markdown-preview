@@ -246,7 +246,7 @@ describe "Markdown preview package", ->
   describe "when the markdown preview view is requested by file URI", ->
     it "opens a preview editor and watches the file for changes", ->
       waitsForPromise "atom.workspace.open promise to be resolved", ->
-        atom.workspace.open("markdown-preview://#{atom.project.resolve('subdir/file.markdown')}")
+        atom.workspace.open("markdown-preview://#{atom.project.getDirectories()[0].resolve('subdir/file.markdown')}")
 
       runs ->
         expect(MarkdownPreviewView::renderMarkdown.callCount).toBeGreaterThan 0

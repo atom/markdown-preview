@@ -91,7 +91,7 @@ resolveImagePaths = (html, filePath) ->
 
       if src[0] is '/'
         unless fs.isFileSync(src)
-          img.attr('src', atom.project.resolve(src.substring(1)))
+          img.attr('src', atom.project.getDirectories()[0]?.resolve(src.substring(1)))
       else
         img.attr('src', path.resolve(path.dirname(filePath), src))
 
