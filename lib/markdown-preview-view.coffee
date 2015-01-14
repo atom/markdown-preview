@@ -110,8 +110,8 @@ class MarkdownPreviewView extends ScrollView
     changeHandler = =>
       @renderMarkdown()
 
-      # TODO: Remove paneForUri call when ::paneForItem is released
-      pane = atom.workspace.paneForItem?(this) ? atom.workspace.paneForUri(@getUri())
+      # TODO: Remove paneForURI call when ::paneForItem is released
+      pane = atom.workspace.paneForItem?(this) ? atom.workspace.paneForURI(@getURI())
       if pane? and pane isnt atom.workspace.getActivePane()
         pane.activateItem(this)
 
@@ -157,7 +157,7 @@ class MarkdownPreviewView extends ScrollView
   getIconName: ->
     "markdown"
 
-  getUri: ->
+  getURI: ->
     if @file?
       "markdown-preview://#{@getPath()}"
     else

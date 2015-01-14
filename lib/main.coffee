@@ -90,9 +90,9 @@ module.exports =
 
   removePreviewForEditor: (editor) ->
     uri = @uriForEditor(editor)
-    previewPane = atom.workspace.paneForUri(uri)
+    previewPane = atom.workspace.paneForURI(uri)
     if previewPane?
-      previewPane.destroyItem(previewPane.itemForUri(uri))
+      previewPane.destroyItem(previewPane.itemForURI(uri))
       true
     else
       false
