@@ -238,6 +238,7 @@ describe "Markdown preview package", ->
     describe "when a new grammar is loaded", ->
       it "re-renders the preview", ->
         waitsForPromise ->
+          expect(atom.packages.isPackageActive('language-javascript')).toBe false
           atom.packages.activatePackage('language-javascript')
 
         waitsFor "render after a new grammar is loaded", ->
