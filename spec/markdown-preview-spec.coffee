@@ -236,12 +236,25 @@ describe "Markdown preview package", ->
             expect(MarkdownPreviewView::renderMarkdown.callCount).toBe 1
 
     describe "when a new grammar is loaded", ->
+      beforeEach ->
+        console.log ">>>>>>>>>>>>>>>>>>>> starting flaky spec"
+        global.enableDebugOutput = true
+
+      afterEach ->
+        console.log "<<<<<<<<<<<<<<<<<<<<< ending flaky spec"
+        global.enableDebugOutput = false
+
       it "re-renders the preview", ->
+        grammarAdded = false
+        atom.grammars.onDidAddGrammar -> grammarAdded = true
+
         waitsForPromise ->
           expect(atom.packages.isPackageActive('language-javascript')).toBe false
           atom.packages.activatePackage('language-javascript')
 
-        waitsFor "render after a new grammar is loaded", ->
+        waitsFor "grammar to be added", -> grammarAdded
+
+        waitsFor "markdown to be re-rendered", ->
           MarkdownPreviewView::renderMarkdown.callCount > 0
 
   describe "when the markdown preview view is requested by file URI", ->
