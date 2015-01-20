@@ -20,31 +20,41 @@ exports.toDOMFragment = (text='', filePath, grammar, callback) ->
     domFragment = template.content.cloneNode(true)
 
     # Default code blocks to be coffee in Literate CoffeeScript files
-    defaultCodeLanguage = 'coffee' if grammar?.scopeName is 'source.litcoffee'
-    convertCodeBlocksToAtomEditors(domFragment, defaultCodeLanguage)
+    # defaultCodeLanguage = 'coffee' if grammar?.scopeName is 'source.litcoffee'
+    # convertCodeBlocksToAtomEditors(domFragment, defaultCodeLanguage)
     callback(null, domFragment)
 
 exports.toHTML = (text='', filePath, grammar, callback) ->
   render text, filePath, grammar, (error, html) ->
     return callback(error) if error?
     # Default code blocks to be coffee in Literate CoffeeScript files
-    defaultCodeLanguage = 'coffee' if grammar?.scopeName is 'source.litcoffee'
-    html = tokenizeCodeBlocks(html, defaultCodeLanguage)
+    # defaultCodeLanguage = 'coffee' if grammar?.scopeName is 'source.litcoffee'
+    # html = tokenizeCodeBlocks(html, defaultCodeLanguage)
     callback(null, html)
 
 render = (text, filePath, grammar, callback) ->
-  roaster ?= require 'roaster'
-  options =
-    sanitize: false
-    breaks: atom.config.get('markdown-preview.breakOnSingleNewline')
+  process = require 'child_process'
 
   # Remove the <!doctype> since otherwise marked will escape it
   # https://github.com/chjj/marked/issues/354
   text = text.replace(/^\s*<!doctype(\s+.*)?>\s*/i, '')
 
-  roaster text, options, (error, html) =>
-    return callback(error) if error
+  pandoc=process.spawn(
+    'pandoc',
+    [ "-fmarkdown"
+    , "-thtml"
+    , "--webtex"
+    ]
+  )
 
+  html = ""
+  error = ""
+  pandoc.stdout.on 'data', (data) -> html+=data
+  pandoc.stderr.on 'data', (data) -> error+=data
+  pandoc.stdin.write(text)
+  pandoc.stdin.end()
+  pandoc.on 'close', (code) ->
+    return callback(error+html) if code!=0
     html = sanitize(html)
     html = resolveImagePaths(html, filePath)
     callback(null, html.trim())
@@ -94,52 +104,5 @@ resolveImagePaths = (html, filePath) ->
           img.attr('src', atom.project.getDirectories()[0]?.resolve(src.substring(1)))
       else
         img.attr('src', path.resolve(path.dirname(filePath), src))
-
-  o.html()
-
-convertCodeBlocksToAtomEditors = (domFragment, defaultLanguage='text') ->
-  if fontFamily = atom.config.get('editor.fontFamily')
-
-    for codeElement in domFragment.querySelectorAll('code')
-      codeElement.style.fontFamily = fontFamily
-
-  for preElement in domFragment.querySelectorAll('pre')
-    codeBlock = preElement.firstChild
-    fenceName = codeBlock.getAttribute('class')?.replace(/^lang-/, '') ? defaultLanguage
-
-    editorElement = document.createElement('atom-text-editor')
-    editorElement.setAttributeNode(document.createAttribute('gutter-hidden'))
-    editorElement.removeAttribute('tabindex') # make read-only
-
-    preElement.parentNode.insertBefore(editorElement, preElement)
-    preElement.remove()
-
-    editor = editorElement.getModel()
-    editor.setText(codeBlock.textContent.trim())
-    if grammar = atom.grammars.grammarForScopeName(scopeForFenceName(fenceName))
-      editor.setGrammar(grammar)
-
-  domFragment
-
-tokenizeCodeBlocks = (html, defaultLanguage='text') ->
-  o = cheerio.load(html)
-
-  if fontFamily = atom.config.get('editor.fontFamily')
-    o('code').css('font-family', fontFamily)
-
-  for preElement in o("pre")
-    codeBlock = o(preElement).children().first()
-    fenceName = codeBlock.attr('class')?.replace(/^lang-/, '') ? defaultLanguage
-
-    highlighter ?= new Highlights(registry: atom.grammars)
-    highlightedHtml = highlighter.highlightSync
-      fileContents: codeBlock.text()
-      scopeName: scopeForFenceName(fenceName)
-
-    highlightedBlock = o(highlightedHtml)
-    # The `editor` class messes things up as `.editor` has absolutely positioned lines
-    highlightedBlock.removeClass('editor').addClass("lang-#{fenceName}")
-
-    o(preElement).replaceWith(highlightedBlock)
 
   o.html()

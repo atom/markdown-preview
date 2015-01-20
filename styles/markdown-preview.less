@@ -1,7 +1,7 @@
 @import "syntax-variables";
 
 @font-family: "Helvetica Neue", Helvetica, sans-serif;
-.markdown-preview {
+.markdown-preview-pandoc {
   font-family: @font-family;
   font-size: 14px;
   line-height: 1.6;
@@ -26,9 +26,34 @@
 }
 
 // This is styling for generic markdownized text. Anything you put in a
-// container with .markdown-preview on it should render generally well. It also
+// container with .markdown-preview-pandoc on it should render generally well. It also
 // includes some GitHub Flavored Markdown specific styling (like @mentions)
-.markdown-preview {
+.markdown-preview-pandoc {
+
+  pre {
+    background-color: #EEE;
+    overflow: auto;
+    border: 1px solid lightgray;
+    word-wrap: normal;
+    code {
+      white-space: pre;
+      border:none;
+      background-color: inherit;
+    }
+    .sourceCode .kw { color: #268BD2; }
+    .sourceCode .dt { color: #268BD2; }
+
+    .sourceCode .dv, .sourceCode .bn, .sourceCode .fl { color: #D33682; }
+    .sourceCode .ch { color: #DC322F; }
+    .sourceCode .st { color: #2AA198; }
+    .sourceCode .co { color: #93A1A1; }
+    .sourceCode .ot { color: #A57800; }
+    .sourceCode .al { color: #CB4B16; font-weight: bold; }
+    .sourceCode .fu { color: #268BD2; }
+    .sourceCode .re { }
+    .sourceCode .er { color: #D30102; font-weight: bold; }
+  }
+
   code,
   tt,
   atom-text-editor {
@@ -151,7 +176,7 @@
   }
 
   hr {
-    background: transparent url("atom://markdown-preview/assets/hr.png") repeat-x 0 0;
+    background: transparent url("atom://markdown-preview-pandoc/assets/hr.png") repeat-x 0 0;
     border: 0 none;
     color: #ccc;
     height: 4px;

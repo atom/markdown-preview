@@ -21,7 +21,7 @@ describe "Markdown preview package", ->
     spyOn(MarkdownPreviewView.prototype, 'renderMarkdown').andCallThrough()
 
     waitsForPromise ->
-      atom.packages.activatePackage("markdown-preview")
+      atom.packages.activatePackage("markdown-preview-pandoc")
 
     waitsForPromise ->
       atom.packages.activatePackage('language-gfm')
@@ -32,7 +32,7 @@ describe "Markdown preview package", ->
         atom.workspace.open("subdir/file.markdown")
 
       runs ->
-        atom.commands.dispatch atom.views.getView(atom.workspace.getActivePaneItem()), 'markdown-preview:toggle'
+        atom.commands.dispatch atom.views.getView(atom.workspace.getActivePaneItem()), 'markdown-preview-pandoc:toggle'
 
       waitsFor ->
         MarkdownPreviewView::renderMarkdown.callCount > 0
@@ -53,7 +53,7 @@ describe "Markdown preview package", ->
           atom.workspace.open("new.markdown")
 
         runs ->
-          atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+          atom.commands.dispatch workspaceElement, 'markdown-preview-pandoc:toggle'
 
         waitsFor ->
           MarkdownPreviewView::renderMarkdown.callCount > 0
@@ -74,7 +74,7 @@ describe "Markdown preview package", ->
           atom.workspace.open("")
 
         runs ->
-          atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+          atom.commands.dispatch workspaceElement, 'markdown-preview-pandoc:toggle'
 
         waitsFor ->
           MarkdownPreviewView::renderMarkdown.callCount > 0
@@ -95,7 +95,7 @@ describe "Markdown preview package", ->
           atom.workspace.open("subdir/file with space.md")
 
         runs ->
-          atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+          atom.commands.dispatch workspaceElement, 'markdown-preview-pandoc:toggle'
 
         waitsFor ->
           MarkdownPreviewView::renderMarkdown.callCount > 0
@@ -116,7 +116,7 @@ describe "Markdown preview package", ->
           atom.workspace.open("subdir/áccéntéd.md")
 
         runs ->
-          atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+          atom.commands.dispatch workspaceElement, 'markdown-preview-pandoc:toggle'
 
         waitsFor ->
           MarkdownPreviewView::renderMarkdown.callCount > 0
@@ -139,7 +139,7 @@ describe "Markdown preview package", ->
         atom.workspace.open("subdir/file.markdown")
 
       runs ->
-        atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+        atom.commands.dispatch workspaceElement, 'markdown-preview-pandoc:toggle'
 
       waitsFor "initial render", ->
         MarkdownPreviewView::renderMarkdown.callCount > 0
@@ -150,7 +150,7 @@ describe "Markdown preview package", ->
         MarkdownPreviewView::renderMarkdown.reset()
 
     it "closes the existing preview when toggle is triggered a second time on the editor", ->
-      atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      atom.commands.dispatch workspaceElement, 'markdown-preview-pandoc:toggle'
 
       [editorPane, previewPane] = atom.workspace.getPanes()
       expect(editorPane.isActive()).toBe true
@@ -158,7 +158,7 @@ describe "Markdown preview package", ->
 
     it "closes the existing preview when toggle is triggered on it and it has focus", ->
       previewPane.activate()
-      atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      atom.commands.dispatch workspaceElement, 'markdown-preview-pandoc:toggle'
 
       [editorPane, previewPane] = atom.workspace.getPanes()
       expect(previewPane.getActiveItem()).toBeUndefined()
@@ -221,7 +221,7 @@ describe "Markdown preview package", ->
 
       describe "when the liveUpdate config is set to false", ->
         it "only re-renders the markdown when the editor is saved, not when the contents are modified", ->
-          atom.config.set 'markdown-preview.liveUpdate', false
+          atom.config.set 'markdown-preview-pandoc.liveUpdate', false
 
           didStopChangingHandler = jasmine.createSpy('didStopChangingHandler')
           atom.workspace.getActiveTextEditor().getBuffer().onDidStopChanging didStopChangingHandler
@@ -260,7 +260,7 @@ describe "Markdown preview package", ->
   describe "when the markdown preview view is requested by file URI", ->
     it "opens a preview editor and watches the file for changes", ->
       waitsForPromise "atom.workspace.open promise to be resolved", ->
-        atom.workspace.open("markdown-preview://#{atom.project.getDirectories()[0].resolve('subdir/file.markdown')}")
+        atom.workspace.open("markdown-preview-pandoc://#{atom.project.getDirectories()[0].resolve('subdir/file.markdown')}")
 
       runs ->
         expect(MarkdownPreviewView::renderMarkdown.callCount).toBeGreaterThan 0
@@ -275,14 +275,14 @@ describe "Markdown preview package", ->
 
   describe "when the editor's grammar it not enabled for preview", ->
     it "does not open the markdown preview", ->
-      atom.config.set('markdown-preview.grammars', [])
+      atom.config.set('markdown-preview-pandoc.grammars', [])
 
       waitsForPromise ->
         atom.workspace.open("subdir/file.markdown")
 
       runs ->
         spyOn(atom.workspace, 'open').andCallThrough()
-        atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+        atom.commands.dispatch workspaceElement, 'markdown-preview-pandoc:toggle'
         expect(atom.workspace.open).not.toHaveBeenCalled()
 
   describe "when the editor's path changes on #win32 and #darwin", ->
@@ -293,7 +293,7 @@ describe "Markdown preview package", ->
         atom.workspace.open("subdir/file.markdown")
 
       runs ->
-        atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+        atom.commands.dispatch workspaceElement, 'markdown-preview-pandoc:toggle'
 
       waitsFor ->
         MarkdownPreviewView::renderMarkdown.callCount > 0
@@ -310,7 +310,7 @@ describe "Markdown preview package", ->
       waitsFor ->
         titleChangedCallback.callCount is 1
 
-  describe "when the URI opened does not have a markdown-preview protocol", ->
+  describe "when the URI opened does not have a markdown-preview-pandoc protocol", ->
     it "does not throw an error trying to decode the URI (regression)", ->
       waitsForPromise ->
         atom.workspace.open('%')
@@ -318,13 +318,13 @@ describe "Markdown preview package", ->
       runs ->
         expect(atom.workspace.getActiveTextEditor()).toBeTruthy()
 
-  describe "when markdown-preview:copy-html is triggered", ->
+  describe "when markdown-preview-pandoc:copy-html is triggered", ->
     it "copies the HTML to the clipboard", ->
       waitsForPromise ->
         atom.workspace.open("subdir/simple.md")
 
       runs ->
-        atom.commands.dispatch workspaceElement, 'markdown-preview:copy-html'
+        atom.commands.dispatch workspaceElement, 'markdown-preview-pandoc:copy-html'
         expect(atom.clipboard.read()).toBe """
           <p><em>italic</em></p>
           <p><strong>bold</strong></p>
@@ -332,7 +332,7 @@ describe "Markdown preview package", ->
         """
 
         atom.workspace.getActiveTextEditor().setSelectedBufferRange [[0, 0], [1, 0]]
-        atom.commands.dispatch workspaceElement, 'markdown-preview:copy-html'
+        atom.commands.dispatch workspaceElement, 'markdown-preview-pandoc:copy-html'
         expect(atom.clipboard.read()).toBe """
           <p><em>italic</em></p>
         """
@@ -345,14 +345,14 @@ describe "Markdown preview package", ->
           atom.packages.activatePackage('language-ruby')
 
         waitsForPromise ->
-          atom.packages.activatePackage('markdown-preview')
+          atom.packages.activatePackage('markdown-preview-pandoc')
 
         waitsForPromise ->
           atom.workspace.open("subdir/file.markdown")
 
         runs ->
           workspaceElement = atom.views.getView(atom.workspace)
-          atom.commands.dispatch workspaceElement, 'markdown-preview:copy-html'
+          atom.commands.dispatch workspaceElement, 'markdown-preview-pandoc:copy-html'
           preview = $('<div>').append(atom.clipboard.read())
 
       describe "when the code block's fence name has a matching grammar", ->
@@ -380,7 +380,7 @@ describe "Markdown preview package", ->
         atom.workspace.open("subdir/evil.md")
 
       runs ->
-        atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+        atom.commands.dispatch workspaceElement, 'markdown-preview-pandoc:toggle'
 
       waitsFor ->
         MarkdownPreviewView::renderMarkdown.callCount > 0
@@ -401,7 +401,7 @@ describe "Markdown preview package", ->
         atom.workspace.open("subdir/doctype-tag.md")
 
       runs ->
-        atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+        atom.commands.dispatch workspaceElement, 'markdown-preview-pandoc:toggle'
 
       waitsFor ->
         MarkdownPreviewView::renderMarkdown.callCount > 0
@@ -420,7 +420,7 @@ describe "Markdown preview package", ->
         atom.workspace.open("subdir/html-tag.md")
 
       runs ->
-        atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+        atom.commands.dispatch workspaceElement, 'markdown-preview-pandoc:toggle'
 
       waitsFor ->
         MarkdownPreviewView::renderMarkdown.callCount > 0

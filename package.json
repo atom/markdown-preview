@@ -1,9 +1,10 @@
 {
-  "name": "markdown-preview",
-  "version": "0.121.0",
+  "name": "markdown-preview-pandoc",
+  "version": "0.0.0",
   "main": "./lib/main",
+  "styles": "markdown-preview.less",
   "description": "Open a rendered version of the Markdown in the current editor with `ctrl-shift-m`.",
-  "repository": "https://github.com/atom/markdown-preview",
+  "repository": "https://github.com/lierdakil/markdown-preview-pandoc",
   "license": "MIT",
   "engines": {
     "atom": "*"
@@ -15,7 +16,6 @@
     "grim": "^1.0.0",
     "highlights": "0.15.0",
     "pathwatcher": "^2.0",
-    "roaster": "^1.1.2",
     "temp": "^0.6.0",
     "underscore-plus": "^1.0.0",
     "wrench": "^1.5.0"
