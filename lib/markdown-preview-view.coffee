@@ -12,7 +12,7 @@ renderer = require './renderer'
 module.exports =
 class MarkdownPreviewView extends ScrollView
   @content: ->
-    @div class: 'markdown-preview native-key-bindings', tabindex: -1
+    @div class: 'markdown-preview-pandoc native-key-bindings', tabindex: -1
 
   constructor: ({@editorId, @filePath}) ->
     super
@@ -51,8 +51,8 @@ class MarkdownPreviewView extends ScrollView
     @emitter.on 'did-change-markdown', callback
 
   on: (eventName) ->
-    if eventName is 'markdown-preview:markdown-changed'
-      Grim.deprecate("Use MarkdownPreviewView::onDidChangeMarkdown instead of the 'markdown-preview:markdown-changed' jQuery event")
+    if eventName is 'markdown-preview-pandoc:markdown-changed'
+      Grim.deprecate("Use MarkdownPreviewView::onDidChangeMarkdown instead of the 'markdown-preview-pandoc:markdown-changed' jQuery event")
     super
 
   subscribeToFilePath: (filePath) ->
@@ -98,13 +98,13 @@ class MarkdownPreviewView extends ScrollView
         @saveAs()
       'core:copy': (event) =>
         event.stopPropagation() if @copyToClipboard()
-      'markdown-preview:zoom-in': =>
+      'markdown-preview-pandoc:zoom-in': =>
         zoomLevel = parseFloat(@css('zoom')) or 1
         @css('zoom', zoomLevel + .1)
-      'markdown-preview:zoom-out': =>
+      'markdown-preview-pandoc:zoom-out': =>
         zoomLevel = parseFloat(@css('zoom')) or 1
         @css('zoom', zoomLevel - .1)
-      'markdown-preview:reset-zoom': =>
+      'markdown-preview-pandoc:reset-zoom': =>
         @css('zoom', 1)
 
     changeHandler = =>
@@ -119,14 +119,14 @@ class MarkdownPreviewView extends ScrollView
       @disposables.add @file.onDidChange(changeHandler)
     else if @editor?
       @disposables.add @editor.getBuffer().onDidStopChanging =>
-        changeHandler() if atom.config.get 'markdown-preview.liveUpdate'
+        changeHandler() if atom.config.get 'markdown-preview-pandoc.liveUpdate'
       @disposables.add @editor.onDidChangePath => @emitter.emit 'did-change-title'
       @disposables.add @editor.getBuffer().onDidSave =>
-        changeHandler() unless atom.config.get 'markdown-preview.liveUpdate'
+        changeHandler() unless atom.config.get 'markdown-preview-pandoc.liveUpdate'
       @disposables.add @editor.getBuffer().onDidReload =>
-        changeHandler() unless atom.config.get 'markdown-preview.liveUpdate'
+        changeHandler() unless atom.config.get 'markdown-preview-pandoc.liveUpdate'
 
-    @disposables.add atom.config.onDidChange 'markdown-preview.breakOnSingleNewline', changeHandler
+    @disposables.add atom.config.onDidChange 'markdown-preview-pandoc.breakOnSingleNewline', changeHandler
 
   renderMarkdown: ->
     @showLoading()
@@ -144,7 +144,7 @@ class MarkdownPreviewView extends ScrollView
         @empty()
         @append(domFragment)
         @emitter.emit 'did-change-markdown'
-        @originalTrigger('markdown-preview:markdown-changed')
+        @originalTrigger('markdown-preview-pandoc:markdown-changed')
 
   getTitle: ->
     if @file?
@@ -159,9 +159,9 @@ class MarkdownPreviewView extends ScrollView
 
   getURI: ->
     if @file?
-      "markdown-preview://#{@getPath()}"
+      "markdown-preview-pandoc://#{@getPath()}"
     else
-      "markdown-preview://editor/#{@editorId}"
+      "markdown-preview-pandoc://editor/#{@editorId}"
 
   getPath: ->
     if @file?
@@ -210,7 +210,7 @@ class MarkdownPreviewView extends ScrollView
 
     if htmlFilePath = atom.showSaveDialogSync(filePath)
       # Hack to prevent encoding issues
-      # https://github.com/atom/markdown-preview/issues/96
+      # https://github.com/atom/markdown-preview-pandoc/issues/96
       html = @[0].innerHTML.split('').join('')
 
       fs.writeFileSync(htmlFilePath, html)

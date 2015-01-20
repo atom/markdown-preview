@@ -18,7 +18,7 @@ describe "MarkdownPreviewView", ->
       atom.packages.activatePackage('language-javascript')
 
     waitsForPromise ->
-      atom.packages.activatePackage('markdown-preview')
+      atom.packages.activatePackage('markdown-preview-pandoc')
 
   afterEach ->
     preview.destroy()
@@ -137,7 +137,7 @@ describe "MarkdownPreviewView", ->
   describe "gfm newlines", ->
     describe "when gfm newlines are not enabled", ->
       it "creates a single paragraph with <br>", ->
-        atom.config.set('markdown-preview.breakOnSingleNewline', false)
+        atom.config.set('markdown-preview-pandoc.breakOnSingleNewline', false)
 
         waitsForPromise ->
           preview.renderMarkdown()
@@ -147,7 +147,7 @@ describe "MarkdownPreviewView", ->
 
     describe "when gfm newlines are enabled", ->
       it "creates a single paragraph with no <br>", ->
-        atom.config.set('markdown-preview.breakOnSingleNewline', true)
+        atom.config.set('markdown-preview-pandoc.breakOnSingleNewline', true)
 
         waitsForPromise ->
           preview.renderMarkdown()
