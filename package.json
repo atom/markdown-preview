@@ -1,6 +1,6 @@
 {
   "name": "markdown-preview-pandoc",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "./lib/main",
   "styles": "markdown-preview.less",
   "description": "Open a pandoc-rendered version of the Markdown in the current editor with `ctrl-shift-m`. This is a fork of markdown-preview package",
