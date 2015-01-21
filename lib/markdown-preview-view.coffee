@@ -133,7 +133,9 @@ class MarkdownPreviewView extends ScrollView
     @disposables.add atom.config.onDidChange 'markdown-preview.breakOnSingleNewline', changeHandler
 
   renderMarkdown: ->
-    console.log "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! renderMarkdown" if global.enableDebugOutput
+    if global.enableDebugOutput
+      console.log "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! renderMarkdown"
+      global.enableDebugOutput = false
     @showLoading()
     if @file?
       @file.read().then (contents) => @renderMarkdownText(contents)

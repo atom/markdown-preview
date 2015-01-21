@@ -242,7 +242,6 @@ describe "Markdown preview package", ->
 
       afterEach ->
         console.log "<<<<<<<<<<<<<<<<<<<<< ending flaky spec"
-        global.enableDebugOutput = false
 
       it "re-renders the preview", ->
         grammarAdded = false
