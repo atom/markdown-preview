@@ -238,20 +238,26 @@ describe "Markdown preview package", ->
     describe "when a new grammar is loaded", ->
       beforeEach ->
         console.log ">>>>>>>>>>>>>>>>>>>> starting flaky spec"
+        startTime = Date.now()
+        global.timeSinceStartOfFlakySpec = -> Date.now() - startTime
         global.enableDebugOutput = true
 
       afterEach ->
-        console.log "<<<<<<<<<<<<<<<<<<<<< ending flaky spec"
+        console.log "<<<<<<<<<<<<<<<<<<<<< ending flaky spec #{global.timeSinceStartOfFlakySpec()}"
 
       it "re-renders the preview", ->
         grammarAdded = false
         atom.grammars.onDidAddGrammar -> grammarAdded = true
+
+        console.log "activating javascript package #{global.timeSinceStartOfFlakySpec()}"
 
         waitsForPromise ->
           expect(atom.packages.isPackageActive('language-javascript')).toBe false
           atom.packages.activatePackage('language-javascript')
 
         waitsFor "grammar to be added", -> grammarAdded
+
+        runs -> console.log "grammar added #{global.timeSinceStartOfFlakySpec()}"
 
         waitsFor "markdown to be re-rendered", ->
           MarkdownPreviewView::renderMarkdown.callCount > 0

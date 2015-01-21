@@ -86,7 +86,7 @@ class MarkdownPreviewView extends ScrollView
 
   handleEvents: ->
     @disposables.add atom.grammars.onDidAddGrammar =>
-      console.log "!!!!!!!!!!!!!!!!!!!!! onDidAddGrammar" if global.enableDebugOutput
+      console.log "!!!!!!!!!!!!!!!!!!!!! onDidAddGrammar #{global.timeSinceStartOfFlakySpec?()}" if global.enableDebugOutput
       @debouncedRenderMarkdown ?= _.debounce((=> @renderMarkdown()), 250)
       @debouncedRenderMarkdown()
 
@@ -134,7 +134,7 @@ class MarkdownPreviewView extends ScrollView
 
   renderMarkdown: ->
     if global.enableDebugOutput
-      console.log "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! renderMarkdown"
+      console.log "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! renderMarkdown #{global.timeSinceStartOfFlakySpec?()}"
       global.enableDebugOutput = false
     @showLoading()
     if @file?
