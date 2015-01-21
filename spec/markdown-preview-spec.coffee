@@ -434,3 +434,19 @@ describe "Markdown preview package", ->
         [editorPane, previewPane] = atom.workspace.getPanes()
         preview = previewPane.getActiveItem()
         expect(preview[0].innerHTML).toBe "content"
+
+  describe "when the markdown contains a <pre> tag", ->
+    it "does not throw an exception", ->
+      waitsForPromise ->
+        atom.workspace.open("subdir/pre-tag.md")
+
+      runs ->
+        atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+
+      waitsFor ->
+        MarkdownPreviewView::renderMarkdown.callCount > 0
+
+      runs ->
+        [editorPane, previewPane] = atom.workspace.getPanes()
+        preview = previewPane.getActiveItem()
+        expect(preview[0].querySelector('atom-text-editor')).toExist()

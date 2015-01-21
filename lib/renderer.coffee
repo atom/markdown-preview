@@ -104,7 +104,7 @@ convertCodeBlocksToAtomEditors = (domFragment, defaultLanguage='text') ->
       codeElement.style.fontFamily = fontFamily
 
   for preElement in domFragment.querySelectorAll('pre')
-    codeBlock = preElement.firstChild
+    codeBlock = preElement.firstElementChild ? preElement
     fenceName = codeBlock.getAttribute('class')?.replace(/^lang-/, '') ? defaultLanguage
 
     editorElement = document.createElement('atom-text-editor')
