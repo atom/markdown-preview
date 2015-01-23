@@ -13,7 +13,11 @@ describe "Markdown preview package", ->
     tempPath = temp.mkdirSync('atom')
     wrench.copyDirSyncRecursive(fixturesPath, tempPath, forceDelete: true)
     atom.project.setPaths([tempPath])
-    jasmine.unspy(window, 'setTimeout')
+
+    if jasmine.useRealClock?
+      jasmine.useRealClock()
+    else
+      jasmine.unspy(window, 'setTimeout')
 
     workspaceElement = atom.views.getView(atom.workspace)
     jasmine.attachToDOM(workspaceElement)
@@ -235,32 +239,22 @@ describe "Markdown preview package", ->
             atom.workspace.getActiveTextEditor().save()
             expect(MarkdownPreviewView::renderMarkdown.callCount).toBe 1
 
-    describe "when a new grammar is loaded", ->
-      beforeEach ->
-        console.log ">>>>>>>>>>>>>>>>>>>> starting flaky spec"
-        startTime = Date.now()
-        global.timeSinceStartOfFlakySpec = -> Date.now() - startTime
-        global.enableDebugOutput = true
+    # TODO: remove this conditional once jasmine.useRealClock is released
+    # in v0.176
+    if jasmine.useRealClock?
+      describe "when a new grammar is loaded", ->
+        it "re-renders the preview", ->
+          grammarAdded = false
+          atom.grammars.onDidAddGrammar -> grammarAdded = true
 
-      afterEach ->
-        console.log "<<<<<<<<<<<<<<<<<<<<< ending flaky spec #{global.timeSinceStartOfFlakySpec()}"
+          waitsForPromise ->
+            expect(atom.packages.isPackageActive('language-javascript')).toBe false
+            atom.packages.activatePackage('language-javascript')
 
-      it "re-renders the preview", ->
-        grammarAdded = false
-        atom.grammars.onDidAddGrammar -> grammarAdded = true
+          waitsFor "grammar to be added", -> grammarAdded
 
-        console.log "activating javascript package #{global.timeSinceStartOfFlakySpec()}"
-
-        waitsForPromise ->
-          expect(atom.packages.isPackageActive('language-javascript')).toBe false
-          atom.packages.activatePackage('language-javascript')
-
-        waitsFor "grammar to be added", -> grammarAdded
-
-        runs -> console.log "grammar added #{global.timeSinceStartOfFlakySpec()}"
-
-        waitsFor "markdown to be re-rendered", ->
-          MarkdownPreviewView::renderMarkdown.callCount > 0
+          waitsFor "markdown to be re-rendered", ->
+            MarkdownPreviewView::renderMarkdown.callCount > 0
 
   describe "when the markdown preview view is requested by file URI", ->
     it "opens a preview editor and watches the file for changes", ->
