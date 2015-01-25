@@ -135,12 +135,16 @@ class MarkdownPreviewView extends ScrollView
     else if @editor?
       pos=@editor.getCursorBufferPosition()
       row=pos.row if pos
-      col=pos.column if pos
       lines=@editor.getText().split('\n')
       if pos
-        while(row<lines.length-1 && lines[row]=='')
+        while(row<lines.length-1 &&
+           (lines[row]==''||
+            lines[row]=='---' ||
+            lines[row]=='...' ||
+            lines[row].startsWith('~~~') ||
+           lines[row].startsWith('```')))
           row=row+1
-      lines[row]=lines[row].slice(0,col)+"<span id='cursor'></span>"+lines[row].slice(col) if pos
+      lines[row]=lines[row]+"\u0091" if pos
       @renderMarkdownText(lines.join('\n'))
 
   renderMarkdownText: (text) ->
@@ -151,7 +155,7 @@ class MarkdownPreviewView extends ScrollView
         @loading = false
         @empty()
         @append(domFragment)
-        offset=@find('#cursor')?.offset()?.top
+        offset=@find(':contains(\u0091)')?.offset()?.top
         @scrollTop(offset-@height()/2) if offset
         @emitter.emit 'did-change-markdown'
         @originalTrigger('markdown-preview-pandoc:markdown-changed')
