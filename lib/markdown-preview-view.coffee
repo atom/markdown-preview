@@ -138,7 +138,7 @@ class MarkdownPreviewView extends ScrollView
       col=pos.column if pos
       lines=@editor.getText().split('\n')
       if pos
-        while(row<lines.length && lines[row]=='')
+        while(row<lines.length-1 && lines[row]=='')
           row=row+1
       lines[row]=lines[row].slice(0,col)+"<span id='cursor'></span>"+lines[row].slice(col) if pos
       @renderMarkdownText(lines.join('\n'))
