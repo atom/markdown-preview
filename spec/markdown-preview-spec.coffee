@@ -13,7 +13,11 @@ describe "Markdown preview package", ->
     tempPath = temp.mkdirSync('atom')
     wrench.copyDirSyncRecursive(fixturesPath, tempPath, forceDelete: true)
     atom.project.setPaths([tempPath])
-    jasmine.unspy(window, 'setTimeout')
+
+    if jasmine.useRealClock?
+      jasmine.useRealClock()
+    else
+      jasmine.unspy(window, 'setTimeout')
 
     workspaceElement = atom.views.getView(atom.workspace)
     jasmine.attachToDOM(workspaceElement)
@@ -235,27 +239,22 @@ describe "Markdown preview package", ->
             atom.workspace.getActiveTextEditor().save()
             expect(MarkdownPreviewView::renderMarkdown.callCount).toBe 1
 
-    describe "when a new grammar is loaded", ->
-      beforeEach ->
-        console.log ">>>>>>>>>>>>>>>>>>>> starting flaky spec"
-        global.enableDebugOutput = true
+    # TODO: remove this conditional once jasmine.useRealClock is released
+    # in v0.176
+    if jasmine.useRealClock?
+      describe "when a new grammar is loaded", ->
+        it "re-renders the preview", ->
+          grammarAdded = false
+          atom.grammars.onDidAddGrammar -> grammarAdded = true
 
-      afterEach ->
-        console.log "<<<<<<<<<<<<<<<<<<<<< ending flaky spec"
-        global.enableDebugOutput = false
+          waitsForPromise ->
+            expect(atom.packages.isPackageActive('language-javascript')).toBe false
+            atom.packages.activatePackage('language-javascript')
 
-      it "re-renders the preview", ->
-        grammarAdded = false
-        atom.grammars.onDidAddGrammar -> grammarAdded = true
+          waitsFor "grammar to be added", -> grammarAdded
 
-        waitsForPromise ->
-          expect(atom.packages.isPackageActive('language-javascript')).toBe false
-          atom.packages.activatePackage('language-javascript')
-
-        waitsFor "grammar to be added", -> grammarAdded
-
-        waitsFor "markdown to be re-rendered", ->
-          MarkdownPreviewView::renderMarkdown.callCount > 0
+          waitsFor "markdown to be re-rendered", ->
+            MarkdownPreviewView::renderMarkdown.callCount > 0
 
   describe "when the markdown preview view is requested by file URI", ->
     it "opens a preview editor and watches the file for changes", ->
@@ -429,3 +428,19 @@ describe "Markdown preview package", ->
         [editorPane, previewPane] = atom.workspace.getPanes()
         preview = previewPane.getActiveItem()
         expect(preview[0].innerHTML).toBe "content"
+
+  describe "when the markdown contains a <pre> tag", ->
+    it "does not throw an exception", ->
+      waitsForPromise ->
+        atom.workspace.open("subdir/pre-tag.md")
+
+      runs ->
+        atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+
+      waitsFor ->
+        MarkdownPreviewView::renderMarkdown.callCount > 0
+
+      runs ->
+        [editorPane, previewPane] = atom.workspace.getPanes()
+        preview = previewPane.getActiveItem()
+        expect(preview[0].querySelector('atom-text-editor')).toExist()

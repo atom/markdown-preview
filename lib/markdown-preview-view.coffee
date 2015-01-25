@@ -29,7 +29,7 @@ class MarkdownPreviewView extends ScrollView
       if atom.workspace?
         @subscribeToFilePath(@filePath)
       else
-        @disposables.add atom.packages.onDidActivateAll =>
+        @disposables.add atom.packages.onDidActivateInitialPackages =>
           @subscribeToFilePath(@filePath)
 
   serialize: ->
@@ -77,7 +77,7 @@ class MarkdownPreviewView extends ScrollView
     if atom.workspace?
       resolve()
     else
-      @disposables.add atom.packages.onDidActivateAll(resolve)
+      @disposables.add atom.packages.onDidActivateInitialPackages(resolve)
 
   editorForId: (editorId) ->
     for editor in atom.workspace.getTextEditors()
@@ -85,11 +85,7 @@ class MarkdownPreviewView extends ScrollView
     null
 
   handleEvents: ->
-    @disposables.add atom.grammars.onDidAddGrammar =>
-      console.log "!!!!!!!!!!!!!!!!!!!!! onDidAddGrammar" if global.enableDebugOutput
-      @debouncedRenderMarkdown ?= _.debounce((=> @renderMarkdown()), 250)
-      @debouncedRenderMarkdown()
-
+    @disposables.add atom.grammars.onDidAddGrammar => _.debounce((=> @renderMarkdown()), 250)
     @disposables.add atom.grammars.onDidUpdateGrammar _.debounce((=> @renderMarkdown()), 250)
 
     atom.commands.add @element,
@@ -133,7 +129,6 @@ class MarkdownPreviewView extends ScrollView
     @disposables.add atom.config.onDidChange 'markdown-preview-pandoc.breakOnSingleNewline', changeHandler
 
   renderMarkdown: ->
-    console.log "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! renderMarkdown" if global.enableDebugOutput
     @showLoading()
     if @file?
       @file.read().then (contents) => @renderMarkdownText(contents)
