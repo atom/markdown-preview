@@ -138,9 +138,11 @@ class MarkdownPreviewView extends ScrollView
     if @file?
       @file.read().then (contents) => @renderMarkdownText(contents)
     else if @editor?
-      row=@editor.getCursorBufferPosition()?.row
+      pos=@editor.getCursorBufferPosition()
+      row=pos.row if pos
+      col=pos.column if pos
       lines=@editor.getText().split('\n')
-      lines[row]="<span id='current'></span>"+lines[row] if row
+      lines[row]=lines[row].slice(0,col)+"<span id='cursor'></span>"+lines[row].slice(col) if pos
       @renderMarkdownText(lines.join('\n'))
 
   renderMarkdownText: (text) ->
@@ -151,7 +153,7 @@ class MarkdownPreviewView extends ScrollView
         @loading = false
         @empty()
         @append(domFragment)
-        offset=@find('#current')?.offset()?.top
+        offset=@find('#cursor')?.offset()?.top
         @scrollTop(offset-@height()/2) if offset
         @emitter.emit 'did-change-markdown'
         @originalTrigger('markdown-preview-pandoc:markdown-changed')
