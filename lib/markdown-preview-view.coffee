@@ -126,8 +126,6 @@ class MarkdownPreviewView extends ScrollView
       @disposables.add @editor.getBuffer().onDidReload =>
         changeHandler() unless atom.config.get 'markdown-preview-pandoc.liveUpdate'
 
-    @disposables.add atom.config.onDidChange 'markdown-preview-pandoc.breakOnSingleNewline', changeHandler
-
   renderMarkdown: ->
     @showLoading()
     if @file?

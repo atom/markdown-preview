@@ -39,12 +39,11 @@ render = (text, filePath, grammar, callback) ->
   # https://github.com/chjj/marked/issues/354
   text = text.replace(/^\s*<!doctype(\s+.*)?>\s*/i, '')
 
+  path = atom.config.get 'markdown-preview-pandoc.pandocPath'
+  opts = atom.config.get 'markdown-preview-pandoc.pandocOpts'
   pandoc=process.spawn(
-    'pandoc',
-    [ "-fmarkdown"
-    , "-thtml"
-    , "--webtex"
-    ]
+    path,
+    opts.split(' ')
   )
 
   html = ""

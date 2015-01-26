@@ -20,9 +20,12 @@ atom.deserializers.add
 
 module.exports =
   config:
-    breakOnSingleNewline:
-      type: 'boolean'
-      default: false
+    pandocPath:
+      type: 'string'
+      default: 'pandoc'
+    pandocOpts:
+      type: 'string'
+      default: '-fmarkdown -thtml --webtex'
     liveUpdate:
       type: 'boolean'
       default: true
@@ -42,9 +45,6 @@ module.exports =
         @toggle()
       'markdown-preview-pandoc:copy-html': =>
         @copyHtml()
-      'markdown-preview-pandoc:toggle-break-on-single-newline': ->
-        keyPath = 'markdown-preview-pandoc.breakOnSingleNewline'
-        atom.config.set(keyPath, !atom.config.get(keyPath))
 
     previewFile = @previewFile.bind(this)
     atom.commands.add '.tree-view .file .name[data-name$=\\.md]', 'markdown-preview-pandoc:preview-file', previewFile
