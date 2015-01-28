@@ -14,7 +14,7 @@
     "fs-plus": "^2.0.0",
     "grim": "^1.0.0",
     "highlights": "0.15.0",
-    "pathwatcher": "^2.7.0",
+    "pathwatcher": "^2.0",
     "roaster": "^1.1.2",
     "temp": "^0.6.0",
     "underscore-plus": "^1.0.0",
