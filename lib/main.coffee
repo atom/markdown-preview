@@ -26,6 +26,9 @@ module.exports =
     liveUpdate:
       type: 'boolean'
       default: true
+    openPreviewInSplitPane:
+      type: 'boolean'
+      default: true
     grammars:
       type: 'array'
       default: [
@@ -100,7 +103,11 @@ module.exports =
   addPreviewForEditor: (editor) ->
     uri = @uriForEditor(editor)
     previousActivePane = atom.workspace.getActivePane()
-    atom.workspace.open(uri, split: 'right', searchAllPanes: true).done (markdownPreviewView) ->
+    options =
+      searchAllPanes: true
+    if atom.config.get('markdown-preview.openPreviewInSplitPane')
+      options.split = 'right'
+    atom.workspace.open(uri, options).done (markdownPreviewView) ->
       if isMarkdownPreviewView(markdownPreviewView)
         previousActivePane.activate()
 
