@@ -53,7 +53,7 @@ module.exports =
     atom.commands.add '.tree-view .file .name[data-name$=\\.mkd]', 'markdown-preview:preview-file', previewFile
     atom.commands.add '.tree-view .file .name[data-name$=\\.mkdown]', 'markdown-preview:preview-file', previewFile
     atom.commands.add '.tree-view .file .name[data-name$=\\.ron]', 'markdown-preview:preview-file', previewFile
-    atom.commands.add '.tree-view .file .name[data-name$=\\.text]', 'markdown-preview:preview-file', previewFile
+    atom.commands.add '.tree-view .file .name[data-name$=\\.txt]', 'markdown-preview:preview-file', previewFile
 
     atom.workspace.addOpener (uriToOpen) ->
       try
