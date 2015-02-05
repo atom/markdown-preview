@@ -131,18 +131,18 @@ class MarkdownPreviewView extends ScrollView
     if @file?
       @file.read().then (contents) => @renderMarkdownText(contents)
     else if @editor?
-      pos=@editor.getCursorBufferPosition()
-      row=pos.row if pos
       lines=@editor.getText().split('\n')
+      scopeForRow = (row) =>
+        @editor.scopesForBufferPosition([row,lines[row].length-1])
+      pos=@editor.getCursorBufferPosition()
       if pos
-        while(row<lines.length-1 &&
-           (lines[row]==''||
-            lines[row]=='---' ||
-            lines[row]=='...' ||
-            lines[row].startsWith('~~~') ||
-           lines[row].startsWith('```')))
-          row=row+1
-      lines[row]=lines[row]+"\u0091" if pos
+        row=pos.row
+        while(row>0 and not
+            (_.isEqual(scopeForRow(row),['source.gfm']) and
+            lines[row].trim()!='')
+            )
+          row=row-1
+        lines[row]=lines[row]+"\u0091" if row>0
       @renderMarkdownText(lines.join('\n'))
 
   renderMarkdownText: (text) ->
