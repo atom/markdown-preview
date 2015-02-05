@@ -29,6 +29,9 @@ module.exports =
     liveUpdate:
       type: 'boolean'
       default: true
+    openPreviewInSplitPane:
+      type: 'boolean'
+      default: true
     grammars:
       type: 'array'
       default: [
@@ -47,12 +50,13 @@ module.exports =
         @copyHtml()
 
     previewFile = @previewFile.bind(this)
+    atom.commands.add '.tree-view .file .name[data-name$=\\.markdown]', 'markdown-preview-pandoc:preview-file', previewFile
     atom.commands.add '.tree-view .file .name[data-name$=\\.md]', 'markdown-preview-pandoc:preview-file', previewFile
     atom.commands.add '.tree-view .file .name[data-name$=\\.mdown]', 'markdown-preview-pandoc:preview-file', previewFile
     atom.commands.add '.tree-view .file .name[data-name$=\\.mkd]', 'markdown-preview-pandoc:preview-file', previewFile
     atom.commands.add '.tree-view .file .name[data-name$=\\.mkdown]', 'markdown-preview-pandoc:preview-file', previewFile
     atom.commands.add '.tree-view .file .name[data-name$=\\.ron]', 'markdown-preview-pandoc:preview-file', previewFile
-    atom.commands.add '.tree-view .file .name[data-name$=\\.text]', 'markdown-preview-pandoc:preview-file', previewFile
+    atom.commands.add '.tree-view .file .name[data-name$=\\.txt]', 'markdown-preview-pandoc:preview-file', previewFile
 
     atom.workspace.addOpener (uriToOpen) ->
       try
@@ -100,7 +104,11 @@ module.exports =
   addPreviewForEditor: (editor) ->
     uri = @uriForEditor(editor)
     previousActivePane = atom.workspace.getActivePane()
-    atom.workspace.open(uri, split: 'right', searchAllPanes: true).done (markdownPreviewView) ->
+    options =
+      searchAllPanes: true
+    if atom.config.get('markdown-preview.openPreviewInSplitPane')
+      options.split = 'right'
+    atom.workspace.open(uri, options).done (markdownPreviewView) ->
       if isMarkdownPreviewView(markdownPreviewView)
         previousActivePane.activate()
 
