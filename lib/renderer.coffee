@@ -11,6 +11,8 @@ highlighter = null
 {resourcePath} = atom.getLoadSettings()
 packagePath = path.dirname(__dirname)
 
+process = require 'child_process'
+
 exports.toDOMFragment = (text='', filePath, grammar, callback) ->
   render text, filePath, grammar, (error, html) ->
     return callback(error) if error?
@@ -33,14 +35,13 @@ exports.toHTML = (text='', filePath, grammar, callback) ->
     callback(null, html)
 
 render = (text, filePath, grammar, callback) ->
-  process = require 'child_process'
-
   # Remove the <!doctype> since otherwise marked will escape it
   # https://github.com/chjj/marked/issues/354
   text = text.replace(/^\s*<!doctype(\s+.*)?>\s*/i, '')
 
   path_ = atom.config.get 'markdown-preview-pandoc.pandocPath'
   opts_ = atom.config.get 'markdown-preview-pandoc.pandocOpts'
+  return unless path_? and opts_?
   pandoc=process.spawn(
     path_,
     opts_.split(' ')
