@@ -1,6 +1,4 @@
 url = require 'url'
-fs = require 'fs-plus'
-{$} = require 'atom-space-pen-views'
 
 MarkdownPreviewView = null # Defer until used
 renderer = null # Defer until used
