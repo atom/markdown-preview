@@ -106,7 +106,7 @@ module.exports =
     previousActivePane = atom.workspace.getActivePane()
     options =
       searchAllPanes: true
-    if atom.config.get('markdown-preview.openPreviewInSplitPane')
+    if atom.config.get('markdown-preview-pandoc.openPreviewInSplitPane')
       options.split = 'right'
     atom.workspace.open(uri, options).done (markdownPreviewView) ->
       if isMarkdownPreviewView(markdownPreviewView)
