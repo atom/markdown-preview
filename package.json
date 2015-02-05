@@ -7,7 +7,7 @@
   "repository": "https://github.com/lierdakil/markdown-preview-pandoc",
   "license": "MIT",
   "engines": {
-    "atom": "*"
+    "atom": ">=0.177.0"
   },
   "dependencies": {
     "atom-space-pen-views": "^2.0.0",
