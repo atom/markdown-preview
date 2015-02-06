@@ -12,7 +12,7 @@ highlighter = null
 packagePath = path.dirname(__dirname)
 
 exports.toDOMFragment = (text='', filePath, grammar, callback) ->
-  render text, filePath, grammar, (error, html) ->
+  render text, filePath, (error, html) ->
     return callback(error) if error?
 
     template = document.createElement('template')
@@ -25,14 +25,14 @@ exports.toDOMFragment = (text='', filePath, grammar, callback) ->
     callback(null, domFragment)
 
 exports.toHTML = (text='', filePath, grammar, callback) ->
-  render text, filePath, grammar, (error, html) ->
+  render text, filePath, (error, html) ->
     return callback(error) if error?
     # Default code blocks to be coffee in Literate CoffeeScript files
     defaultCodeLanguage = 'coffee' if grammar?.scopeName is 'source.litcoffee'
     html = tokenizeCodeBlocks(html, defaultCodeLanguage)
     callback(null, html)
 
-render = (text, filePath, grammar, callback) ->
+render = (text, filePath, callback) ->
   roaster ?= require 'roaster'
   options =
     sanitize: false
