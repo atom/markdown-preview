@@ -43,7 +43,7 @@ render = (text, filePath, grammar, callback) ->
   text = text.replace(/^\s*<!doctype(\s+.*)?>\s*/i, '')
 
   roaster text, options, (error, html) =>
-    return callback(error) if error
+    return callback(error) if error?
 
     html = sanitize(html)
     html = resolveImagePaths(html, filePath)
