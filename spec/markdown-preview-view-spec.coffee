@@ -187,6 +187,13 @@ describe "MarkdownPreviewView", ->
 
   describe "when core:copy is triggered", ->
     it "writes the rendered HTML to the clipboard", ->
+      preview.destroy()
+      preview.element.remove()
+
+      filePath = atom.project.getDirectories()[0].resolve('subdir/code-block.md')
+      preview = new MarkdownPreviewView({filePath})
+      jasmine.attachToDOM(preview.element)
+
       waitsForPromise ->
         preview.renderMarkdown()
 
@@ -198,18 +205,6 @@ describe "MarkdownPreviewView", ->
 
       runs ->
         expect(atom.clipboard.read()).toBe """
-          <h2 id="file-markdown">File.markdown</h2>
-          <p><img class="emoji" title=":cool:" alt="cool" src="/Users/nathansobo/github/markdown-preview/node_modules/roaster/node_modules/emoji-images/pngs/cool.png" height="20"></p>
-          <pre class="editor-colors lang-ruby"><div class="line"><span class="source ruby"><span class="meta function method without-arguments ruby"><span class="keyword control def ruby"><span>def</span></span><span>&nbsp;</span><span class="entity name function ruby"><span>func</span></span></span></span></div><div class="line"><span class="source ruby"><span>&nbsp;&nbsp;x&nbsp;</span><span class="keyword operator assignment ruby"><span>=</span></span><span>&nbsp;</span><span class="constant numeric ruby"><span>1</span></span></span></div><div class="line"><span class="source ruby"><span class="keyword control ruby"><span>end</span></span></span></div></pre>
-          <ul>
-          <li><pre class="editor-colors lang-javascript"><div class="line"><span class="source js"><span class="keyword control js"><span>if</span></span><span>&nbsp;a&nbsp;</span><span class="keyword operator js"><span>===</span></span><span>&nbsp;</span><span class="constant numeric js"><span>3</span></span><span>&nbsp;</span><span class="meta brace curly js"><span>{</span></span></span></div><div class="line"><span class="source js"><span>b&nbsp;</span><span class="keyword operator js"><span>=</span></span><span>&nbsp;</span><span class="constant numeric js"><span>5</span></span></span></div><div class="line"><span class="source js"><span class="meta brace curly js"><span>}</span></span></span></div></pre>
-          </li>
-          </ul>
-          <pre class="editor-colors lang-text"><div class="line"><span class="text plain null-grammar"><span>function&nbsp;f(x)&nbsp;{</span></span></div><div class="line"><span class="text plain null-grammar"><span>&nbsp;&nbsp;return&nbsp;x++;</span></span></div><div class="line"><span class="text plain null-grammar"><span>}</span></span></div></pre><pre class="editor-colors lang-kombucha"><div class="line"><span class="text plain null-grammar"><span>drink-that-stuff:</span></span></div><div class="line"><span class="text plain null-grammar"><span>&nbsp;&nbsp;tastes-weird~</span></span></div></pre>
-          <pre class="editor-colors lang-python"><div class="line"><span class="text plain null-grammar"><span>def&nbsp;foo()</span></span></div><div class="line"><span class="text plain null-grammar"><span>&nbsp;</span></span></div><div class="line"><span class="text plain null-grammar"><span>&nbsp;&nbsp;bar</span></span></div><div class="line"><span class="text plain null-grammar"><span>&nbsp;</span></span></div><div class="line"><span class="text plain null-grammar"><span>&nbsp;</span></span></div><div class="line"><span class="text plain null-grammar"><span>&nbsp;&nbsp;baz</span></span></div></pre>
-          <p><img src="/Users/nathansobo/github/markdown-preview/spec/fixtures/subdir/image1.png" alt="Image1"></p>
-          <p><img src="/Users/nathansobo/github/markdown-preview/spec/fixtures/tmp/image2.png" alt="Image2"></p>
-          <p><img src="http://github.com/image3.png" alt="Image3"></p>
-          <p>lorem
-          ipsum</p>
+         <h1 id="code-block">Code Block</h1>
+         <pre class="editor-colors lang-javascript"><div class="line"><span class="source js"><span class="keyword control js"><span>if</span></span><span>&nbsp;a&nbsp;</span><span class="keyword operator js"><span>===</span></span><span>&nbsp;</span><span class="constant numeric js"><span>3</span></span><span>&nbsp;</span><span class="meta brace curly js"><span>{</span></span></span></div><div class="line"><span class="source js"><span>&nbsp;&nbsp;b&nbsp;</span><span class="keyword operator js"><span>=</span></span><span>&nbsp;</span><span class="constant numeric js"><span>5</span></span></span></div><div class="line"><span class="source js"><span class="meta brace curly js"><span>}</span></span></span></div></pre>
         """
