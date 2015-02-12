@@ -130,10 +130,15 @@ class MarkdownPreviewView extends ScrollView
 
   renderMarkdown: ->
     @showLoading()
+    @getMarkdownSource().then (source) => @renderMarkdownText(source) if source?
+
+  getMarkdownSource: ->
     if @file?
-      @file.read().then (contents) => @renderMarkdownText(contents)
+      @file.read()
     else if @editor?
-      @renderMarkdownText(@editor.getText())
+      Promise.resolve(@editor.getText())
+    else
+      Promise.resolve(null)
 
   renderMarkdownText: (text) ->
     renderer.toDOMFragment text, @getPath(), @getGrammar(), (error, domFragment) =>
@@ -194,7 +199,15 @@ class MarkdownPreviewView extends ScrollView
     # Use default copy event handler if there is selected text inside this view
     return false if selectedText and selectedNode? and (@[0] is selectedNode or $.contains(@[0], selectedNode))
 
-    atom.clipboard.write(@[0].innerHTML)
+    @getMarkdownSource().then (source) =>
+      return unless source?
+
+      renderer.toHTML source, @getPath(), @getGrammar(), (error, html) =>
+        if error?
+          console.warn('Copying Markdown as HTML failed', error)
+        else
+          atom.clipboard.write(html)
+
     true
 
   saveAs: ->
