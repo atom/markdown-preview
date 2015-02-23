@@ -140,6 +140,12 @@ class MarkdownPreviewView extends ScrollView
     else
       Promise.resolve(null)
 
+  getHTML: (callback) ->
+    @getMarkdownSource().then (source) =>
+      return unless source?
+
+      renderer.toHTML source, @getPath(), @getGrammar(), callback
+
   renderMarkdownText: (text) ->
     renderer.toDOMFragment text, @getPath(), @getGrammar(), (error, domFragment) =>
       if error
@@ -199,14 +205,11 @@ class MarkdownPreviewView extends ScrollView
     # Use default copy event handler if there is selected text inside this view
     return false if selectedText and selectedNode? and (@[0] is selectedNode or $.contains(@[0], selectedNode))
 
-    @getMarkdownSource().then (source) =>
-      return unless source?
-
-      renderer.toHTML source, @getPath(), @getGrammar(), (error, html) =>
-        if error?
-          console.warn('Copying Markdown as HTML failed', error)
-        else
-          atom.clipboard.write(html)
+    @getHTML (error, html) ->
+      if error?
+        console.warn('Copying Markdown as HTML failed', error)
+      else
+        atom.clipboard.write(html)
 
     true
 
@@ -222,12 +225,13 @@ class MarkdownPreviewView extends ScrollView
         filePath = path.join(projectPath, filePath)
 
     if htmlFilePath = atom.showSaveDialogSync(filePath)
-      # Hack to prevent encoding issues
-      # https://github.com/atom/markdown-preview/issues/96
-      html = @[0].innerHTML.split('').join('')
 
-      fs.writeFileSync(htmlFilePath, html)
-      atom.workspace.open(htmlFilePath)
+      @getHTML (error, html) ->
+        if error?
+          console.warn('Saving Markdown as HTML failed', error)
+        else
+          fs.writeFileSync(htmlFilePath, html)
+          atom.workspace.open(htmlFilePath)
 
   isEqual: (other) ->
     @[0] is other?[0] # Compare DOM elements

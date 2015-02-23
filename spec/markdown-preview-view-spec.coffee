@@ -158,7 +158,7 @@ describe "MarkdownPreviewView", ->
   describe "when core:save-as is triggered", ->
     beforeEach ->
       preview.destroy()
-      filePath = atom.project.getDirectories()[0].resolve('subdir/simple.md')
+      filePath = atom.project.getDirectories()[0].resolve('subdir/code-block.md')
       preview = new MarkdownPreviewView({filePath})
       jasmine.attachToDOM(preview.element)
 
@@ -172,16 +172,15 @@ describe "MarkdownPreviewView", ->
       runs ->
         spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
         atom.commands.dispatch preview.element, 'core:save-as'
-        outputPath = fs.realpathSync(outputPath)
-        expect(fs.isFileSync(outputPath)).toBe true
 
       waitsFor ->
-        atom.workspace.getActiveTextEditor()?.getPath() is outputPath
+        fs.existsSync(outputPath) && atom.workspace.getActiveTextEditor()?.getPath() is fs.realpathSync(outputPath)
 
       runs ->
+        expect(fs.isFileSync(outputPath)).toBe true
         expect(atom.workspace.getActiveTextEditor().getText()).toBe """
-          <p><em>italic</em></p>
-          <p><strong>bold</strong></p>
+          <h1 id="code-block">Code Block</h1>
+          <pre class="editor-colors lang-javascript"><div class="line"><span class="source js"><span class="keyword control js"><span>if</span></span><span>&nbsp;a&nbsp;</span><span class="keyword operator js"><span>===</span></span><span>&nbsp;</span><span class="constant numeric js"><span>3</span></span><span>&nbsp;</span><span class="meta brace curly js"><span>{</span></span></span></div><div class="line"><span class="source js"><span>&nbsp;&nbsp;b&nbsp;</span><span class="keyword operator js"><span>=</span></span><span>&nbsp;</span><span class="constant numeric js"><span>5</span></span></span></div><div class="line"><span class="source js"><span class="meta brace curly js"><span>}</span></span></span></div></pre>
           <p>encoding \u2192 issue</p>
         """
 
@@ -207,4 +206,5 @@ describe "MarkdownPreviewView", ->
         expect(atom.clipboard.read()).toBe """
          <h1 id="code-block">Code Block</h1>
          <pre class="editor-colors lang-javascript"><div class="line"><span class="source js"><span class="keyword control js"><span>if</span></span><span>&nbsp;a&nbsp;</span><span class="keyword operator js"><span>===</span></span><span>&nbsp;</span><span class="constant numeric js"><span>3</span></span><span>&nbsp;</span><span class="meta brace curly js"><span>{</span></span></span></div><div class="line"><span class="source js"><span>&nbsp;&nbsp;b&nbsp;</span><span class="keyword operator js"><span>=</span></span><span>&nbsp;</span><span class="constant numeric js"><span>5</span></span></span></div><div class="line"><span class="source js"><span class="meta brace curly js"><span>}</span></span></span></div></pre>
+         <p>encoding \u2192 issue</p>
         """
