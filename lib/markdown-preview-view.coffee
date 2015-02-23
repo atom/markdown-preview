@@ -183,6 +183,28 @@ class MarkdownPreviewView extends ScrollView
   getGrammar: ->
     @editor?.getGrammar()
 
+  getDocumentStyleSheets: -> # This function exists so we can stub it
+    document.styleSheets
+
+  getMarkdownPreviewCSS: ->
+    return @markdownPreviewCSS if @markdownPreviewCSS
+
+    rules = []
+    ruleRegExp = /\.markdown-preview/
+
+    for stylesheet in @getDocumentStyleSheets()
+      if stylesheet.rules?
+        for rule in stylesheet.rules
+          # We need `atom-text-editor` and `.markdown-review` css
+          if rule.selectorText?.match(ruleRegExp)? || stylesheet.ownerNode?.context is 'atom-text-editor'
+            cleanedRule = rule.cssText
+              .replace(/atom-text-editor/g, 'pre.editor-colors') # <atom-text-editor> are now <pre>
+              .replace(/:host/g, '.host') # Remove silly css selector containing ":host" causing problem with FF
+            rules.push(cleanedRule)
+
+    @markdownPreviewCSS = rules.join '\n'
+    @markdownPreviewCSS
+
   showError: (result) ->
     failureMessage = result?.message
 
@@ -226,10 +248,20 @@ class MarkdownPreviewView extends ScrollView
 
     if htmlFilePath = atom.showSaveDialogSync(filePath)
 
-      @getHTML (error, html) ->
+      @getHTML (error, htmlBody) =>
         if error?
           console.warn('Saving Markdown as HTML failed', error)
         else
+          html = """
+          <!DOCTYPE html>
+          <html>
+            <head>
+                <title>Markdown to HTML</title>
+                <style>#{@getMarkdownPreviewCSS()}</style>
+            </head>
+            <body class='markdown-preview'>#{htmlBody}</body>
+          </html>""" + "\n" # Ensure trailing newline
+
           fs.writeFileSync(htmlFilePath, html)
           atom.workspace.open(htmlFilePath)
 

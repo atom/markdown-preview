@@ -164,6 +164,34 @@ describe "MarkdownPreviewView", ->
 
     it "saves the rendered HTML and opens it", ->
       outputPath = temp.path(suffix: '.html')
+      expectedFilePath = atom.project.getDirectories()[0].resolve('saved-html.html')
+      expectedOutput = fs.readFileSync(expectedFilePath).toString()
+
+      createRule = (selector, css) ->
+        return {
+          selectorText: selector
+          cssText: "#{selector} #{css}"
+        }
+
+      styles = [
+        {
+          ownerNode:
+            context: 'atom-text-editor',
+          rules: [
+            createRule ".foo", "{ color: blue; }"
+            createRule ".bar", "{ color: red; }"
+            createRule ":host", "{ color: gold; }"
+            createRule "atom-text-editor", "{ color: pink; }"
+          ]
+        }, {
+          rules: [
+            createRule ".markdown-preview", "{ color: orange; }"
+            createRule ".not-included", "{ color: green; }"
+            createRule ".markdown-preview :host", "{ color: purple; }"
+          ]
+        }
+      ]
+
       expect(fs.isFileSync(outputPath)).toBe false
 
       waitsForPromise ->
@@ -171,6 +199,7 @@ describe "MarkdownPreviewView", ->
 
       runs ->
         spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
+        spyOn(preview, 'getDocumentStyleSheets').andReturn(styles)
         atom.commands.dispatch preview.element, 'core:save-as'
 
       waitsFor ->
@@ -178,11 +207,7 @@ describe "MarkdownPreviewView", ->
 
       runs ->
         expect(fs.isFileSync(outputPath)).toBe true
-        expect(atom.workspace.getActiveTextEditor().getText()).toBe """
-          <h1 id="code-block">Code Block</h1>
-          <pre class="editor-colors lang-javascript"><div class="line"><span class="source js"><span class="keyword control js"><span>if</span></span><span>&nbsp;a&nbsp;</span><span class="keyword operator js"><span>===</span></span><span>&nbsp;</span><span class="constant numeric js"><span>3</span></span><span>&nbsp;</span><span class="meta brace curly js"><span>{</span></span></span></div><div class="line"><span class="source js"><span>&nbsp;&nbsp;b&nbsp;</span><span class="keyword operator js"><span>=</span></span><span>&nbsp;</span><span class="constant numeric js"><span>5</span></span></span></div><div class="line"><span class="source js"><span class="meta brace curly js"><span>}</span></span></span></div></pre>
-          <p>encoding \u2192 issue</p>
-        """
+        expect(atom.workspace.getActiveTextEditor().getText()).toBe expectedOutput
 
   describe "when core:copy is triggered", ->
     it "writes the rendered HTML to the clipboard", ->
