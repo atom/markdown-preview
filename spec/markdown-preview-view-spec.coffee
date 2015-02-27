@@ -173,23 +173,22 @@ describe "MarkdownPreviewView", ->
           cssText: "#{selector} #{css}"
         }
 
-      styles = [
+      markdownPreviewStyles = [
         {
-          ownerNode:
-            context: 'atom-text-editor',
           rules: [
-            createRule ".foo", "{ color: blue; }"
-            createRule ".bar", "{ color: red; }"
-            createRule ":host", "{ color: gold; }"
-            createRule "atom-text-editor", "{ color: pink; }"
+            createRule ".markdown-preview", "{ color: orange; }"
           ]
         }, {
           rules: [
-            createRule ".markdown-preview", "{ color: orange; }"
             createRule ".not-included", "{ color: green; }"
             createRule ".markdown-preview :host", "{ color: purple; }"
           ]
         }
+      ]
+
+      atomTextEditorStyles = [
+        "atom-text-editor .line { color: brown; }\natom-text-editor .number { color: cyan; }"
+        "atom-text-editor :host .something { color: black; }"
       ]
 
       expect(fs.isFileSync(outputPath)).toBe false
@@ -199,7 +198,8 @@ describe "MarkdownPreviewView", ->
 
       runs ->
         spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
-        spyOn(preview, 'getDocumentStyleSheets').andReturn(styles)
+        spyOn(preview, 'getDocumentStyleSheets').andReturn(markdownPreviewStyles)
+        spyOn(preview, 'getTextEditorStyles').andReturn(atomTextEditorStyles)
         atom.commands.dispatch preview.element, 'core:save-as'
 
       waitsFor ->

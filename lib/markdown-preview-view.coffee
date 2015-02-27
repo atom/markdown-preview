@@ -186,23 +186,28 @@ class MarkdownPreviewView extends ScrollView
   getDocumentStyleSheets: -> # This function exists so we can stub it
     document.styleSheets
 
+  getTextEditorStyles: ->
+    textEditorStyles = document.querySelectorAll('atom-text-editor /deep/ style')
+    Array.prototype.slice.apply(textEditorStyles).map (styleElement) -> styleElement.innerText
+
   getMarkdownPreviewCSS: ->
     return @markdownPreviewCSS if @markdownPreviewCSS
 
-    rules = []
+    markdowPreviewRules = []
     ruleRegExp = /\.markdown-preview/
 
     for stylesheet in @getDocumentStyleSheets()
       if stylesheet.rules?
         for rule in stylesheet.rules
-          # We need `atom-text-editor` and `.markdown-review` css
-          if rule.selectorText?.match(ruleRegExp)? || stylesheet.ownerNode?.context is 'atom-text-editor'
-            cleanedRule = rule.cssText
-              .replace(/atom-text-editor/g, 'pre.editor-colors') # <atom-text-editor> are now <pre>
-              .replace(/:host/g, '.host') # Remove silly css selector containing ":host" causing problem with FF
-            rules.push(cleanedRule)
+          # We only need `.markdown-review` css
+          markdowPreviewRules.push(rule.cssText) if rule.selectorText?.match(ruleRegExp)?
 
-    @markdownPreviewCSS = rules.join '\n'
+    @markdownPreviewCSS = markdowPreviewRules
+      .concat(@getTextEditorStyles())
+      .join('\n')
+      .replace(/atom-text-editor/g, 'pre.editor-colors') # <atom-text-editor> are now <pre>
+      .replace(/:host/g, '.host') # Remove shadow-dom :host selector causing problem on FF
+
     @markdownPreviewCSS
 
   showError: (result) ->
