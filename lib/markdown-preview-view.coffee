@@ -195,6 +195,7 @@ class MarkdownPreviewView extends ScrollView
 
     markdowPreviewRules = []
     ruleRegExp = /\.markdown-preview/
+    cssUrlRefExp = /url\(atom:\/\/markdown-preview\/assets\/(.*)\)/
 
     for stylesheet in @getDocumentStyleSheets()
       if stylesheet.rules?
@@ -207,7 +208,11 @@ class MarkdownPreviewView extends ScrollView
       .join('\n')
       .replace(/atom-text-editor/g, 'pre.editor-colors') # <atom-text-editor> are now <pre>
       .replace(/:host/g, '.host') # Remove shadow-dom :host selector causing problem on FF
-
+      .replace cssUrlRefExp, (match, assetsName, offset, string) -> # base64 encode assets
+        assetPath = path.join __dirname, '../assets', assetsName
+        originalData = fs.readFileSync assetPath, 'binary'
+        base64Data = new Buffer(originalData, 'binary').toString('base64')
+        "url('data:image/jpeg;base64,#{base64Data}')"
     @markdownPreviewCSS
 
   showError: (result) ->
