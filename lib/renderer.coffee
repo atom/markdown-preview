@@ -14,7 +14,7 @@ packagePath = path.dirname(__dirname)
 process = require 'child_process'
 
 exports.toDOMFragment = (text='', filePath, grammar, callback) ->
-  render text, filePath, grammar, (error, html) ->
+  render text, filePath, (error, html) ->
     return callback(error) if error?
 
     template = document.createElement('template')
@@ -27,14 +27,14 @@ exports.toDOMFragment = (text='', filePath, grammar, callback) ->
     callback(null, domFragment)
 
 exports.toHTML = (text='', filePath, grammar, callback) ->
-  render text, filePath, grammar, (error, html) ->
+  render text, filePath, (error, html) ->
     return callback(error) if error?
     # Default code blocks to be coffee in Literate CoffeeScript files
     # defaultCodeLanguage = 'coffee' if grammar?.scopeName is 'source.litcoffee'
     # html = tokenizeCodeBlocks(html, defaultCodeLanguage)
     callback(null, html)
 
-render = (text, filePath, grammar, callback) ->
+render = (text, filePath, callback) ->
   # Remove the <!doctype> since otherwise marked will escape it
   # https://github.com/chjj/marked/issues/354
   text = text.replace(/^\s*<!doctype(\s+.*)?>\s*/i, '')
