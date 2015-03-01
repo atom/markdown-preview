@@ -87,6 +87,9 @@ class MarkdownPreviewView extends ScrollView
   handleEvents: ->
     @disposables.add atom.grammars.onDidAddGrammar => _.debounce((=> @renderMarkdown()), 250)
     @disposables.add atom.grammars.onDidUpdateGrammar _.debounce((=> @renderMarkdown()), 250)
+    @disposables.add @editor.onDidChangeScrollTop =>
+      @scrollToEditorPos() if atom.config.get(
+        'markdown-preview-pandoc.scrollWithEditor')
 
     atom.commands.add @element,
       'core:move-up': =>
@@ -131,19 +134,7 @@ class MarkdownPreviewView extends ScrollView
     if @file?
       @file.read().then (contents) => @renderMarkdownText(contents)
     else if @editor?
-      lines=@editor.getText().split('\n')
-      scopeForRow = (row) =>
-        @editor.scopesForBufferPosition([row,lines[row].length-1])
-      pos=@editor.getCursorBufferPosition()
-      if pos
-        row=pos.row
-        while(row>0 and not
-            (_.isEqual(scopeForRow(row),['source.gfm']) and
-            lines[row].trim()!='')
-            )
-          row=row-1
-        lines[row]=lines[row]+"\u0091" if row>0
-      @renderMarkdownText(lines.join('\n'))
+      @renderMarkdownText(@editor.getText())
 
   renderMarkdownText: (text) ->
     renderer.toDOMFragment text, @getPath(), @getGrammar(), (error, domFragment) =>
@@ -153,10 +144,15 @@ class MarkdownPreviewView extends ScrollView
         @loading = false
         @empty()
         @append(domFragment)
-        offset=@find(':contains(\u0091)')?.offset()?.top
-        @scrollTop(offset-@height()/2) if offset
+        @scrollToEditorPos(@editor.getCursorScreenRow())
         @emitter.emit 'did-change-markdown'
         @originalTrigger('markdown-preview-pandoc:markdown-changed')
+
+  scrollToEditorPos: (line) ->
+    line=(@editor.getFirstVisibleScreenRow()+
+        @editor.getLastVisibleScreenRow())/2 unless line
+    p=line/@editor.getLastScreenRow()
+    @scrollTop(p*this[0].scrollHeight-@height()/2)
 
   getTitle: ->
     if @file?

@@ -41,6 +41,9 @@ module.exports =
         'text.plain'
         'text.plain.null-grammar'
       ]
+    scrollWithEditor:
+      type: 'boolean'
+      default: true
 
   activate: ->
     atom.commands.add 'atom-workspace',
