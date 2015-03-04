@@ -158,12 +158,40 @@ describe "MarkdownPreviewView", ->
   describe "when core:save-as is triggered", ->
     beforeEach ->
       preview.destroy()
-      filePath = atom.project.getDirectories()[0].resolve('subdir/simple.md')
+      filePath = atom.project.getDirectories()[0].resolve('subdir/code-block.md')
       preview = new MarkdownPreviewView({filePath})
       jasmine.attachToDOM(preview.element)
 
     it "saves the rendered HTML and opens it", ->
       outputPath = temp.path(suffix: '.html')
+      expectedFilePath = atom.project.getDirectories()[0].resolve('saved-html.html')
+      expectedOutput = fs.readFileSync(expectedFilePath).toString()
+
+      createRule = (selector, css) ->
+        return {
+          selectorText: selector
+          cssText: "#{selector} #{css}"
+        }
+
+      markdownPreviewStyles = [
+        {
+          rules: [
+            createRule ".markdown-preview", "{ color: orange; }"
+          ]
+        }, {
+          rules: [
+            createRule ".not-included", "{ color: green; }"
+            createRule ".markdown-preview :host", "{ color: purple; }"
+          ]
+        }
+      ]
+
+      atomTextEditorStyles = [
+        "atom-text-editor .line { color: brown; }\natom-text-editor .number { color: cyan; }"
+        "atom-text-editor :host .something { color: black; }"
+        "atom-text-editor .hr { background: url(atom://markdown-preview/assets/hr.png); }"
+      ]
+
       expect(fs.isFileSync(outputPath)).toBe false
 
       waitsForPromise ->
@@ -171,19 +199,16 @@ describe "MarkdownPreviewView", ->
 
       runs ->
         spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
+        spyOn(preview, 'getDocumentStyleSheets').andReturn(markdownPreviewStyles)
+        spyOn(preview, 'getTextEditorStyles').andReturn(atomTextEditorStyles)
         atom.commands.dispatch preview.element, 'core:save-as'
-        outputPath = fs.realpathSync(outputPath)
-        expect(fs.isFileSync(outputPath)).toBe true
 
       waitsFor ->
-        atom.workspace.getActiveTextEditor()?.getPath() is outputPath
+        fs.existsSync(outputPath) && atom.workspace.getActiveTextEditor()?.getPath() is fs.realpathSync(outputPath)
 
       runs ->
-        expect(atom.workspace.getActiveTextEditor().getText()).toBe """
-          <p><em>italic</em></p>
-          <p><strong>bold</strong></p>
-          <p>encoding \u2192 issue</p>
-        """
+        expect(fs.isFileSync(outputPath)).toBe true
+        expect(atom.workspace.getActiveTextEditor().getText()).toBe expectedOutput
 
   describe "when core:copy is triggered", ->
     it "writes the rendered HTML to the clipboard", ->
@@ -207,4 +232,5 @@ describe "MarkdownPreviewView", ->
         expect(atom.clipboard.read()).toBe """
          <h1 id="code-block">Code Block</h1>
          <pre class="editor-colors lang-javascript"><div class="line"><span class="source js"><span class="keyword control js"><span>if</span></span><span>&nbsp;a&nbsp;</span><span class="keyword operator js"><span>===</span></span><span>&nbsp;</span><span class="constant numeric js"><span>3</span></span><span>&nbsp;</span><span class="meta brace curly js"><span>{</span></span></span></div><div class="line"><span class="source js"><span>&nbsp;&nbsp;b&nbsp;</span><span class="keyword operator js"><span>=</span></span><span>&nbsp;</span><span class="constant numeric js"><span>5</span></span></span></div><div class="line"><span class="source js"><span class="meta brace curly js"><span>}</span></span></span></div></pre>
+         <p>encoding \u2192 issue</p>
         """
