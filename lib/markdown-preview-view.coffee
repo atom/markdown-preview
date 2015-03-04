@@ -255,7 +255,9 @@ class MarkdownPreviewView extends ScrollView
     return if @loading
 
     filePath = @getPath()
+    title = 'Markdown to HTML'
     if filePath
+      title = path.parse(filePath).name
       filePath += '.html'
     else
       filePath = 'untitled.md.html'
@@ -272,7 +274,7 @@ class MarkdownPreviewView extends ScrollView
           <!DOCTYPE html>
           <html>
             <head>
-                <title>Markdown to HTML</title>
+                <title>#{title}</title>
                 <style>#{@getMarkdownPreviewCSS()}</style>
             </head>
             <body class='markdown-preview'>#{htmlBody}</body>
