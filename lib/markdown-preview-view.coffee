@@ -261,7 +261,7 @@ class MarkdownPreviewView extends ScrollView
       filePath += '.html'
     else
       filePath = 'untitled.md.html'
-      if projectPath = atom.project.getPath()
+      if projectPath = atom.project.getPaths()[0]
         filePath = path.join(projectPath, filePath)
 
     if htmlFilePath = atom.showSaveDialogSync(filePath)
