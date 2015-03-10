@@ -200,7 +200,7 @@ describe "MarkdownPreviewView", ->
       runs ->
         spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
         spyOn(preview, 'getDocumentStyleSheets').andReturn(markdownPreviewStyles)
-        spyOn(preview, 'getTextEditorStyles').andReturn(atomTextEditorStyles)
+        spyOn(preview, 'getTextEditorStyles').andReturn(Promise.resolve(atomTextEditorStyles))
         atom.commands.dispatch preview.element, 'core:save-as'
 
       waitsFor ->
