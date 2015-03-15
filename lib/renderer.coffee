@@ -41,11 +41,16 @@ render = (text, filePath, callback) ->
 
   path_ = atom.config.get 'markdown-preview-pandoc.pandocPath'
   opts_ = atom.config.get 'markdown-preview-pandoc.pandocOpts'
+  cwd_  = atom.project.getDirectories()
+            .filter (d) ->
+              d.contains(filePath)
+            .map (d) ->
+              d.realPath
+
   return unless path_? and opts_?
-  pandoc=process.spawn(
-    path_,
-    opts_.split(' ')
-  )
+  pandoc=process.spawn path_,
+    opts_.split(' '),
+    cwd: cwd_[0]
 
   html = ""
   error = ""
@@ -54,7 +59,10 @@ render = (text, filePath, callback) ->
   pandoc.stdin.write(text)
   pandoc.stdin.end()
   pandoc.on 'close', (code) ->
-    return callback(error+html) if code!=0
+    if code!=0
+      console.log(error)
+      console.log(html)
+      return callback(error+html)
     html = sanitize(html)
     html = resolveImagePaths(html, filePath)
     callback(null, html.trim())
