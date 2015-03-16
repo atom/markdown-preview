@@ -186,7 +186,7 @@ class MarkdownPreviewView extends ScrollView
   getDocumentStyleSheets: -> # This function exists so we can stub it
     document.styleSheets
 
-  getTextEditorStyles: () ->
+  getTextEditorStyles: ->
 
     textEditorStyles = document.createElement("atom-styles")
     textEditorStyles.setAttribute "context", "atom-text-editor"
@@ -199,7 +199,7 @@ class MarkdownPreviewView extends ScrollView
     Array.prototype.slice.apply(textEditorStyles.childNodes).map (styleElement) ->
       styleElement.innerText
 
-  getMarkdownPreviewCSS: () ->
+  getMarkdownPreviewCSS: ->
     markdowPreviewRules = []
     ruleRegExp = /\.markdown-preview/
     cssUrlRefExp = /url\(atom:\/\/markdown-preview\/assets\/(.*)\)/

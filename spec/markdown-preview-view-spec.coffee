@@ -212,7 +212,8 @@ describe "MarkdownPreviewView", ->
 
     describe "text editor style extraction", ->
 
-      disposableStyleSheet = disposableStyleSheet2 = extractedStyles = null
+      [disposableStyleSheet, disposableStyleSheet2, extractedStyles] = []
+
       textEditorStyle = ".editor-style .extraction-test { color: blue; }"
       unrelatedStyle  = ".something else { color: red; }"
 
@@ -230,10 +231,6 @@ describe "MarkdownPreviewView", ->
 
       it "does not return other styles", ->
         expect(extractedStyles.indexOf(unrelatedStyle)).toBe(-1)
-
-      afterEach ->
-        disposableStyleSheet.dispose()
-        disposableStyleSheet2.dispose()
 
   describe "when core:copy is triggered", ->
     it "writes the rendered HTML to the clipboard", ->
