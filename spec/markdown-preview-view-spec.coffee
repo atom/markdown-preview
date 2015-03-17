@@ -212,16 +212,16 @@ describe "MarkdownPreviewView", ->
 
     describe "text editor style extraction", ->
 
-      [disposableStyleSheet, disposableStyleSheet2, extractedStyles] = []
+      [extractedStyles] = []
 
       textEditorStyle = ".editor-style .extraction-test { color: blue; }"
       unrelatedStyle  = ".something else { color: red; }"
 
       beforeEach ->
-        disposableStyleSheet = atom.styles.addStyleSheet textEditorStyle,
+        atom.styles.addStyleSheet textEditorStyle,
           context: 'atom-text-editor'
 
-        disposableStyleSheet2 = atom.styles.addStyleSheet unrelatedStyle,
+        atom.styles.addStyleSheet unrelatedStyle,
           context: 'unrelated-context'
 
         extractedStyles = preview.getTextEditorStyles()
