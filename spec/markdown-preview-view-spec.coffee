@@ -210,6 +210,28 @@ describe "MarkdownPreviewView", ->
         expect(fs.isFileSync(outputPath)).toBe true
         expect(atom.workspace.getActiveTextEditor().getText()).toBe expectedOutput
 
+    describe "text editor style extraction", ->
+
+      [extractedStyles] = []
+
+      textEditorStyle = ".editor-style .extraction-test { color: blue; }"
+      unrelatedStyle  = ".something else { color: red; }"
+
+      beforeEach ->
+        atom.styles.addStyleSheet textEditorStyle,
+          context: 'atom-text-editor'
+
+        atom.styles.addStyleSheet unrelatedStyle,
+          context: 'unrelated-context'
+
+        extractedStyles = preview.getTextEditorStyles()
+
+      it "returns an array containing atom-text-editor css style strings", ->
+        expect(extractedStyles.indexOf(textEditorStyle)).toBeGreaterThan(-1)
+
+      it "does not return other styles", ->
+        expect(extractedStyles.indexOf(unrelatedStyle)).toBe(-1)
+
   describe "when core:copy is triggered", ->
     it "writes the rendered HTML to the clipboard", ->
       preview.destroy()

@@ -192,13 +192,14 @@ class MarkdownPreviewView extends ScrollView
     textEditorStyles.setAttribute "context", "atom-text-editor"
     document.body.appendChild textEditorStyles
 
-    Array.prototype.slice.apply(textEditorStyles).map (styleElement) -> styleElement.innerText
+    # Force styles injection
+    textEditorStyles.initialize()
 
-    textEditorStyles.remove()
+    # Extract style elements content
+    Array.prototype.slice.apply(textEditorStyles.childNodes).map (styleElement) ->
+      styleElement.innerText
 
   getMarkdownPreviewCSS: ->
-    return @markdownPreviewCSS if @markdownPreviewCSS
-
     markdowPreviewRules = []
     ruleRegExp = /\.markdown-preview/
     cssUrlRefExp = /url\(atom:\/\/markdown-preview\/assets\/(.*)\)/
@@ -209,17 +210,16 @@ class MarkdownPreviewView extends ScrollView
           # We only need `.markdown-review` css
           markdowPreviewRules.push(rule.cssText) if rule.selectorText?.match(ruleRegExp)?
 
-    @markdownPreviewCSS = markdowPreviewRules
+    markdowPreviewRules
       .concat(@getTextEditorStyles())
       .join('\n')
-      .replace(/atom-text-editor/g, 'pre.editor-colors') # <atom-text-editor> are now <pre>
+      .replace(/atom-text-editor/g, 'pre.editor-colors')
       .replace(/:host/g, '.host') # Remove shadow-dom :host selector causing problem on FF
       .replace cssUrlRefExp, (match, assetsName, offset, string) -> # base64 encode assets
         assetPath = path.join __dirname, '../assets', assetsName
         originalData = fs.readFileSync assetPath, 'binary'
         base64Data = new Buffer(originalData, 'binary').toString('base64')
         "url('data:image/jpeg;base64,#{base64Data}')"
-    @markdownPreviewCSS
 
   showError: (result) ->
     failureMessage = result?.message
@@ -270,15 +270,16 @@ class MarkdownPreviewView extends ScrollView
         if error?
           console.warn('Saving Markdown as HTML failed', error)
         else
+
           html = """
-          <!DOCTYPE html>
-          <html>
-            <head>
-                <title>#{title}</title>
-                <style>#{@getMarkdownPreviewCSS()}</style>
-            </head>
-            <body class='markdown-preview'>#{htmlBody}</body>
-          </html>""" + "\n" # Ensure trailing newline
+            <!DOCTYPE html>
+            <html>
+              <head>
+                  <title>#{title}</title>
+                  <style>#{@getMarkdownPreviewCSS()}</style>
+              </head>
+              <body class='markdown-preview'>#{htmlBody}</body>
+            </html>""" + "\n" # Ensure trailing newline
 
           fs.writeFileSync(htmlFilePath, html)
           atom.workspace.open(htmlFilePath)
