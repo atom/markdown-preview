@@ -116,6 +116,7 @@ convertCodeBlocksToAtomEditors = (domFragment, defaultLanguage='text') ->
     preElement.remove()
 
     editor = editorElement.getModel()
+    editor.getCursor().destroy()
     editor.setText(codeBlock.textContent.trim())
     if grammar = atom.grammars.grammarForScopeName(scopeForFenceName(fenceName))
       editor.setGrammar(grammar)
