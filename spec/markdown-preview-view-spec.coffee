@@ -99,6 +99,17 @@ describe "MarkdownPreviewView", ->
           }
         """
 
+  describe "editor behaves read-only", ->
+    beforeEach ->
+      waitsForPromise ->
+        preview.renderMarkdown()
+
+    describe "when a code block is rendered", ->
+      it "it does not have line-cursor decorations", ->
+        plainEditor = preview.find("atom-text-editor[data-grammar='text plain null-grammar']")
+        decorations = plainEditor[0].getModel().getDecorations(class: 'cursor-line', type: 'line')
+        expect(decorations.length).toBe 0
+
   describe "image resolving", ->
     beforeEach ->
       waitsForPromise ->
