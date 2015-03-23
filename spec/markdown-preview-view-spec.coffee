@@ -70,7 +70,7 @@ describe "MarkdownPreviewView", ->
       waitsForPromise ->
         preview.renderMarkdown()
 
-    fit "removes line decorations on rendered code blocks", ->
+    it "removes line decorations on rendered code blocks", ->
       editor = preview.find("atom-text-editor[data-grammar='text plain null-grammar']")
       decorations = editor[0].getModel().getDecorations(class: 'cursor-line', type: 'line')
       expect(decorations.length).toBe 0
