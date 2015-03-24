@@ -18,6 +18,7 @@ class MarkdownPreviewView extends ScrollView
     super
     @emitter = new Emitter
     @disposables = new CompositeDisposable
+    @showedLoading = false
 
   attached: ->
     return if @isAttached
@@ -108,6 +109,7 @@ class MarkdownPreviewView extends ScrollView
         @css('zoom', 1)
 
     changeHandler = =>
+      @showedLoading = true
       @renderMarkdown()
 
       # TODO: Remove paneForURI call when ::paneForItem is released
@@ -129,7 +131,8 @@ class MarkdownPreviewView extends ScrollView
     @disposables.add atom.config.onDidChange 'markdown-preview.breakOnSingleNewline', changeHandler
 
   renderMarkdown: ->
-    @showLoading()
+    if @showedLoading is false
+      @showLoading()
     @getMarkdownSource().then (source) => @renderMarkdownText(source) if source?
 
   getMarkdownSource: ->
@@ -152,8 +155,7 @@ class MarkdownPreviewView extends ScrollView
         @showError(error)
       else
         @loading = false
-        @empty()
-        @append(domFragment)
+        @html(domFragment)
         @emitter.emit 'did-change-markdown'
         @originalTrigger('markdown-preview:markdown-changed')
 
