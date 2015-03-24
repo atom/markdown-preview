@@ -18,6 +18,7 @@ class MarkdownPreviewView extends ScrollView
     super
     @emitter = new Emitter
     @disposables = new CompositeDisposable
+    @loaded = false
 
   attached: ->
     return if @isAttached
@@ -129,7 +130,7 @@ class MarkdownPreviewView extends ScrollView
     @disposables.add atom.config.onDidChange 'markdown-preview.breakOnSingleNewline', changeHandler
 
   renderMarkdown: ->
-    @showLoading()
+    @showLoading() unless @loaded
     @getMarkdownSource().then (source) => @renderMarkdownText(source) if source?
 
   getMarkdownSource: ->
@@ -152,8 +153,8 @@ class MarkdownPreviewView extends ScrollView
         @showError(error)
       else
         @loading = false
-        @empty()
-        @append(domFragment)
+        @loaded = true
+        @html(domFragment)
         @emitter.emit 'did-change-markdown'
         @originalTrigger('markdown-preview:markdown-changed')
 
