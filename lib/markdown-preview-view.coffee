@@ -9,6 +9,7 @@ fs = require 'fs-plus'
 String = require 'string'
 
 renderer = require './renderer'
+main = require './main'
 
 module.exports =
 class MarkdownPreviewView extends ScrollView
@@ -30,7 +31,9 @@ class MarkdownPreviewView extends ScrollView
         options = searchAllPanes: true
         if atom.config.get('markdown-preview.openPreviewInSplitPane')
             options.split = 'left'
-        callenEditor = atom.workspace.open( path.resolve("/", p, href), options )
+        atom.workspace.open( path.resolve("/", p, href), options ).done (callenEditor) ->
+            if callenEditor.getGrammar().name is "GitHub Markdown"
+                main.addPreviewForEditor(callenEditor)
 
   attached: ->
     return if @isAttached
@@ -85,6 +88,8 @@ class MarkdownPreviewView extends ScrollView
       else
         # The editor this preview was created for has been closed so close
         # this preview since a preview cannot be rendered without an editor
+        # Accessing PaneView via $::view() is deprecated. Use the raw DOM node
+        # or underlying model object instead.
         @parents('.pane').view()?.destroyItem(this)
 
     if atom.workspace?
