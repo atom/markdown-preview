@@ -6,6 +6,7 @@ Grim = require 'grim'
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
 {File} = require 'pathwatcher'
+String = require 'string'
 
 renderer = require './renderer'
 
@@ -19,6 +20,17 @@ class MarkdownPreviewView extends ScrollView
     @emitter = new Emitter
     @disposables = new CompositeDisposable
     @loaded = false
+    markdownPreviewView = this
+    @on 'click', 'a', ->
+        href = $(this).attr('href')
+        if(String(href).startsWith("https://") or
+             String(href).startsWith("http://"))
+            return
+        p = path.dirname(markdownPreviewView.getPath())
+        options = searchAllPanes: true
+        if atom.config.get('markdown-preview.openPreviewInSplitPane')
+            options.split = 'left'
+        callenEditor = atom.workspace.open( path.resolve("/", p, href), options )
 
   attached: ->
     return if @isAttached
