@@ -51,11 +51,6 @@ class MarkdownPreviewView extends ScrollView
   onDidChangeMarkdown: (callback) ->
     @emitter.on 'did-change-markdown', callback
 
-  on: (eventName) ->
-    if eventName is 'markdown-preview:markdown-changed'
-      Grim.deprecate("Use MarkdownPreviewView::onDidChangeMarkdown instead of the 'markdown-preview:markdown-changed' jQuery event")
-    super
-
   subscribeToFilePath: (filePath) ->
     @file = new File(filePath)
     @emitter.emit 'did-change-title'
@@ -288,3 +283,9 @@ class MarkdownPreviewView extends ScrollView
 
   isEqual: (other) ->
     @[0] is other?[0] # Compare DOM elements
+
+if Grim.includeDeprecatedAPIs
+  MarkdownPreviewView::on = (eventName) ->
+    if eventName is 'markdown-preview:markdown-changed'
+      Grim.deprecate("Use MarkdownPreviewView::onDidChangeMarkdown instead of the 'markdown-preview:markdown-changed' jQuery event")
+    super
