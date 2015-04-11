@@ -124,6 +124,12 @@ class MarkdownPreviewView extends ScrollView
 
     @disposables.add atom.config.onDidChange 'markdown-preview.breakOnSingleNewline', changeHandler
 
+    @disposables.add atom.config.observe 'markdown-preview.useGitHubStyle', (useGitHubStyle) =>
+      if useGitHubStyle
+        @element.setAttribute('data-use-github-style', '')
+      else
+        @element.removeAttribute('data-use-github-style')
+
   renderMarkdown: ->
     @showLoading() unless @loaded
     @getMarkdownSource().then (source) => @renderMarkdownText(source) if source?

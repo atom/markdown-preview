@@ -36,6 +36,10 @@ module.exports =
         'text.plain'
         'text.plain.null-grammar'
       ]
+    useGitHubStyle:
+      title: 'Use GitHub.com style'
+      type: 'boolean'
+      default: false
 
   activate: ->
     atom.commands.add 'atom-workspace',

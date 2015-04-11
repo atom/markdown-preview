@@ -428,3 +428,36 @@
     width: 20px;
   }
 }
+
+// GitHub styles; only used when `useGitHubStyle` is enabled.
+[data-use-github-style] {
+  &.markdown-preview {
+    background: #fff;
+    color: #333;
+
+    code {
+      background-color: rgba(0, 0, 0, 0.04);
+      color: #333;
+      border-width: 0;
+      padding: 0.2em 0;
+
+      &::before, &::after {
+        letter-spacing: -0.2em;
+        content: "\00a0";
+      }
+    }
+
+    h1, h2 {
+      border: none;
+      border-bottom: 1px solid #eee;
+    }
+
+    hr {
+      background: #e7e7e7;
+    }
+
+    a {
+      color: #4183c4;
+    }
+  }
+}
