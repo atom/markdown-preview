@@ -10,7 +10,7 @@
   box-sizing: border-box;
   padding: 20px;
 
-  code {
+  &, code {
     color: #333;
   }
 }
@@ -54,10 +54,6 @@
     width: 100%;
   }
 
-  li:last-child > atom-text-editor {
-    margin-bottom: 0;
-  }
-
   & > *:first-child {
     margin-top: 0 !important;
   }
@@ -85,8 +81,7 @@
   // Headings
   h1, h2, h3, h4, h5, h6 {
     font-family: @font-family;
-    margin: 20px 0 10px;
-    padding: 0 0 10px 0;
+    margin: 1em 0 16px;
     font-weight: bold;
     -webkit-font-smoothing: antialiased;
     cursor: text;
@@ -114,32 +109,35 @@
   }
 
   h1 {
-    font-size: 28px;
-    border-bottom: 1px solid #ddd;
-    color: #000;
+    padding-bottom: 0.3em;
+    font-size: 2.25em;
+    line-height: 1.2;
+    border-bottom: 1px solid #eee;
   }
 
   h2 {
-    font-size: 24px;
+    padding-bottom: 0.3em;
+    font-size: 1.75em;
+    line-height: 1.225;
     border-bottom: 1px solid #eee;
-    color: #000;
   }
 
   h3 {
-    font-size: 18px;
+    font-size: 1.5em;
+    line-height: 1.43;
   }
 
   h4 {
-    font-size: 16px;
+    font-size: 1.25em;
   }
 
   h5 {
-    font-size: 14px;
+    font-size: 1em;
   }
 
   h6 {
+    font-size: 1em;
     color: #777;
-    font-size: 14px;
   }
 
   p,
@@ -151,12 +149,11 @@
   }
 
   hr {
-    background: transparent url("atom://markdown-preview/assets/hr.png") repeat-x 0 0;
     border: 0 none;
-    color: #ccc;
+    background-color: #e7e7e7;
     height: 4px;
     padding: 0;
-    margin: 15px 0;
+    margin: 16px 0;
   }
 
   & > h2:first-child,
@@ -404,10 +401,15 @@
     font-size: 13px;
     line-height: 19px;
     overflow: auto;
+    margin-top: 0;
     padding: 6px 10px;
     border-radius:3px;
     background: @syntax-background-color;
     border: 1px solid darken(@syntax-background-color, 10%);
+
+    & + p {
+      margin-top: 0;
+    }
   }
 
   kbd {
