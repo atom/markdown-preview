@@ -566,16 +566,18 @@
   }
 
   atom-text-editor {
-    background: #f8f8f8;
-    border: 1px solid #ccc;
-    font-size: 13px;
-    line-height: 19px;
+    padding: @margin;
     overflow: auto;
-    margin-top: 0;
-    padding: 6px 10px;
+    font-size: 85%;
+    line-height: 1.45;
+    background: #f7f7f7;
+    background-color: @syntax-background-color;
     border-radius: 3px;
-    background: @syntax-background-color;
-    border: 1px solid darken(@syntax-background-color, 10%);
+  }
+
+  atom-text-editor {
+    margin-bottom: @margin;
+    word-break: normal;
   }
 
   code,
@@ -584,12 +586,12 @@
     font-family: Consolas, "Liberation Mono", Courier, monospace;
   }
 
-
-  li > atom-text-editor {
-    display: inline-block;
-    vertical-align: top;
-    width: 100%;
-  }
+  // NOTE: Doesn't seem necessary.
+  // li > atom-text-editor {
+  //   display: inline-block;
+  //   vertical-align: top;
+  //   width: 100%;
+  // }
 
   .emoji {
     height: 20px;
