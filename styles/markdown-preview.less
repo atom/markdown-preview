@@ -7,7 +7,7 @@
 // container with .markdown-body on it should render generally well. It also
 // includes some GitHub Flavored Markdown specific styling (like @mentions)
 // .markdown-body {
-.markdown-preview {
+.markdown-body {
   overflow: hidden;
   font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
   font-size: 16px;
@@ -464,6 +464,8 @@
 // container with .markdown-preview on it should render generally well. It also
 // includes some GitHub Flavored Markdown specific styling (like @mentions)
 .markdown-preview {
+  .markdown-body();
+
   overflow: scroll;
   background-color: #fff;
   box-sizing: border-box;
@@ -519,7 +521,8 @@
   }
 
   // Lists, Blockquotes & Such
-  ul, ol {
+  ul,
+  ol {
     li > :first-child,
     li ul:first-of-type {
       margin-top: 0;
@@ -568,9 +571,8 @@
   atom-text-editor {
     padding: @margin;
     overflow: auto;
-    font-size: 85%;
+    font-size: 84%; // Hack to get default size to 13px.
     line-height: 1.45;
-    background: #f7f7f7;
     background-color: @syntax-background-color;
     border-radius: 3px;
   }
@@ -601,5 +603,5 @@
 
 // Raises specifity of GitHub styles; only when `useGitHubStyle` is enabled.
 .markdown-preview[data-use-github-style] {
-  // .markdown-preview();
+  .markdown-preview();
 }
