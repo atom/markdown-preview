@@ -348,3 +348,37 @@ describe "Markdown preview package", ->
       expectPreviewInSplitPane()
 
       runs -> expect(preview.find('atom-text-editor')).toExist()
+
+  describe "GitHub style markdown preview", ->
+    beforeEach ->
+      atom.config.set 'markdown-preview.useGitHubStyle', false
+
+    it "renders markdown using the default style when GitHub styling is disabled", ->
+      waitsForPromise -> atom.workspace.open("subdir/simple.md")
+      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      expectPreviewInSplitPane()
+
+      runs -> expect(preview.element.getAttribute('data-use-github-style')).toBeNull()
+
+    it "renders markdown using the GitHub styling when enabled", ->
+      atom.config.set 'markdown-preview.useGitHubStyle', true
+
+      waitsForPromise -> atom.workspace.open("subdir/simple.md")
+      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      expectPreviewInSplitPane()
+
+      runs -> expect(preview.element.getAttribute('data-use-github-style')).toBe ''
+
+    it "updates the rendering style immediately when the configuration is changed", ->
+      waitsForPromise -> atom.workspace.open("subdir/simple.md")
+      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      expectPreviewInSplitPane()
+
+      runs ->
+        expect(preview.element.getAttribute('data-use-github-style')).toBeNull()
+
+        atom.config.set 'markdown-preview.useGitHubStyle', true
+        expect(preview.element.getAttribute('data-use-github-style')).toBe ''
+
+        atom.config.set 'markdown-preview.useGitHubStyle', false
+        expect(preview.element.getAttribute('data-use-github-style')).toBeNull()
