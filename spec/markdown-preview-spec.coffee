@@ -378,7 +378,7 @@ describe "Markdown preview package", ->
         expect(preview.element.getAttribute('data-use-github-style')).toBeNull()
 
         atom.config.set 'markdown-preview.useGitHubStyle', true
-        expect(preview.element.getAttribute('data-use-github-style')).toBe ''
+        expect(preview.element.getAttribute('data-use-github-style')).not.toBeNull()
 
         atom.config.set 'markdown-preview.useGitHubStyle', false
         expect(preview.element.getAttribute('data-use-github-style')).toBeNull()
