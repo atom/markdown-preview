@@ -1,19 +1,5 @@
 @import "syntax-variables";
-
-@font-family: "Helvetica Neue", Helvetica, sans-serif;
-.markdown-preview {
-  font-family: @font-family;
-  font-size: 14px;
-  line-height: 1.6;
-  background-color: #fff;
-  overflow: scroll;
-  box-sizing: border-box;
-  padding: 20px;
-
-  code {
-    color: #333;
-  }
-}
+@import (reference) "../assets/primer-markdown";
 
 .markdown-spinner {
   margin: auto;
@@ -25,149 +11,42 @@
   text-align: center;
 }
 
-// This is styling for generic markdownized text. Anything you put in a
-// container with .markdown-preview on it should render generally well. It also
-// includes some GitHub Flavored Markdown specific styling (like @mentions)
-.markdown-preview {
-  code,
-  tt,
-  atom-text-editor {
-    font-size: 12px;
-    font-family: Consolas, "Liberation Mono", Courier, monospace;
-  }
+// These are our overrides and specific styles built on top of GitHub's styling
+// of (GitHub Flavored) Markdown documents:
+//   * https://github.com/primer/markdown/blob/master/components/markdown.scss
+.markdown-preview,
+.markdown-preview[data-use-github-style] {
+  // This mixin comes from `../assets/primer-markdown.less`.
+  .markdown-body();
 
-  a, a code {
-    color: #4183c4;
-  }
+  overflow: scroll;
+  background-color: #fff;
+  box-sizing: border-box;
+  padding: 20px;
 
-  ol > li {
-    list-style-type: decimal;
-  }
-
-  ul > li {
-    list-style-type: disc;
-  }
-
-  li > atom-text-editor {
-    display: inline-block;
-    vertical-align: top;
-    width: 100%;
-  }
-
-  li:last-child > atom-text-editor {
-    margin-bottom: 0;
-  }
-
-  & > *:first-child {
-    margin-top: 0 !important;
-  }
-
-  & > *:last-child {
-    margin-bottom: 0 !important;
-  }
-
-  // Link Colors
-  a.absent {
-    color: #c00;
-  }
-
-  a.anchor {
-    display: block;
-    padding-left: 30px;
-    margin-left: -30px;
-    cursor: pointer;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
+  &, code {
+    color: #333;
   }
 
   // Headings
   h1, h2, h3, h4, h5, h6 {
-    font-family: @font-family;
-    margin: 20px 0 10px;
-    padding: 0 0 10px 0;
-    font-weight: bold;
     -webkit-font-smoothing: antialiased;
     cursor: text;
-    position: relative;
-
-    .octicon-link {
-      display: none;
-      color: #000;
-    }
-
-    &:hover a.anchor {
-      text-decoration: none;
-      line-height: 1;
-      padding-left: 0;
-      margin-left: -22px;
-      top: 15%;
-
-      .octicon-link {
-        display: inline-block;
-      }
-    }
-    tt, code {
-      font-size: inherit;
-    }
   }
 
-  h1 {
-    font-size: 28px;
-    border-bottom: 1px solid #ddd;
-    color: #000;
-  }
-
-  h2 {
-    font-size: 24px;
-    border-bottom: 1px solid #eee;
-    color: #000;
-  }
-
-  h3 {
-    font-size: 18px;
-  }
-
-  h4 {
-    font-size: 16px;
-  }
-
-  h5 {
-    font-size: 14px;
-  }
-
-  h6 {
-    color: #777;
-    font-size: 14px;
-  }
-
-  p,
-  blockquote,
-  ul, ol, dl,
-  table,
-  atom-text-editor {
-    margin: 15px 0;
-  }
-
-  hr {
-    background: transparent url("atom://markdown-preview/assets/hr.png") repeat-x 0 0;
-    border: 0 none;
-    color: #ccc;
-    height: 4px;
-    padding: 0;
-    margin: 15px 0;
-  }
-
-  & > h2:first-child,
   & > h1:first-child,
   & > h1:first-child + h2,
+  & > h2:first-child,
   & > h3:first-child,
   & > h4:first-child,
   & > h5:first-child,
   & > h6:first-child {
     margin-top: 0;
     padding-top: 0;
+  }
+
+  a, a code {
+    color: #4183c4;
   }
 
   // fixes margin on shit like:
@@ -195,41 +74,27 @@
   }
 
   // Lists, Blockquotes & Such
-  ul, ol {
-    padding-left: 30px;
-
-    &.no-list {
-      list-style-type: none;
-      padding: 0;
-    }
-
+  ul,
+  ol {
     li > :first-child,
     li ul:first-of-type {
       margin-top: 0;
     }
   }
 
-  ul ul,
-  ul ol,
-  ol ol,
-  ol ul {
-    margin-bottom: 0;
+  ol > li {
+    list-style-type: decimal;
   }
 
-  dl {
-    padding: 0;
+  ul > li {
+    list-style-type: disc;
   }
 
   dl dt {
-    font-size: 14px;
-    font-weight: bold;
-    font-style: italic;
-    padding: 0;
-    margin: 15px 0 5px;
-
     &:first-child {
       padding: 0;
     }
+
     & > :first-child {
       margin-top: 0;
     }
@@ -240,8 +105,6 @@
   }
 
   dl dd {
-    margin: 0 0 15px;
-    padding: 0 15px;
     & > :first-child {
       margin-top: 0;
     }
@@ -252,175 +115,30 @@
   }
 
   blockquote {
-    border-left: 4px solid #DDD;
-    padding: 0 15px;
-    color: #777;
-
-    & > :first-child {
-      margin-top: 0;
-    }
-
-    & > :last-child {
-      margin-bottom: 0;
-    }
-
     p {
       font-size: 16px;
       line-height: 1.5;
     }
   }
 
-  // Tables
-  table {
-
-    th {
-      font-weight: bold;
-    }
-
-    th, td {
-      border: 1px solid #ccc;
-      padding: 6px 13px;
-    }
-
-    tr {
-      border-top: 1px solid #ccc;
-      background-color: #fff;
-
-      &:nth-child(2n) {
-        background-color: #f8f8f8;
-      }
-    }
-  }
-
-  // Images & Stuff
-  img {
-    max-width: 100%;
-  }
-
-  // Gollum Image Tags
-
-  // Framed
-  span.frame {
-    display: block;
-    overflow: hidden;
-
-    & > span {
-      border: 1px solid #ddd;
-      display: block;
-      float: left;
-      overflow: hidden;
-      margin: 13px 0 0;
-      padding: 7px;
-      width: auto;
-    }
-
-    span img {
-      display: block;
-      float: left;
-    }
-
-    span span {
-      clear: both;
-      color: #333;
-      display: block;
-      padding: 5px 0 0;
-    }
-  }
-
-  span.align-center {
-    display: block;
-    overflow: hidden;
-    clear: both;
-
-    & > span {
-      display: block;
-      overflow: hidden;
-      margin: 13px auto 0;
-      text-align: center;
-    }
-
-    span img {
-      margin: 0 auto;
-      text-align: center;
-    }
-  }
-
-  span.align-right {
-    display: block;
-    overflow: hidden;
-    clear: both;
-
-    & > span {
-      display: block;
-      overflow: hidden;
-      margin: 13px 0 0;
-      text-align: right;
-    }
-
-    span img {
-      margin: 0;
-      text-align: right;
-    }
-  }
-
-  span.float-left {
-    display: block;
-    margin-right: 13px;
-    overflow: hidden;
-    float: left;
-
-    span {
-      margin: 13px 0 0;
-    }
-  }
-
-  span.float-right {
-    display: block;
-    margin-left: 13px;
-    overflow: hidden;
-    float: right;
-
-    & > span {
-      display: block;
-      overflow: hidden;
-      margin: 13px auto 0;
-      text-align: right;
-    }
-  }
-
-  // Inline code snippets
-  code, tt {
-    margin: 0 2px;
-    padding: 0 5px;
-    border: 1px solid #eaeaea;
-    background-color: #f8f8f8;
-    border-radius:3px;
-    text-shadow: none;
+  atom-text-editor {
+    padding: @margin;
+    overflow: auto;
+    font-size: 84%; // Hack to get default size to 13px.
+    line-height: 1.45;
+    background-color: @syntax-background-color;
+    border-radius: 3px;
   }
 
   atom-text-editor {
-    background: #f8f8f8;
-    border: 1px solid #ccc;
-    font-size: 13px;
-    line-height: 19px;
-    overflow: auto;
-    padding: 6px 10px;
-    border-radius:3px;
-    background: @syntax-background-color;
-    border: 1px solid darken(@syntax-background-color, 10%);
+    margin-bottom: @margin;
+    word-break: normal;
   }
 
-  kbd {
-    background-color: #dddddd;
-    background-image: linear-gradient(#f1f1f1, #ddd);
-    background-repeat: repeat-x;
-    border-radius: 2px;
-    border: 1px solid #ddd;
-    border-bottom-color: #ccc;
-    border-right-color: #ccc;
-    padding: 1px 4px;
-    line-height: 10px;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  code,
+  tt,
+  atom-text-editor {
+    font-family: Consolas, "Liberation Mono", Courier, monospace;
   }
 
   .emoji {
