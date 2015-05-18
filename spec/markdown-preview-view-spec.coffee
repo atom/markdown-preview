@@ -38,6 +38,8 @@ describe "MarkdownPreviewView", ->
       preview.showError("Not a real file")
       expect(preview.text()).toContain "Failed"
 
+    it "Handle click events on relative links"
+
   describe "serialization", ->
     newPreview = null
 

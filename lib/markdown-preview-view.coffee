@@ -6,8 +6,10 @@ Grim = require 'grim'
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
 {File} = require 'pathwatcher'
+String = require 'string'
 
 renderer = require './renderer'
+main = require './main'
 
 module.exports =
 class MarkdownPreviewView extends ScrollView
@@ -19,6 +21,19 @@ class MarkdownPreviewView extends ScrollView
     @emitter = new Emitter
     @disposables = new CompositeDisposable
     @loaded = false
+    markdownPreviewView = this
+    @on 'click', 'a', ->
+        href = $(this).attr('href')
+        if(String(href).startsWith("https://") or
+             String(href).startsWith("http://"))
+            return
+        p = path.dirname(markdownPreviewView.getPath())
+        options = searchAllPanes: true
+        if atom.config.get('markdown-preview.openPreviewInSplitPane')
+            options.split = 'left'
+        atom.workspace.open( path.resolve("/", p, href), options ).done (callenEditor) ->
+            if callenEditor.getGrammar().name is "GitHub Markdown"
+                main.addPreviewForEditor(callenEditor)
 
   attached: ->
     return if @isAttached
@@ -68,6 +83,8 @@ class MarkdownPreviewView extends ScrollView
       else
         # The editor this preview was created for has been closed so close
         # this preview since a preview cannot be rendered without an editor
+        # Accessing PaneView via $::view() is deprecated. Use the raw DOM node
+        # or underlying model object instead.
         @parents('.pane').view()?.destroyItem(this)
 
     if atom.workspace?
