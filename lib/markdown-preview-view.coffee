@@ -149,7 +149,7 @@ class MarkdownPreviewView extends ScrollView
         @loading = false
         @empty()
         @append(domFragment)
-        @scrollToEditorPos(@editor.getCursorScreenRow())
+        @scrollToEditorPos(@editor.getCursorScreenPosition().row)
         @emitter.emit 'did-change-markdown'
         @originalTrigger('markdown-preview-pandoc:markdown-changed')
 
