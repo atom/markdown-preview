@@ -42,7 +42,7 @@ render = (text, filePath, callback) ->
   # https://github.com/chjj/marked/issues/354
   text = text.replace(/^\s*<!doctype(\s+.*)?>\s*/i, '')
 
-  roaster text, options, (error, html) =>
+  roaster text, options, (error, html) ->
     return callback(error) if error?
 
     html = sanitize(html)
