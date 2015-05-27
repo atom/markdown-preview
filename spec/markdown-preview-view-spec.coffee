@@ -209,7 +209,7 @@ describe "MarkdownPreviewView", ->
         atom.commands.dispatch preview.element, 'core:save-as'
 
       waitsFor ->
-        fs.existsSync(outputPath) && atom.workspace.getActiveTextEditor()?.getPath() is fs.realpathSync(outputPath)
+        fs.existsSync(outputPath) and atom.workspace.getActiveTextEditor()?.getPath() is fs.realpathSync(outputPath)
 
       runs ->
         expect(fs.isFileSync(outputPath)).toBe true

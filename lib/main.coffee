@@ -49,7 +49,7 @@ module.exports =
         @copyHtml()
       'markdown-preview:toggle-break-on-single-newline': ->
         keyPath = 'markdown-preview.breakOnSingleNewline'
-        atom.config.set(keyPath, !atom.config.get(keyPath))
+        atom.config.set(keyPath, not atom.config.get(keyPath))
 
     previewFile = @previewFile.bind(this)
     atom.commands.add '.tree-view .file .name[data-name$=\\.markdown]', 'markdown-preview:preview-file', previewFile
@@ -130,7 +130,7 @@ module.exports =
 
     renderer ?= require './renderer'
     text = editor.getSelectedText() or editor.getText()
-    renderer.toHTML text, editor.getPath(), editor.getGrammar(), (error, html) =>
+    renderer.toHTML text, editor.getPath(), editor.getGrammar(), (error, html) ->
       if error
         console.warn('Copying Markdown as HTML failed', error)
       else
