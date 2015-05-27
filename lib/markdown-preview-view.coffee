@@ -68,7 +68,7 @@ class MarkdownPreviewView extends ScrollView
       else
         # The editor this preview was created for has been closed so close
         # this preview since a preview cannot be rendered without an editor
-        @parents('.pane').view()?.destroyItem(this)
+        atom.workspace?.paneForItem(this)?.destroyItem(this)
 
     if atom.workspace?
       resolve()
