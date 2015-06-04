@@ -154,8 +154,9 @@ class MarkdownPreviewView extends ScrollView
         @originalTrigger('markdown-preview-pandoc:markdown-changed')
 
   scrollToEditorPos: (line) ->
-    line=(@editor.getFirstVisibleScreenRow()+
-        @editor.getLastVisibleScreenRow())/2 unless line
+    element = atom.views.getView(@editor)
+    line=(element.getFirstVisibleScreenRow()+
+        element.getLastVisibleScreenRow())/2 unless line
     p=line/@editor.getLastScreenRow()
     @scrollTop(p*this[0].scrollHeight-@height()/2)
 
