@@ -48,11 +48,11 @@ render = (text, filePath, callback) ->
     html = sanitize(html)
     html = resolveImagePaths(html, filePath)
 
-    customCSSPath = atom.config.get('markdown-preview.customCSSFile');
+    customCSSPath = atom.config.get('markdown-preview.customCSSFile')
     if customCSSPath
       customCSSPath = customCSSPath
-        .replace(/^~?\//, (process.env.HOME || '')+'/');
-      customCSS = fs.readFileSync(customCSSPath, 'utf8');
+        .replace(/^~?\//, (process.env.HOME or '')+'/')
+      customCSS = fs.readFileSync(customCSSPath, 'utf8')
       html += "<style>#{customCSS}</style>"
 
     callback(null, html.trim())
