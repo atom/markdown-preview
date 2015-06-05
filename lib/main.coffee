@@ -27,6 +27,10 @@ module.exports =
     openPreviewInSplitPane:
       type: 'boolean'
       default: true
+    customCSSFile:
+      title: 'Custom CSS File'
+      type: 'string'
+      default: ''
     grammars:
       type: 'array'
       default: [
