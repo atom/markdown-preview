@@ -92,7 +92,8 @@ resolveImagePaths = (html, filePath) ->
 
       if src[0] is '/'
         unless fs.isFileSync(src)
-          img.attr('src', path.join(rootDirectory, src.substring(1)))
+          if rootDirectory
+            img.attr('src', path.join(rootDirectory, src.substring(1)))
       else
         img.attr('src', path.resolve(path.dirname(filePath), src))
 
