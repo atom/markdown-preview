@@ -349,7 +349,7 @@ describe "Markdown preview package", ->
 
       runs -> expect(preview.find('atom-text-editor')).toExist()
 
-  fdescribe "when there is an image with a relative path and no directory", ->
+  describe "when there is an image with a relative path and no directory", ->
     it "does not alter the image src", ->
       runs ->
         atom.project.removePath(projectPath) for projectPath in atom.project.getPaths()
