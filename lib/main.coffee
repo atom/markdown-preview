@@ -1,4 +1,5 @@
 url = require 'url'
+fs = require 'fs-plus'
 
 MarkdownPreviewView = null # Defer until used
 renderer = null # Defer until used
