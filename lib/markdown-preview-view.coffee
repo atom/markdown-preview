@@ -135,7 +135,7 @@ class MarkdownPreviewView extends ScrollView
     @getMarkdownSource().then (source) => @renderMarkdownText(source) if source?
 
   getMarkdownSource: ->
-    if @file? and typeof @file.path is 'string'
+    if @file?.getPath()
       @file.read()
     else if @editor?
       Promise.resolve(@editor.getText())
