@@ -351,8 +351,7 @@ describe "Markdown preview package", ->
 
   describe "when there is an image with a relative path and no directory", ->
     it "does not alter the image src", ->
-      runs ->
-        atom.project.removePath(projectPath) for projectPath in atom.project.getPaths()
+      atom.project.removePath(projectPath) for projectPath in atom.project.getPaths()
 
       filePath = path.join(temp.mkdirSync('atom'), 'bar.md')
       fs.writeFileSync(filePath, "![rel path](/foo.png)")
