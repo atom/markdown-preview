@@ -349,6 +349,24 @@ describe "Markdown preview package", ->
 
       runs -> expect(preview.find('atom-text-editor')).toExist()
 
+  describe "when there is an image with a relative path and no directory", ->
+    it "does not alter the image src", ->
+      atom.project.removePath(projectPath) for projectPath in atom.project.getPaths()
+
+      filePath = path.join(temp.mkdirSync('atom'), 'bar.md')
+      fs.writeFileSync(filePath, "![rel path](/foo.png)")
+
+      waitsForPromise ->
+        atom.workspace.open(filePath)
+
+      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      expectPreviewInSplitPane()
+
+      runs ->
+        expect(preview[0].innerHTML).toBe """
+          <p><img src="/foo.png" alt="rel path"></p>
+        """
+
   describe "GitHub style markdown preview", ->
     beforeEach ->
       atom.config.set 'markdown-preview.useGitHubStyle', false
