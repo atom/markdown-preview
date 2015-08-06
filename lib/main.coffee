@@ -111,6 +111,9 @@ module.exports =
     if atom.config.get('markdown-preview.openPreviewInSplitPane')
       options.split = 'right'
     atom.workspace.open(uri, options).done (markdownPreviewView) ->
+      editor.onDidChangeScrollTop (e) ->
+            markdownPreviewView.scrollTop e
+            return
       if isMarkdownPreviewView(markdownPreviewView)
         previousActivePane.activate()
 
