@@ -42,12 +42,23 @@ describe "MarkdownPreviewView", ->
     newPreview = null
 
     afterEach ->
-      newPreview.destroy()
+      newPreview?.destroy()
 
-    it "recreates the file when serialized/deserialized", ->
+    it "recreates the preview when serialized/deserialized", ->
       newPreview = atom.deserializers.deserialize(preview.serialize())
       jasmine.attachToDOM(newPreview.element)
       expect(newPreview.getPath()).toBe preview.getPath()
+
+    it "does not recreate a preview when the file no longer exists", ->
+      filePath = path.join(temp.mkdirSync('markdown-preview-'), 'foo.md')
+      fs.writeFileSync(filePath, '# Hi')
+
+      preview = new MarkdownPreviewView({filePath})
+      serialized = preview.serialize()
+      fs.removeSync(filePath)
+
+      newPreview = atom.deserializers.deserialize(serialized)
+      expect(newPreview).toBeUndefined()
 
     it "serializes the editor id when opened for an editor", ->
       preview.destroy()
