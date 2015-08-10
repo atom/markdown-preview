@@ -1,4 +1,5 @@
 url = require 'url'
+fs = require 'fs-plus'
 
 MarkdownPreviewView = null # Defer until used
 renderer = null # Defer until used
@@ -14,7 +15,8 @@ isMarkdownPreviewView = (object) ->
 atom.deserializers.add
   name: 'MarkdownPreviewView'
   deserialize: (state) ->
-    createMarkdownPreviewView(state) if state.constructor is Object
+    if state.editorId or fs.isFileSync(state.filePath)
+      createMarkdownPreviewView(state)
 
 module.exports =
   config:
