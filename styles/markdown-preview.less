@@ -128,8 +128,19 @@
     line-height: 1.45;
     background-color: @syntax-background-color;
     border-radius: 3px;
-    &::shadow ::-webkit-scrollbar {
-      display: none;
+
+    // only show scrollbars on hover
+    .scrollbars-visible-always &::shadow {
+      .vertical-scrollbar,
+      .horizontal-scrollbar {
+        visibility: hidden;
+      }
+    }
+    .scrollbars-visible-always &:hover::shadow {
+      .vertical-scrollbar,
+      .horizontal-scrollbar {
+        visibility: visible;
+      }
     }
   }
 
