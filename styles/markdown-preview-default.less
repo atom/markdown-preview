@@ -8,147 +8,96 @@
 @import "syntax-variables";
 
 .markdown-preview:not([data-use-github-style]) {
-  box-sizing: border-box;
   padding: 2em;
   font-size: 1.25em;
   color: @syntax-text-color;
   background-color: @syntax-background-color;
   overflow: scroll;
 
-  code {
-    color: #333;
-  }
-
-  // Headings
-  h1, h2, h3, h4, h5, h6 {
-    -webkit-font-smoothing: antialiased;
-    cursor: text;
-  }
-
-  & > h1:first-child,
-  & > h1:first-child + h2,
-  & > h2:first-child,
-  & > h3:first-child,
-  & > h4:first-child,
-  & > h5:first-child,
-  & > h6:first-child {
+  & > :first-child {
     margin-top: 0;
-    padding-top: 0;
   }
 
-  a, a code {
+
+  // Headings --------------------
+
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.2;
+    margin-top: 1em;
+    margin-bottom: .5em;
+  }
+
+  h1 { font-size: 2.4em; font-weight: 300; }
+  h2 { font-size: 2.0em; font-weight: 300; }
+  h3 { font-size: 1.8em; font-weight: 400; }
+  h4 { font-size: 1.5em; font-weight: 500; }
+  h5 { font-size: 1.2em; font-weight: 600; }
+  h6 { font-size: 1.0em; font-weight: 600; }
+
+  h1 { border-bottom: 2px solid @syntax-indent-guide-color; }
+  h2 { border-bottom: 1px solid @syntax-indent-guide-color; }
+
+
+  // Link --------------------
+
+  a,
+  a code {
     color: #4183c4;
   }
 
-  // fixes margin on shit like:
-  // <a name='the-heading'>
-  // <h1>The Heading</h1></a>
-  a:first-child {
-    h1, h2, h3, h4, h5, h6 {
-      margin-top: 0;
-      padding-top: 0;
-    }
+
+  // Images --------------------
+
+  img {
+    max-width: 100%;
   }
 
-  h1 + p,
-  h2 + p,
-  h3 + p,
-  h4 + p,
-  h5 + p,
-  h6 + p {
-    margin-top: 0;
-  }
 
-  // ReST first graf in nested list
-  li p.first {
-    display: inline-block;
-  }
-
-  // Lists, Blockquotes & Such
-  ul,
-  ol {
-    li > :first-child,
-    li ul:first-of-type {
-      margin-top: 0;
-    }
-  }
-
-  ol > li {
-    list-style-type: decimal;
-  }
-
-  ul > li {
-    list-style-type: disc;
-  }
-
-  dl dt {
-    &:first-child {
-      padding: 0;
-    }
-
-    & > :first-child {
-      margin-top: 0;
-    }
-
-    & > :last-child {
-      margin-bottom: 0;
-    }
-  }
-
-  dl dd {
-    & > :first-child {
-      margin-top: 0;
-    }
-
-    & > :last-child {
-      margin-bottom: 0;
-    }
-  }
+  // Blockquotes --------------------
 
   blockquote {
+    border-color: @syntax-indent-guide-color;
     p {
       font-size: 16px;
       line-height: 1.5;
     }
   }
 
+
+  // HR --------------------
+
+  hr {
+    border-top: 2px dashed @syntax-indent-guide-color;
+  }
+
+
+  // Table --------------------
+
+  table {
+    width: 100%;
+    margin-bottom: 1em;
+  }
+
+  th,
+  td {
+    padding: .3em;
+    border: 1px solid @syntax-indent-guide-color;
+  }
+
+
+  // Code --------------------
+
+  code {
+    color: @syntax-text-color;
+    background-color: contrast(@syntax-background-color, lighten(@syntax-background-color, 8%), darken(@syntax-background-color, 6%));
+  }
+
   atom-text-editor {
-    padding: 16px;
-    overflow: auto;
-    font-size: 84%; // Hack to get default size to 13px.
-    line-height: 1.45;
-    background-color: @syntax-background-color;
+    margin-bottom: 1em;
+    padding: 1em;
+    font-size: .92em;
     border-radius: 3px;
-
-    // only show scrollbars on hover
-    .scrollbars-visible-always &::shadow {
-      .vertical-scrollbar,
-      .horizontal-scrollbar {
-        visibility: hidden;
-      }
-    }
-    .scrollbars-visible-always &:hover::shadow {
-      .vertical-scrollbar,
-      .horizontal-scrollbar {
-        visibility: visible;
-      }
-    }
-  }
-
-  atom-text-editor {
-    margin-bottom: 16px;
-    word-break: normal;
-  }
-
-  code,
-  tt,
-  atom-text-editor {
-    font-family: Consolas, "Liberation Mono", Courier, monospace;
-  }
-
-  .emoji {
-    height: 20px;
-    width: 20px;
+    background-color: contrast(@syntax-background-color, lighten(@syntax-background-color, 4%), darken(@syntax-background-color, 4%));
   }
 
 }
