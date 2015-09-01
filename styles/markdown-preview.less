@@ -1,134 +1,8 @@
-@import "syntax-variables";
-@import (reference) "../assets/primer-markdown";
 
-.markdown-spinner {
-  margin: auto;
-  background-image: url(images/octocat-spinner-128.gif);
-  background-repeat: no-repeat;
-  background-size: 64px;
-  background-position: top center;
-  padding-top: 70px;
-  text-align: center;
-}
+// Global Markdown Preview styles
 
-// These are our overrides and specific styles built on top of GitHub's styling
-// of (GitHub Flavored) Markdown documents:
-//   * https://github.com/primer/markdown/blob/master/components/markdown.scss
-.markdown-preview,
-.markdown-preview[data-use-github-style] {
-  // This mixin comes from `../assets/primer-markdown.less`.
-  .markdown-body();
-
-  overflow: scroll;
-  background-color: #fff;
-  box-sizing: border-box;
-  padding: 20px;
-
-  &, code {
-    color: #333;
-  }
-
-  // Headings
-  h1, h2, h3, h4, h5, h6 {
-    -webkit-font-smoothing: antialiased;
-    cursor: text;
-  }
-
-  & > h1:first-child,
-  & > h1:first-child + h2,
-  & > h2:first-child,
-  & > h3:first-child,
-  & > h4:first-child,
-  & > h5:first-child,
-  & > h6:first-child {
-    margin-top: 0;
-    padding-top: 0;
-  }
-
-  a, a code {
-    color: #4183c4;
-  }
-
-  // fixes margin on shit like:
-  // <a name='the-heading'>
-  // <h1>The Heading</h1></a>
-  a:first-child {
-    h1, h2, h3, h4, h5, h6 {
-      margin-top: 0;
-      padding-top: 0;
-    }
-  }
-
-  h1 + p,
-  h2 + p,
-  h3 + p,
-  h4 + p,
-  h5 + p,
-  h6 + p {
-    margin-top: 0;
-  }
-
-  // ReST first graf in nested list
-  li p.first {
-    display: inline-block;
-  }
-
-  // Lists, Blockquotes & Such
-  ul,
-  ol {
-    li > :first-child,
-    li ul:first-of-type {
-      margin-top: 0;
-    }
-  }
-
-  ol > li {
-    list-style-type: decimal;
-  }
-
-  ul > li {
-    list-style-type: disc;
-  }
-
-  dl dt {
-    &:first-child {
-      padding: 0;
-    }
-
-    & > :first-child {
-      margin-top: 0;
-    }
-
-    & > :last-child {
-      margin-bottom: 0;
-    }
-  }
-
-  dl dd {
-    & > :first-child {
-      margin-top: 0;
-    }
-
-    & > :last-child {
-      margin-bottom: 0;
-    }
-  }
-
-  blockquote {
-    p {
-      font-size: 16px;
-      line-height: 1.5;
-    }
-  }
-
+.markdown-preview {
   atom-text-editor {
-    padding: @margin;
-    overflow: auto;
-    font-size: 84%; // Hack to get default size to 13px.
-    line-height: 1.45;
-    background-color: @syntax-background-color;
-    border-radius: 3px;
-
     // only show scrollbars on hover
     .scrollbars-visible-always &::shadow {
       .vertical-scrollbar,
@@ -143,20 +17,14 @@
       }
     }
   }
+}
 
-  atom-text-editor {
-    margin-bottom: @margin;
-    word-break: normal;
-  }
-
-  code,
-  tt,
-  atom-text-editor {
-    font-family: Consolas, "Liberation Mono", Courier, monospace;
-  }
-
-  .emoji {
-    height: 20px;
-    width: 20px;
-  }
+.markdown-spinner {
+  margin: auto;
+  background-image: url(images/octocat-spinner-128.gif);
+  background-repeat: no-repeat;
+  background-size: 64px;
+  background-position: top center;
+  padding-top: 70px;
+  text-align: center;
 }
