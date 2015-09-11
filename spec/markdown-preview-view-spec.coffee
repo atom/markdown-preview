@@ -53,6 +53,7 @@ describe "MarkdownPreviewView", ->
       filePath = path.join(temp.mkdirSync('markdown-preview-'), 'foo.md')
       fs.writeFileSync(filePath, '# Hi')
 
+      preview.destroy()
       preview = new MarkdownPreviewView({filePath})
       serialized = preview.serialize()
       fs.removeSync(filePath)

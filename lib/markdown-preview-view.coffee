@@ -1,11 +1,10 @@
 path = require 'path'
 
-{Emitter, Disposable, CompositeDisposable} = require 'atom'
+{Emitter, Disposable, CompositeDisposable, File} = require 'atom'
 {$, $$$, ScrollView} = require 'atom-space-pen-views'
 Grim = require 'grim'
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
-{File} = require 'pathwatcher'
 
 renderer = require './renderer'
 
