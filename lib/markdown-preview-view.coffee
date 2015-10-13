@@ -188,13 +188,10 @@ class MarkdownPreviewView extends ScrollView
     document.styleSheets
 
   getTextEditorStyles: ->
-
     textEditorStyles = document.createElement("atom-styles")
+    textEditorStyles.initialize(atom.styles)
     textEditorStyles.setAttribute "context", "atom-text-editor"
     document.body.appendChild textEditorStyles
-
-    # Force styles injection
-    textEditorStyles.initialize()
 
     # Extract style elements content
     Array.prototype.slice.apply(textEditorStyles.childNodes).map (styleElement) ->
