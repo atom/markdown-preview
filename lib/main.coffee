@@ -21,7 +21,7 @@ module.exports =
     liveUpdate:
       type: 'boolean'
       default: true
-      description: 'Re-render the preview as the contents of the source changes, without requing the source buffer to be saved. If disabled, the preview is re-rendered only when the buffer is saved to disk.'
+      description: 'Re-render the preview as the contents of the source changes, without requiring the source buffer to be saved. If disabled, the preview is re-rendered only when the buffer is saved to disk.'
     openPreviewInSplitPane:
       type: 'boolean'
       default: true
