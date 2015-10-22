@@ -35,7 +35,7 @@ module.exports =
         'text.plain'
         'text.plain.null-grammar'
       ]
-      description: 'List of scopes for languages which previewing is enabled. See [this README](https://github.com/atom/spell-check#spell-check-package-) for more information on finding the correct scope for a specific language.'
+      description: 'List of scopes for languages for which previewing is enabled. See [this README](https://github.com/atom/spell-check#spell-check-package-) for more information on finding the correct scope for a specific language.'
     useGitHubStyle:
       title: 'Use GitHub.com style'
       type: 'boolean'
