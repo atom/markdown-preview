@@ -32,9 +32,9 @@ module.exports =
         'source.gfm'
         'source.litcoffee'
         'text.html.basic'
+        'text.md'
         'text.plain'
         'text.plain.null-grammar'
-        'text.md'
       ]
       description: 'List of scopes for languages for which previewing is enabled. See [this README](https://github.com/atom/spell-check#spell-check-package-) for more information on finding the correct scope for a specific language.'
     useGitHubStyle:
