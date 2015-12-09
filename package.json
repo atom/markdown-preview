@@ -22,6 +22,9 @@
   "devDependencies": {
     "coffeelint": "^1.9.7"
   },
+  "deserializers": {
+    "MarkdownPreviewView": "./lib/deserializer"
+  },
   "configSchema": {
     "breakOnSingleNewline": {
       "type": "boolean",
