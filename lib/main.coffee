@@ -17,7 +17,7 @@ module.exports =
     breakOnSingleNewline:
       type: 'boolean'
       default: false
-      description: 'In Markdown, a single newline character doesn\'t cause a line break in the generated HTML. In GitHub Flavored Markdown, that is not true. Enable this config option to insert line breaks in redenred HTML for single newlines in Markdown source.'
+      description: 'In Markdown, a single newline character doesn\'t cause a line break in the generated HTML. In GitHub Flavored Markdown, that is not true. Enable this config option to insert line breaks in rendered HTML for single newlines in Markdown source.'
     liveUpdate:
       type: 'boolean'
       default: true
