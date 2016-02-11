@@ -1,7 +1,9 @@
 # Markdown Preview package [![Build Status](https://travis-ci.org/atom/markdown-preview.svg?branch=master)](https://travis-ci.org/atom/markdown-preview)
 
-Show the rendered HTML markdown to the right of the current editor using
-`ctrl-shift-m`.
+Show the rendered HTML markdown next to the the current editor using
+`ctrl-shift-m`.  You can choose in which direction to show the preview (`right`
+and `down` being the most common), or even to show the preview in a new tab in
+the current pane.
 
 It can be activated from the editor using the `ctrl-shift-m` key-binding and is
 currently enabled for `.markdown`, `.md`, `.mdown`, `.mkd`, `.mkdown`, `.ron`, and `.txt` files.
