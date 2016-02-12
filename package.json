@@ -21,5 +21,43 @@
   },
   "devDependencies": {
     "coffeelint": "^1.9.7"
+  },
+  "deserializers": {
+    "MarkdownPreviewView": "createMarkdownPreviewView"
+  },
+  "configSchema": {
+    "breakOnSingleNewline": {
+      "type": "boolean",
+      "default": false,
+      "description": "In Markdown, a single newline character doesn't cause a line break in the generated HTML. In GitHub Flavored Markdown, that is not true. Enable this config option to insert line breaks in rendered HTML for single newlines in Markdown source."
+    },
+    "liveUpdate": {
+      "type": "boolean",
+      "default": true,
+      "description": "Re-render the preview as the contents of the source changes, without requiring the source buffer to be saved. If disabled, the preview is re-rendered only when the buffer is saved to disk."
+    },
+    "openPreviewInSplitPane": {
+      "type": "boolean",
+      "default": true,
+      "description": "Open the preview in a split pane. If disabled, the preview is opened in a new tab in the same pane."
+    },
+    "grammars": {
+      "type": "array",
+      "default": [
+        "source.gfm",
+        "source.litcoffee",
+        "text.html.basic",
+        "text.md",
+        "text.plain",
+        "text.plain.null-grammar"
+      ],
+      "description": "List of scopes for languages for which previewing is enabled. See [this README](https://github.com/atom/spell-check#spell-check-package-) for more information on finding the correct scope for a specific language."
+    },
+    "useGitHubStyle": {
+      "title": "Use GitHub.com style",
+      "type": "boolean",
+      "default": false,
+      "description": "Use the same CSS styles for preview as the ones used on GitHub.com."
+    }
   }
 }
