@@ -2,7 +2,7 @@
 
 Show the rendered HTML markdown next to the the current editor using
 `ctrl-shift-m`.  You can choose in which direction to show the preview (`right`
-or `down`), or even to show the preview in a new tab in
+and `down` being the most common), or even to show the preview in a new tab in
 the current pane.
 
 It can be activated from the editor using the `ctrl-shift-m` key-binding and is
