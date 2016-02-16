@@ -4,19 +4,6 @@ fs = require 'fs-plus'
 MarkdownPreviewView = null # Defer until used
 renderer = null # Defer until used
 
-# Migrate any old openPreviewInSplitPane setting from a boolean to the new
-# string value.  The migration is 'false' --> 'none', and 'true' --> 'right'.
-# It would be nice to wait and do this on-demand, but config schema validation
-# runs even before the pacakge is activated, so we *have* to do this at module
-# load time if we want to accurately migrate the setting.
-atom.config.transact ->
-  splitKey = 'markdown-preview.openPreviewInSplitPane'
-  origSplit = atom.config.getRawValue(splitKey)
-  if origSplit? and typeof(origSplit) is 'boolean'
-    newSplit = if origSplit then 'right' else 'none'
-    console.log 'migrating', splitKey, 'from', origSplit, 'to', newSplit
-    atom.config.set(splitKey, newSplit)
-
 createMarkdownPreviewView = (state) ->
   MarkdownPreviewView ?= require './markdown-preview-view'
   new MarkdownPreviewView(state)
@@ -36,10 +23,14 @@ module.exports =
       default: true
       description: 'Re-render the preview as the contents of the source changes, without requiring the source buffer to be saved. If disabled, the preview is re-rendered only when the buffer is saved to disk.'
     openPreviewInSplitPane:
+      type: 'boolean'
+      default: true
+      description: 'Open the preview in a split pane. If disabled, the preview is opened in a new tab in the same pane.'
+    splitPaneDirection:
       type: 'string'
       default: 'right'
-      enum: ['none', 'right', 'down', 'left', 'up']
-      description: 'Where to open the preview, whether in a new tab in the same pane (`none`), or in a new pane in the specified direction.'
+      enum: ['right', 'down']
+      description: 'Direction in which to open the split pane (when **Open Preview In Split Pane** is enabled).'
     grammars:
       type: 'array'
       default: [
@@ -130,9 +121,8 @@ module.exports =
     previousActivePane = atom.workspace.getActivePane()
     options =
       searchAllPanes: true
-    splitPane = atom.config.get('markdown-preview.openPreviewInSplitPane')
-    if splitPane isnt 'none'
-      options.split = splitPane
+    if atom.config.get('markdown-preview.openPreviewInSplitPane')
+      options.split = atom.config.get('markdown-preview.splitPaneDirection')
     atom.workspace.open(uri, options).then (markdownPreviewView) ->
       if isMarkdownPreviewView(markdownPreviewView)
         previousActivePane.activate()
