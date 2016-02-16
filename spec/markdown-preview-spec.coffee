@@ -25,7 +25,7 @@ describe "Markdown preview package", ->
     waitsForPromise ->
       atom.packages.activatePackage('language-gfm')
 
-  expectPreviewInSplitPane = (orientation='horizontal')->
+  expectPreviewInSplitPane = (orientation='horizontal') ->
     runs ->
       expect(atom.workspace.getPanes()).toHaveLength 2
 
