@@ -130,14 +130,21 @@ class MarkdownPreviewView extends ScrollView
   renderMarkdown: ->
     @showLoading() unless @loaded
     @getMarkdownSource().then (source) => @renderMarkdownText(source) if source?
+    .catch (reason) =>
+      @showError({message: reason})
 
   getMarkdownSource: ->
     if @file?.getPath()
-      @file.read()
+      @file.read().then (source) =>
+        if source is null
+          Promise.reject("#{@file.getBaseName()} could not be found")
+        else
+          Promise.resolve(source)
+      .catch (reason) => Promise.reject(reason)
     else if @editor?
       Promise.resolve(@editor.getText())
     else
-      Promise.resolve(null)
+      Promise.reject()
 
   getHTML: (callback) ->
     @getMarkdownSource().then (source) =>
