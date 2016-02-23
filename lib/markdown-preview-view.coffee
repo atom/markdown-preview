@@ -140,7 +140,7 @@ class MarkdownPreviewView extends ScrollView
           Promise.reject("#{@file.getBaseName()} could not be found")
         else
           Promise.resolve(source)
-      .catch (reason) => Promise.reject(reason)
+      .catch (reason) -> Promise.reject(reason)
     else if @editor?
       Promise.resolve(@editor.getText())
     else
