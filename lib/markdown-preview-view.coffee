@@ -53,6 +53,7 @@ class MarkdownPreviewView extends ScrollView
   subscribeToFilePath: (filePath) ->
     @file = new File(filePath)
     @emitter.emit 'did-change-title'
+    @disposables.add @file.onDidRename(=> @emitter.emit 'did-change-title')
     @handleEvents()
     @renderMarkdown()
 
