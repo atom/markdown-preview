@@ -6,6 +6,7 @@ Highlights = require 'highlights'
 {$} = require 'atom-space-pen-views'
 roaster = null # Defer until used
 {scopeForFenceName} = require './extension-helper'
+yfm = require 'hexo-front-matter'
 
 highlighter = null
 {resourcePath} = atom.getLoadSettings()
@@ -41,6 +42,10 @@ render = (text, filePath, callback) ->
   # Remove the <!doctype> since otherwise marked will escape it
   # https://github.com/chjj/marked/issues/354
   text = text.replace(/^\s*<!doctype(\s+.*)?>\s*/i, '')
+
+  # Remove YAML front-matter
+  # https://github.com/atom/markdown-preview/issues/361
+  text = yfm.split(text).content
 
   roaster text, options, (error, html) ->
     return callback(error) if error?

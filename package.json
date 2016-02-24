@@ -13,6 +13,7 @@
     "cheerio": "0.15.0",
     "fs-plus": "^2.0.0",
     "grim": "^1.2.1",
+    "hexo-front-matter": "^0.2.2",
     "highlights": "^1.2",
     "roaster": "^1.1.2",
     "temp": "^0.8.1",
