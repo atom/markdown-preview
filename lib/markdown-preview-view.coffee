@@ -61,7 +61,8 @@ class MarkdownPreviewView extends ScrollView
       @editor = @editorForId(editorId)
 
       if @editor?
-        @emitter.emit 'did-change-title' if @editor?
+        @emitter.emit 'did-change-title'
+        @disposables.add @editor.onDidDestroy(=> @subscribeToFilePath(@getPath()))
         @handleEvents()
         @renderMarkdown()
       else
