@@ -50,7 +50,7 @@ describe "Markdown preview package", ->
         expect(editorPane.isActive()).toBe true
 
     it "displays a markdown preview in a split pane (right)", ->
-      atom.config.set 'markdown-preview.openPreviewInSplitPane', 'right'
+      atom.config.set 'markdown-preview.splitPaneDirection', 'right'
       waitsForPromise -> atom.workspace.open("subdir/file.markdown")
       runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
       expectPreviewInSplitPane('horizontal')
@@ -61,7 +61,7 @@ describe "Markdown preview package", ->
         expect(editorPane.isActive()).toBe true
 
     it "displays a markdown preview in a split pane (down)", ->
-      atom.config.set 'markdown-preview.openPreviewInSplitPane', 'down'
+      atom.config.set 'markdown-preview.splitPaneDirection', 'down'
       waitsForPromise -> atom.workspace.open("subdir/file.markdown")
       runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
       expectPreviewInSplitPane('vertical')

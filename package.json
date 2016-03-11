@@ -36,7 +36,7 @@
       "default": true,
       "description": "Re-render the preview as the contents of the source changes, without requiring the source buffer to be saved. If disabled, the preview is re-rendered only when the buffer is saved to disk."
     },
-    "openPreviewInSplitPane": {
+    "splitPaneDirection": {
       "type": "string",
       "default": "right",
       "enum": ["none", "right", "down"],

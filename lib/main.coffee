@@ -86,7 +86,7 @@ module.exports =
     previousActivePane = atom.workspace.getActivePane()
     options =
       searchAllPanes: true
-    splitPane = atom.config.get('markdown-preview.openPreviewInSplitPane')
+    splitPane = atom.config.get('markdown-preview.splitPaneDirection')
     if splitPane isnt 'none'
       options.split = splitPane
     atom.workspace.open(uri, options).then (markdownPreviewView) ->
