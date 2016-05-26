@@ -2,7 +2,7 @@
 
 :cool:
 
-```ruby
+```Ruby
 def func
   x = 1
 end
