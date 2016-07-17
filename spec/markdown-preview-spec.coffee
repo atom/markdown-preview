@@ -187,8 +187,7 @@ describe "Markdown preview package", ->
 
     describe "when the editor is destroyed", ->
       beforeEach ->
-        editor = atom.workspace.getPanes()[0].getActiveItem()
-        atom.workspace.getPanes()[0].destroyItem(editor)
+        atom.workspace.getPanes()[0].destroyActiveItem()
 
       it "falls back to using the file path", ->
         atom.workspace.getPanes()[1].activate()

@@ -131,9 +131,9 @@ class MarkdownPreviewView extends ScrollView
 
   renderMarkdown: ->
     @showLoading() unless @loaded
-    @getMarkdownSource().then (source) => @renderMarkdownText(source) if source?
-    .catch (reason) =>
-      @showError({message: reason})
+    @getMarkdownSource()
+    .then (source) => @renderMarkdownText(source) if source?
+    .catch (reason) => @showError({message: reason})
 
   getMarkdownSource: ->
     if @file?.getPath()
