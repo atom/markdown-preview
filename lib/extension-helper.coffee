@@ -36,4 +36,5 @@ scopesByFenceName =
 
 module.exports =
   scopeForFenceName: (fenceName) ->
+    fenceName = fenceName.toLowerCase()
     scopesByFenceName[fenceName] ? "source.#{fenceName}"

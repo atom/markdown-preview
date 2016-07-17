@@ -34,22 +34,18 @@ module.exports =
     atom.commands.add '.tree-view .file .name[data-name$=\\.txt]', 'markdown-preview:preview-file', previewFile
 
     atom.workspace.addOpener (uriToOpen) =>
-      try
-        {protocol, host, pathname} = url.parse(uriToOpen)
-      catch error
-        return
-
-      return unless protocol is 'markdown-preview:'
+      [protocol, path] = uriToOpen.split('://')
+      return unless protocol is 'markdown-preview'
 
       try
-        pathname = decodeURI(pathname) if pathname
-      catch error
+        path = decodeURI(path)
+      catch
         return
 
-      if host is 'editor'
-        @createMarkdownPreviewView(editorId: pathname.substring(1))
+      if path.startsWith 'editor/'
+        @createMarkdownPreviewView(editorId: path.substring(7))
       else
-        @createMarkdownPreviewView(filePath: pathname)
+        @createMarkdownPreviewView(filePath: path)
 
   createMarkdownPreviewView: (state) ->
     if state.editorId or fs.isFileSync(state.filePath)

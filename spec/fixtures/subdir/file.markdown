@@ -2,7 +2,13 @@
 
 :cool:
 
-```ruby
+```
+function f(x) {
+  return x++;
+}
+```
+
+```Ruby
 def func
   x = 1
 end
@@ -11,12 +17,6 @@ end
 * ```javascript
 if a === 3 {
   b = 5
-}
-```
-
-```
-function f(x) {
-  return x++;
 }
 ```
 

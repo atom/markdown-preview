@@ -1,0 +1,2 @@
+# Do not convert line endings as is directly compared with in spec
+spec/fixtures/saved-html.html -text

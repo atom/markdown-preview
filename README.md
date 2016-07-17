@@ -1,10 +1,9 @@
-# Markdown Preview package [![Build Status](https://travis-ci.org/atom/markdown-preview.svg?branch=master)](https://travis-ci.org/atom/markdown-preview)
+# Markdown Preview package
+[![OS X Build Status](https://travis-ci.org/atom/markdown-preview.svg?branch=master)](https://travis-ci.org/atom/markdown-preview) [![Windows Build Status](https://ci.appveyor.com/api/projects/status/bvh0evhh4v6w9b29/branch/master?svg=true)](https://ci.appveyor.com/project/Atom/markdown-preview/branch/master) [![Dependency Status](https://david-dm.org/atom/markdown-preview.svg)](https://david-dm.org/atom/markdown-preview)
 
-Show the rendered HTML markdown to the right of the current editor using
-`ctrl-shift-m`.
+Show the rendered HTML markdown to the right of the current editor using <kbd>ctrl-shift-m</kbd>.
 
-It can be activated from the editor using the `ctrl-shift-m` key-binding and is
-currently enabled for `.markdown`, `.md`, `.mdown`, `.mkd`, `.mkdown`, `.ron`, and `.txt` files.
+It is currently enabled for `.markdown`, `.md`, `.mdown`, `.mkd`, `.mkdown`, `.ron`, and `.txt` files.
 
 ![markdown-preview](https://cloud.githubusercontent.com/assets/378023/10013086/24cad23e-6149-11e5-90e6-663009210218.png)
 
