@@ -201,7 +201,7 @@ describe "Markdown preview package", ->
           preview.onDidChangeTitle(titleChangedCallback)
           fs.renameSync(preview.getPath(), path.join(path.dirname(preview.getPath()), 'file2.md'))
 
-        waitsFor ->
+        waitsFor "title to update", ->
           preview.getTitle() is "file2.md Preview"
 
         runs ->
@@ -210,9 +210,9 @@ describe "Markdown preview package", ->
         spyOn(preview, 'showLoading')
 
         runs ->
-          preview.file.writeSync "Hey!"
+          fs.writeFileSync(preview.getPath(), "Hey!")
 
-        waitsFor ->
+        waitsFor "contents to update", ->
           preview.text().indexOf("Hey!") >= 0
 
         runs ->
@@ -221,7 +221,7 @@ describe "Markdown preview package", ->
         preview.onDidChangeMarkdown(listener = jasmine.createSpy('didChangeMarkdownListener'))
 
         runs ->
-          preview.file.writeSync "Hey!"
+          fs.writeFileSync(preview.getPath(), "Hey!")
 
         waitsFor "::onDidChangeMarkdown handler to be called", ->
           listener.callCount > 0
