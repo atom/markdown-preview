@@ -1,4 +1,4 @@
-'atom-workspace, atom-workspace atom-text-editor':
+'atom-workspace [data-grammar*="gfm"], atom-workspace atom-text-editor [data-grammar*="gfm"]':
   'ctrl-M': 'markdown-preview:toggle'
 
 '.platform-darwin .markdown-preview':
