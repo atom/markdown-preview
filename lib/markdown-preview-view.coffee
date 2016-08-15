@@ -277,7 +277,7 @@ class MarkdownPreviewView extends ScrollView
                   <title>#{title}</title>
                   <style>#{@getMarkdownPreviewCSS()}</style>
               </head>
-              <body class='markdown-preview'>#{htmlBody}</body>
+              <body class='markdown-preview' data-use-github-style>#{htmlBody}</body>
             </html>""" + "\n" # Ensure trailing newline
 
           fs.writeFileSync(htmlFilePath, html)
