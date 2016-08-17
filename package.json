@@ -13,7 +13,7 @@
     "cheerio": "0.15.0",
     "fs-plus": "^2.0.0",
     "grim": "^1.2.1",
-    "highlights": "^1.2",
+    "highlights": "1.4.0",
     "roaster": "^1.2.1",
     "temp": "^0.8.1",
     "underscore-plus": "^1.0.0",
