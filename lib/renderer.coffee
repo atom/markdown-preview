@@ -119,7 +119,7 @@ convertCodeBlocksToAtomEditors = (domFragment, defaultLanguage='text') ->
     editor = editorElement.getModel()
     # remove the default selection of a line in each editor
     editor.getDecorations(class: 'cursor-line', type: 'line')[0].destroy()
-    editor.setText(codeBlock.textContent.trim())
+    editor.setText(codeBlock.textContent)
     if grammar = atom.grammars.grammarForScopeName(scopeForFenceName(fenceName))
       editor.setGrammar(grammar)
 
