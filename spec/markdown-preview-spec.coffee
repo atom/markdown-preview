@@ -172,6 +172,72 @@ describe "Markdown preview package", ->
           waitsFor ->
             preview.text().indexOf("ch ch changes") >= 0
 
+    describe "when the original preview is split", ->
+      it "renders another preview in the new split pane", ->
+        atom.workspace.getPanes()[1].splitRight({copyActiveItem: true})
+
+        expect(atom.workspace.getPanes()).toHaveLength 3
+
+        waitsFor "split markdown preview to be created", ->
+          preview = atom.workspace.getPanes()[2].getActiveItem()
+
+        runs ->
+          expect(preview).toBeInstanceOf(MarkdownPreviewView)
+          expect(preview.getPath()).toBe atom.workspace.getActivePaneItem().getPath()
+
+    describe "when the editor is destroyed", ->
+      beforeEach ->
+        atom.workspace.getPanes()[0].destroyActiveItem()
+
+      it "falls back to using the file path", ->
+        atom.workspace.getPanes()[1].activate()
+        expect(preview.file.getPath()).toBe atom.workspace.getActivePaneItem().getPath()
+
+      it "continues to update the preview if the file is changed on #win32 and #darwin", ->
+        titleChangedCallback = jasmine.createSpy('titleChangedCallback')
+
+        runs ->
+          expect(preview.getTitle()).toBe 'file.markdown Preview'
+          preview.onDidChangeTitle(titleChangedCallback)
+          fs.renameSync(preview.getPath(), path.join(path.dirname(preview.getPath()), 'file2.md'))
+
+        waitsFor "title to update", ->
+          preview.getTitle() is "file2.md Preview"
+
+        runs ->
+          expect(titleChangedCallback).toHaveBeenCalled()
+
+        spyOn(preview, 'showLoading')
+
+        runs ->
+          fs.writeFileSync(preview.getPath(), "Hey!")
+
+        waitsFor "contents to update", ->
+          preview.text().indexOf("Hey!") >= 0
+
+        runs ->
+          expect(preview.showLoading).not.toHaveBeenCalled()
+
+        preview.onDidChangeMarkdown(listener = jasmine.createSpy('didChangeMarkdownListener'))
+
+        runs ->
+          fs.writeFileSync(preview.getPath(), "Hey!")
+
+        waitsFor "::onDidChangeMarkdown handler to be called", ->
+          listener.callCount > 0
+
+      it "allows a new split pane of the preview to be created", ->
+        atom.workspace.getPanes()[1].splitRight({copyActiveItem: true})
+
+        expect(atom.workspace.getPanes()).toHaveLength 3
+
+        waitsFor "split markdown preview to be created", ->
+          preview = atom.workspace.getPanes()[2].getActiveItem()
+
+        runs ->
+          expect(preview).toBeInstanceOf(MarkdownPreviewView)
+          expect(preview.getPath()).toBe atom.workspace.getActivePaneItem().getPath()
+
     describe "when a new grammar is loaded", ->
       it "re-renders the preview", ->
         atom.workspace.getActiveTextEditor().setText """

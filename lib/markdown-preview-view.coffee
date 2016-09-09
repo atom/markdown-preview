@@ -51,6 +51,7 @@ class MarkdownPreviewView extends ScrollView
   subscribeToFilePath: (filePath) ->
     @file = new File(filePath)
     @emitter.emit 'did-change-title'
+    @disposables.add @file.onDidRename(=> @emitter.emit 'did-change-title')
     @handleEvents()
     @renderMarkdown()
 
@@ -59,13 +60,12 @@ class MarkdownPreviewView extends ScrollView
       @editor = @editorForId(editorId)
 
       if @editor?
-        @emitter.emit 'did-change-title' if @editor?
+        @emitter.emit 'did-change-title'
+        @disposables.add @editor.onDidDestroy(=> @subscribeToFilePath(@getPath()))
         @handleEvents()
         @renderMarkdown()
       else
-        # The editor this preview was created for has been closed so close
-        # this preview since a preview cannot be rendered without an editor
-        atom.workspace?.paneForItem(this)?.destroyItem(this)
+        @subscribeToFilePath(@filePath)
 
     if atom.workspace?
       resolve()
@@ -128,15 +128,22 @@ class MarkdownPreviewView extends ScrollView
 
   renderMarkdown: ->
     @showLoading() unless @loaded
-    @getMarkdownSource().then (source) => @renderMarkdownText(source) if source?
+    @getMarkdownSource()
+    .then (source) => @renderMarkdownText(source) if source?
+    .catch (reason) => @showError({message: reason})
 
   getMarkdownSource: ->
     if @file?.getPath()
-      @file.read()
+      @file.read().then (source) =>
+        if source is null
+          Promise.reject("#{@file.getBaseName()} could not be found")
+        else
+          Promise.resolve(source)
+      .catch (reason) -> Promise.reject(reason)
     else if @editor?
       Promise.resolve(@editor.getText())
     else
-      Promise.resolve(null)
+      Promise.reject()
 
   getHTML: (callback) ->
     @getMarkdownSource().then (source) =>
