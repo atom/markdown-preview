@@ -88,13 +88,12 @@
   & > ul,
   & > ol {
     margin-bottom: @margin;
-    label {
-      vertical-align: top;
-      .task-list-item-checkbox {
-        margin: 0 0.15em 0.25em -1.4em;
-        vertical-align: middle;
-      }
-    }
+  }
+
+  // move task list checkboxes
+  .task-list-item-checkbox {
+    position: absolute;
+    margin: .25em 0 0 -1.4em;
   }
 
 
