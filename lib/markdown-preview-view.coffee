@@ -166,7 +166,7 @@ class MarkdownPreviewView extends ScrollView
         @originalTrigger('markdown-preview:markdown-changed')
 
   getTitle: ->
-    if @file? && @getPath()?
+    if @file? and @getPath()?
       "#{path.basename(@getPath())} Preview"
     else if @editor?
       "#{@editor.getTitle()} Preview"
