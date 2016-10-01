@@ -473,7 +473,6 @@ describe "Markdown preview package", ->
       runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
       expectPreviewInSplitPane()
 
-
     it "saves the HTML when it is triggered and the editor has focus", ->
       [editorPane, previewPane] = atom.workspace.getPanes()
       editorPane.activate()
@@ -491,7 +490,6 @@ describe "Markdown preview package", ->
 
       runs ->
         expect(fs.isFileSync(outputPath)).toBe true
-
 
     it "saves the HTML when it is triggered and the preview pane has focus", ->
       [editorPane, previewPane] = atom.workspace.getPanes()
