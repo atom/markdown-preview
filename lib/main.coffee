@@ -133,5 +133,5 @@ module.exports =
     activePane = atom.workspace.getActivePaneItem()
 
     if isMarkdownPreviewView(activePane)
-      activePane.saveAs(). then ->
+      activePane.saveAs().then ->
         previousActivePane.activate()
