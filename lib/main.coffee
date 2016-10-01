@@ -125,11 +125,11 @@ module.exports =
     return unless editor.getGrammar().scopeName in grammars
 
     uri = @uriForEditor(editor)
-    previewPane = atom.workspace.paneForURI(uri)
-    return unless previewPane?
+    markdownPreviewPane = atom.workspace.paneForURI(uri)
+    return unless markdownPreviewPane?
 
     previousActivePane = atom.workspace.getActivePane()
-    previewPane.activate()
+    markdownPreviewPane.activate()
     activePane = atom.workspace.getActivePaneItem()
 
     if isMarkdownPreviewView(activePane)
