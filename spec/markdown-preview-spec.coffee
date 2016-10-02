@@ -466,3 +466,43 @@ describe "Markdown preview package", ->
 
         atom.config.set 'markdown-preview.useGitHubStyle', false
         expect(preview.element.getAttribute('data-use-github-style')).toBeNull()
+
+  describe "when Save as Html is triggered", ->
+    beforeEach ->
+      waitsForPromise -> atom.workspace.open("subdir/simple.markdown")
+      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      expectPreviewInSplitPane()
+
+    it "saves the HTML when it is triggered and the editor has focus", ->
+      [editorPane, previewPane] = atom.workspace.getPanes()
+      editorPane.activate()
+
+      outputPath = temp.path(suffix: '.html')
+      expect(fs.isFileSync(outputPath)).toBe false
+
+      runs ->
+        spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
+        atom.commands.dispatch workspaceElement, 'markdown-preview:save-as-html'
+
+      waitsFor ->
+        fs.existsSync(outputPath)
+
+      runs ->
+        expect(fs.isFileSync(outputPath)).toBe true
+
+    it "saves the HTML when it is triggered and the preview pane has focus", ->
+      [editorPane, previewPane] = atom.workspace.getPanes()
+      previewPane.activate()
+
+      outputPath = temp.path(suffix: '.html')
+      expect(fs.isFileSync(outputPath)).toBe false
+
+      runs ->
+        spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
+        atom.commands.dispatch workspaceElement, 'markdown-preview:save-as-html'
+
+      waitsFor ->
+        fs.existsSync(outputPath)
+
+      runs ->
+        expect(fs.isFileSync(outputPath)).toBe true
