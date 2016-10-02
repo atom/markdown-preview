@@ -23,6 +23,9 @@ module.exports =
       'markdown-preview:toggle-break-on-single-newline': ->
         keyPath = 'markdown-preview.breakOnSingleNewline'
         atom.config.set(keyPath, not atom.config.get(keyPath))
+      'markdown-preview:use-github.com-style': ->
+        keyPath = 'markdown-preview.useGitHubStyle'
+        atom.config.set(keyPath, not atom.config.get(keyPath))
 
     previewFile = @previewFile.bind(this)
     atom.commands.add '.tree-view .file .name[data-name$=\\.markdown]', 'markdown-preview:preview-file', previewFile
