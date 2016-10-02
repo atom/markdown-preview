@@ -23,7 +23,7 @@ module.exports =
       'markdown-preview:toggle-break-on-single-newline': ->
         keyPath = 'markdown-preview.breakOnSingleNewline'
         atom.config.set(keyPath, not atom.config.get(keyPath))
-      'markdown-preview:use-github.com-style': ->
+      'markdown-preview:toggle-github-style': ->
         keyPath = 'markdown-preview.useGitHubStyle'
         atom.config.set(keyPath, not atom.config.get(keyPath))
 
