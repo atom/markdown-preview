@@ -482,7 +482,6 @@ describe "Markdown preview package", ->
 
       runs ->
         spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
-        console.log(outputPath)
         atom.commands.dispatch workspaceElement, 'markdown-preview:save-as-html'
 
       waitsFor ->
