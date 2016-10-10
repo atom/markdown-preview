@@ -206,14 +206,16 @@ class MarkdownPreviewView extends ScrollView
 
   getMarkdownPreviewCSS: ->
     markdowPreviewRules = []
-    ruleRegExp = /\.markdown-preview/
+    packageRuleCSSRegExp = /\.markdown-preview/
+    baseCSSRegExp = /bootstrap\.less$/
     cssUrlRefExp = /url\(atom:\/\/markdown-preview\/assets\/(.*)\)/
 
     for stylesheet in @getDocumentStyleSheets()
       if stylesheet.rules?
+        isBaseCSS = stylesheet.ownerNode?.sourcePath?.match(baseCSSRegExp)?
         for rule in stylesheet.rules
-          # We only need `.markdown-review` css
-          markdowPreviewRules.push(rule.cssText) if rule.selectorText?.match(ruleRegExp)?
+          # We only need `.markdown-review` css and base css
+          markdowPreviewRules.push(rule.cssText) if isBaseCSS || rule.selectorText?.match(packageRuleCSSRegExp)?
 
     markdowPreviewRules
       .concat(@getTextEditorStyles())

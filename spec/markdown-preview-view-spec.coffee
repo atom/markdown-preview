@@ -203,6 +203,13 @@ describe "MarkdownPreviewView", ->
             createRule ".not-included", "{ color: green; }"
             createRule ".markdown-preview :host", "{ color: purple; }"
           ]
+        }, {
+          rules: [
+            createRule "basecss", "{ color: pink; }"
+          ],
+          ownerNode: {
+            sourcePath: "/anywhere/bootstrap.less"
+          }
         }
       ]
 
