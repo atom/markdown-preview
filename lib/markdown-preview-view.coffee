@@ -2,7 +2,6 @@ path = require 'path'
 
 {Emitter, Disposable, CompositeDisposable, File} = require 'atom'
 {$, $$$, ScrollView} = require 'atom-space-pen-views'
-Grim = require 'grim'
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
 
@@ -25,12 +24,11 @@ class MarkdownPreviewView extends ScrollView
 
     if @editorId?
       @resolveEditor(@editorId)
+    else if atom.workspace?
+      @subscribeToFilePath(@filePath)
     else
-      if atom.workspace?
+      @disposables.add atom.packages.onDidActivateInitialPackages =>
         @subscribeToFilePath(@filePath)
-      else
-        @disposables.add atom.packages.onDidActivateInitialPackages =>
-          @subscribeToFilePath(@filePath)
 
   serialize: ->
     deserializer: 'MarkdownPreviewView'
@@ -105,8 +103,7 @@ class MarkdownPreviewView extends ScrollView
     changeHandler = =>
       @renderMarkdown()
 
-      # TODO: Remove paneForURI call when ::paneForItem is released
-      pane = atom.workspace.paneForItem?(this) ? atom.workspace.paneForURI(@getURI())
+      pane = atom.workspace.paneForItem(this)
       if pane? and pane isnt atom.workspace.getActivePane()
         pane.activateItem(this)
 
@@ -205,7 +202,7 @@ class MarkdownPreviewView extends ScrollView
       styleElement.innerText
 
   getMarkdownPreviewCSS: ->
-    markdowPreviewRules = []
+    markdownPreviewRules = []
     ruleRegExp = /\.markdown-preview/
     cssUrlRefExp = /url\(atom:\/\/markdown-preview\/assets\/(.*)\)/
 
@@ -213,9 +210,9 @@ class MarkdownPreviewView extends ScrollView
       if stylesheet.rules?
         for rule in stylesheet.rules
           # We only need `.markdown-review` css
-          markdowPreviewRules.push(rule.cssText) if rule.selectorText?.match(ruleRegExp)?
+          markdownPreviewRules.push(rule.cssText) if rule.selectorText?.match(ruleRegExp)?
 
-    markdowPreviewRules
+    markdownPreviewRules
       .concat(@getTextEditorStyles())
       .join('\n')
       .replace(/atom-text-editor/g, 'pre.editor-colors')
@@ -292,9 +289,3 @@ class MarkdownPreviewView extends ScrollView
 
   isEqual: (other) ->
     @[0] is other?[0] # Compare DOM elements
-
-if Grim.includeDeprecatedAPIs
-  MarkdownPreviewView::on = (eventName) ->
-    if eventName is 'markdown-preview:markdown-changed'
-      Grim.deprecate("Use MarkdownPreviewView::onDidChangeMarkdown instead of the 'markdown-preview:markdown-changed' jQuery event")
-    super
