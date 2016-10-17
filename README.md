@@ -1,5 +1,5 @@
 # Markdown Preview package
-[![OS X Build Status](https://travis-ci.org/atom/markdown-preview.svg?branch=master)](https://travis-ci.org/atom/markdown-preview) [![Windows Build Status](https://ci.appveyor.com/api/projects/status/bvh0evhh4v6w9b29/branch/master?svg=true)](https://ci.appveyor.com/project/Atom/markdown-preview/branch/master) [![Dependency Status](https://david-dm.org/atom/markdown-preview.svg)](https://david-dm.org/atom/markdown-preview)
+[![macOS Build Status](https://travis-ci.org/atom/markdown-preview.svg?branch=master)](https://travis-ci.org/atom/markdown-preview) [![Windows Build Status](https://ci.appveyor.com/api/projects/status/bvh0evhh4v6w9b29/branch/master?svg=true)](https://ci.appveyor.com/project/Atom/markdown-preview/branch/master) [![Dependency Status](https://david-dm.org/atom/markdown-preview.svg)](https://david-dm.org/atom/markdown-preview)
 
 Show the rendered HTML markdown to the right of the current editor using <kbd>ctrl-shift-m</kbd>.
 
