@@ -99,7 +99,7 @@ class MarkdownPreviewView extends ScrollView
         @css('zoom', zoomLevel - .1)
       'markdown-preview:reset-zoom': =>
         @css('zoom', 1)
-      'click': (event)=>
+      'click': (event) =>
         event.stopPropagation()
         @followLink(event)
 
@@ -256,14 +256,14 @@ class MarkdownPreviewView extends ScrollView
 
     true
 
-  followLink: (event)->
+  followLink: (event) ->
     return false if @loading
-    if event.target.tagName == 'A' && event.target.protocol == 'file:'
+    if event.target.tagName is 'A' and event.target.protocol is 'file:'
       activeFile = @getPath()
       activeFileDir = path.dirname(activeFile)
       clickedFile = event.target.getAttribute('href')
       clickedPath = path.join(activeFileDir, clickedFile)
-      atom.workspace.open clickedPath, { split: 'left' }
+      atom.workspace.open clickedPath, {split: 'left'}
 
   saveAs: ->
     return if @loading
