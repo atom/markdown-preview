@@ -18,6 +18,7 @@ scopesByFenceName =
   'java': 'source.java'
   'js': 'source.js'
   'javascript': 'source.js'
+  'jsx': 'source.js.jsx'
   'json': 'source.json'
   'less': 'source.less'
   'mustache': 'text.html.mustache'
