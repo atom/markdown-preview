@@ -20,8 +20,13 @@ module.exports =
         @toggle()
       'markdown-preview:copy-html': =>
         @copyHtml()
+      'markdown-preview:save-as-html': =>
+        @saveAsHtml()
       'markdown-preview:toggle-break-on-single-newline': ->
         keyPath = 'markdown-preview.breakOnSingleNewline'
+        atom.config.set(keyPath, not atom.config.get(keyPath))
+      'markdown-preview:toggle-github-style': ->
+        keyPath = 'markdown-preview.useGitHubStyle'
         atom.config.set(keyPath, not atom.config.get(keyPath))
 
     previewFile = @previewFile.bind(this)
@@ -110,3 +115,27 @@ module.exports =
         console.warn('Copying Markdown as HTML failed', error)
       else
         atom.clipboard.write(html)
+
+  saveAsHtml: ->
+    activePane = atom.workspace.getActivePaneItem()
+    if isMarkdownPreviewView(activePane)
+      activePane.saveAs()
+      return
+
+    editor = atom.workspace.getActiveTextEditor()
+    return unless editor?
+
+    grammars = atom.config.get('markdown-preview.grammars') ? []
+    return unless editor.getGrammar().scopeName in grammars
+
+    uri = @uriForEditor(editor)
+    markdownPreviewPane = atom.workspace.paneForURI(uri)
+    return unless markdownPreviewPane?
+
+    previousActivePane = atom.workspace.getActivePane()
+    markdownPreviewPane.activate()
+    activePane = atom.workspace.getActivePaneItem()
+
+    if isMarkdownPreviewView(activePane)
+      activePane.saveAs().then ->
+        previousActivePane.activate()

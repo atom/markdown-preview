@@ -4,18 +4,24 @@
 .markdown-preview {
   atom-text-editor {
     // only show scrollbars on hover
-    .scrollbars-visible-always &::shadow {
+    .scrollbars-visible-always & {
       .vertical-scrollbar,
       .horizontal-scrollbar {
         visibility: hidden;
       }
     }
-    .scrollbars-visible-always &:hover::shadow {
+    .scrollbars-visible-always &:hover {
       .vertical-scrollbar,
       .horizontal-scrollbar {
         visibility: visible;
       }
     }
+  }
+
+  // move task list checkboxes
+  .task-list-item-checkbox {
+    position: absolute;
+    margin: .25em 0 0 -1.4em;
   }
 }
 
