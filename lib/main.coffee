@@ -10,11 +10,6 @@ isMarkdownPreviewView = (object) ->
 
 module.exports =
   activate: ->
-    if parseFloat(atom.getVersion()) < 1.7
-      atom.deserializers.add
-        name: 'MarkdownPreviewView'
-        deserialize: module.exports.createMarkdownPreviewView.bind(module.exports)
-
     atom.commands.add 'atom-workspace',
       'markdown-preview:toggle': =>
         @toggle()
