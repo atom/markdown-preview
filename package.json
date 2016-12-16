@@ -9,7 +9,6 @@
     "atom": "*"
   },
   "dependencies": {
-    "atom-space-pen-views": "^2.0.0",
     "cheerio": "0.15.0",
     "fs-plus": "^2.0.0",
     "highlights": "1.4.1",
