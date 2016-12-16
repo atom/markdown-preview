@@ -2,6 +2,7 @@ path = require 'path'
 fs = require 'fs-plus'
 temp = require 'temp'
 MarkdownPreviewView = require '../lib/markdown-preview-view'
+url = require 'url'
 
 describe "MarkdownPreviewView", ->
   [file, preview, workspaceElement] = []
@@ -124,12 +125,12 @@ describe "MarkdownPreviewView", ->
     describe "when the image uses a relative path", ->
       it "resolves to a path relative to the file", ->
         image = preview.element.querySelector("img[alt=Image1]")
-        expect(image.src).toMatch atom.project.getDirectories()[0].resolve('subdir/image1.png')
+        expect(image.src).toMatch url.parse(atom.project.getDirectories()[0].resolve('subdir/image1.png'))
 
     describe "when the image uses an absolute path that does not exist", ->
       it "resolves to a path relative to the project root", ->
         image = preview.element.querySelector("img[alt=Image2]")
-        expect(image.src).toMatch atom.project.getDirectories()[0].resolve('tmp/image2.png')
+        expect(image.src).toMatch url.parse(atom.project.getDirectories()[0].resolve('tmp/image2.png'))
 
     describe "when the image uses an absolute path that exists", ->
       it "doesn't change the URL", ->
@@ -144,7 +145,7 @@ describe "MarkdownPreviewView", ->
           preview.renderMarkdown()
 
         runs ->
-          expect(preview.element.querySelector("img[alt=absolute]").src).toMatch filePath
+          expect(preview.element.querySelector("img[alt=absolute]").src).toMatch url.parse(filePath)
 
     describe "when the image uses a web URL", ->
       it "doesn't change the URL", ->
