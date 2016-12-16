@@ -99,7 +99,7 @@ describe "Markdown preview package", ->
         markdownEditor.setText "Hey!"
 
         waitsFor ->
-          preview.text().indexOf("Hey!") >= 0
+          preview.element.textContent.includes('Hey!')
 
         runs ->
           expect(preview.showLoading).not.toHaveBeenCalled()
@@ -127,7 +127,7 @@ describe "Markdown preview package", ->
             markdownEditor.setText("Hey!")
 
           waitsFor ->
-            preview.text().indexOf("Hey!") >= 0
+            preview.element.textContent.includes("Hey!")
 
           runs ->
             expect(previewPane.isActive()).toBe true
@@ -148,7 +148,7 @@ describe "Markdown preview package", ->
             markdownEditor.setText("Hey!")
 
           waitsFor ->
-            preview.text().indexOf("Hey!") >= 0
+            preview.element.textContent.includes('Hey!')
 
           runs ->
             expect(editorPane.isActive()).toBe true
@@ -166,11 +166,11 @@ describe "Markdown preview package", ->
             didStopChangingHandler.callCount > 0
 
           runs ->
-            expect(preview.text()).not.toContain("ch ch changes")
+            expect(preview.element.textContent).not.toMatch("ch ch changes")
             atom.workspace.getActiveTextEditor().save()
 
           waitsFor ->
-            preview.text().indexOf("ch ch changes") >= 0
+            preview.element.textContent.includes("ch ch changes")
 
     describe "when the original preview is split", ->
       it "renders another preview in the new split pane", ->
@@ -213,7 +213,7 @@ describe "Markdown preview package", ->
           fs.writeFileSync(preview.getPath(), "Hey!")
 
         waitsFor "contents to update", ->
-          preview.text().indexOf("Hey!") >= 0
+          preview.element.textContent.includes('Hey!')
 
         runs ->
           expect(preview.showLoading).not.toHaveBeenCalled()
@@ -247,7 +247,7 @@ describe "Markdown preview package", ->
         """
 
         waitsFor "markdown to be rendered after its text changed", ->
-          preview.find("atom-text-editor").data("grammar") is "text plain null-grammar"
+          preview.element.querySelector("atom-text-editor").dataset.grammar is "text plain null-grammar"
 
         grammarAdded = false
         runs ->
@@ -260,7 +260,7 @@ describe "Markdown preview package", ->
         waitsFor "grammar to be added", -> grammarAdded
 
         waitsFor "markdown to be rendered after grammar was added", ->
-          preview.find("atom-text-editor").data("grammar") isnt "source js"
+          preview.element.querySelector("atom-text-editor").dataset.grammar isnt "source js"
 
   describe "when the markdown preview view is requested by file URI", ->
     it "opens a preview editor and watches the file for changes", ->
@@ -352,26 +352,27 @@ describe "Markdown preview package", ->
         runs ->
           workspaceElement = atom.views.getView(atom.workspace)
           atom.commands.dispatch workspaceElement, 'markdown-preview:copy-html'
-          preview = $('<div>').append(atom.clipboard.read())
+          preview = document.createElement('div')
+          preview.innerHTML = atom.clipboard.read()
 
       describe "when the code block's fence name has a matching grammar", ->
         it "tokenizes the code block with the grammar", ->
-          expect(preview.find("pre span.entity.name.function.ruby")).toExist()
+          expect(preview.querySelector("pre span.entity.name.function.ruby")).toBeDefined()
 
       describe "when the code block's fence name doesn't have a matching grammar", ->
         it "does not tokenize the code block", ->
-          expect(preview.find("pre.lang-kombucha .line .null-grammar").children().length).toBe 2
+          expect(preview.querySelectorAll("pre.lang-kombucha .line .null-grammar").length).toBe 2
 
       describe "when the code block contains empty lines", ->
         it "doesn't remove the empty lines", ->
-          expect(preview.find("pre.lang-python").children().length).toBe 6
-          expect(preview.find("pre.lang-python div:nth-child(2)").text().trim()).toBe ''
-          expect(preview.find("pre.lang-python div:nth-child(4)").text().trim()).toBe ''
-          expect(preview.find("pre.lang-python div:nth-child(5)").text().trim()).toBe ''
+          expect(preview.querySelector("pre.lang-python").children.length).toBe 6
+          expect(preview.querySelector("pre.lang-python div:nth-child(2)").textContent.trim()).toBe ''
+          expect(preview.querySelector("pre.lang-python div:nth-child(4)").textContent.trim()).toBe ''
+          expect(preview.querySelector("pre.lang-python div:nth-child(5)").textContent.trim()).toBe ''
 
       describe "when the code block is nested in a list", ->
         it "detects and styles the block", ->
-          expect(preview.find("pre.lang-javascript")).toHaveClass 'editor-colors'
+          expect(preview.querySelector("pre.lang-javascript")).toHaveClass 'editor-colors'
 
   describe "sanitization", ->
     it "removes script tags and attributes that commonly contain inline scripts", ->
@@ -380,7 +381,7 @@ describe "Markdown preview package", ->
       expectPreviewInSplitPane()
 
       runs ->
-        expect(preview[0].innerHTML).toBe """
+        expect(preview.element.innerHTML).toBe """
           <p>hello</p>
           <p></p>
           <p>
@@ -394,7 +395,7 @@ describe "Markdown preview package", ->
       expectPreviewInSplitPane()
 
       runs ->
-        expect(preview[0].innerHTML).toBe """
+        expect(preview.element.innerHTML).toBe """
           <p>content
           &lt;!doctype html&gt;</p>
         """
@@ -405,7 +406,7 @@ describe "Markdown preview package", ->
       runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
       expectPreviewInSplitPane()
 
-      runs -> expect(preview[0].innerHTML).toBe "content"
+      runs -> expect(preview.element.innerHTML).toBe "content"
 
   describe "when the markdown contains a <pre> tag", ->
     it "does not throw an exception", ->
@@ -413,7 +414,7 @@ describe "Markdown preview package", ->
       runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
       expectPreviewInSplitPane()
 
-      runs -> expect(preview.find('atom-text-editor')).toExist()
+      runs -> expect(preview.element.querySelector('atom-text-editor')).toBeDefined()
 
   describe "when there is an image with a relative path and no directory", ->
     it "does not alter the image src", ->
@@ -429,7 +430,7 @@ describe "Markdown preview package", ->
       expectPreviewInSplitPane()
 
       runs ->
-        expect(preview[0].innerHTML).toBe """
+        expect(preview.element.innerHTML).toBe """
           <p><img src="/foo.png" alt="rel path"></p>
         """
 
