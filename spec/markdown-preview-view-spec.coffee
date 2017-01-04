@@ -181,7 +181,7 @@ describe "MarkdownPreviewView", ->
       jasmine.attachToDOM(preview.element)
 
     it "saves the rendered HTML and opens it", ->
-      outputPath = temp.path(suffix: '.html')
+      outputPath = fs.realpathSync(temp.mkdirSync()) + 'output.html'
       expectedFilePath = atom.project.getDirectories()[0].resolve('saved-html.html')
       expectedOutput = fs.readFileSync(expectedFilePath).toString()
 
@@ -222,7 +222,7 @@ describe "MarkdownPreviewView", ->
         atom.commands.dispatch preview.element, 'core:save-as'
 
       waitsFor ->
-        fs.existsSync(outputPath) and atom.workspace.getActiveTextEditor()?.getPath() is fs.realpathSync(outputPath)
+        fs.existsSync(outputPath) and atom.workspace.getActiveTextEditor()?.getPath() is outputPath
 
       runs ->
         expect(fs.isFileSync(outputPath)).toBe true
