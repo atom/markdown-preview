@@ -134,7 +134,7 @@ tokenizeCodeBlocks = (html, defaultLanguage='text') ->
     codeBlock = o(preElement).children().first()
     fenceName = codeBlock.attr('class')?.replace(/^lang-/, '') ? defaultLanguage
 
-    highlighter ?= new Highlights(registry: atom.grammars)
+    highlighter ?= new Highlights(registry: atom.grammars, scopePrefix: 'syntax--')
     highlightedHtml = highlighter.highlightSync
       fileContents: codeBlock.text()
       scopeName: scopeForFenceName(fenceName)
