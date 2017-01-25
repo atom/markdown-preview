@@ -120,6 +120,9 @@ class MarkdownPreviewView
         @css('zoom', zoomLevel - .1)
       'markdown-preview:reset-zoom': =>
         @css('zoom', 1)
+      'click': (event) =>
+        event.stopPropagation()
+        @followLink(event)
 
     changeHandler = =>
       @renderMarkdown()
@@ -279,6 +282,15 @@ class MarkdownPreviewView
         atom.clipboard.write(html)
 
     true
+
+  followLink: (event) ->
+    return false if @loading
+    if event.target.tagName is 'A' and event.target.protocol is 'file:'
+      activeFile = @getPath()
+      activeFileDir = path.dirname(activeFile)
+      clickedFile = event.target.getAttribute('href')
+      clickedPath = path.join(activeFileDir, clickedFile)
+      atom.workspace.open clickedPath, {split: 'left'}
 
   saveAs: ->
     return if @loading
