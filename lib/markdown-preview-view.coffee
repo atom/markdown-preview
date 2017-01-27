@@ -103,23 +103,19 @@ class MarkdownPreviewView
     @disposables.add atom.grammars.onDidUpdateGrammar _.debounce((=> @renderMarkdown()), 250)
 
     atom.commands.add @element,
-      'core:move-up': =>
-        @scrollUp()
-      'core:move-down': =>
-        @scrollDown()
       'core:save-as': (event) =>
         event.stopPropagation()
         @saveAs()
       'core:copy': (event) =>
         event.stopPropagation() if @copyToClipboard()
       'markdown-preview:zoom-in': =>
-        zoomLevel = parseFloat(@css('zoom')) or 1
-        @css('zoom', zoomLevel + .1)
+        zoomLevel = parseFloat(getComputedStyle(@element).zoom)
+        @element.style.zoom = zoomLevel + 0.1
       'markdown-preview:zoom-out': =>
-        zoomLevel = parseFloat(@css('zoom')) or 1
-        @css('zoom', zoomLevel - .1)
+        zoomLevel = parseFloat(getComputedStyle(@element).zoom)
+        @element.style.zoom = zoomLevel - 0.1
       'markdown-preview:reset-zoom': =>
-        @css('zoom', 1)
+        @element.style.zoom = 1
 
     changeHandler = =>
       @renderMarkdown()
