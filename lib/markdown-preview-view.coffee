@@ -39,10 +39,10 @@ class MarkdownPreviewView
   registerScrollCommands: ->
     @disposables.add(atom.commands.add(@element, {
       'core:move-up': =>
-        @element.scrollTop -= window.offsetHeight / 20
+        @element.scrollTop -= document.body.offsetHeight / 20
         return
       'core:move-down': =>
-        @element.scrollTop += window.offsetHeight / 20
+        @element.scrollTop += document.body.offsetHeight / 20
         return
       'core:page-up': =>
         @element.scrollTop -= @element.offsetHeight
