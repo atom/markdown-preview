@@ -243,7 +243,7 @@ class MarkdownPreviewView
   showError: (result) ->
     @element.textContent = ''
     h2 = document.createElement('h2')
-    h2.textContent = 'Prevewing Markdown Failed'
+    h2.textContent = 'Previewing Markdown Failed'
     @element.appendChild(h2)
     if failureMessage = result?.message
       h3 = document.createElement('h3')
