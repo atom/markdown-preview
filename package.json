@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "cheerio": "0.15.0",
-    "fs-plus": "^2.0.0",
+    "fs-plus": "^3.0.0",
     "highlights": "2.1.1",
     "roaster": "^1.2.1",
     "temp": "^0.8.1",
