@@ -25,8 +25,7 @@ describe "Markdown preview package", ->
       atom.packages.activatePackage('language-gfm')
 
   expectPreviewInSplitPane = ->
-    runs ->
-      expect(atom.workspace.getPanes()).toHaveLength 2
+    waitsFor -> getCenter().getPanes().length is 2
 
     waitsFor "markdown preview to be created", ->
       preview = atom.workspace.getPanes()[1].getActiveItem()
