@@ -39,6 +39,21 @@ describe "MarkdownPreviewView", ->
       preview.showError("Not a real file")
       expect(preview.element.textContent).toMatch("Failed")
 
+    it "rerenders the markdown and the scrollTop stays the same", ->
+      waitsForPromise ->
+        preview.renderMarkdown()
+
+      runs ->
+        preview.element.style.maxHeight = '10px'
+        preview.element.scrollTop = 24
+        expect(preview.element.scrollTop).toBe 24
+
+      waitsForPromise ->
+        preview.renderMarkdown()
+
+      runs ->
+        expect(preview.element.scrollTop).toBe 24
+
   describe "serialization", ->
     newPreview = null
 
