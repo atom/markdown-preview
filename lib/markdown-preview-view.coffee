@@ -32,6 +32,9 @@ class MarkdownPreviewView
     filePath: @getPath() ? @filePath
     editorId: @editorId
 
+  copy: ->
+    new MarkdownPreviewView({@editorId, filePath: @getPath() ? @filePath})
+
   destroy: ->
     @disposables.dispose()
     @element.remove()
