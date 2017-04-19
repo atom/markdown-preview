@@ -116,11 +116,16 @@ convertCodeBlocksToAtomEditors = (domFragment, defaultLanguage='text') ->
     preElement.remove()
 
     editor = editorElement.getModel()
-    # remove the default selection of a line in each editor
-    editor.getDecorations(class: 'cursor-line', type: 'line')[0].destroy()
     editor.setText(codeBlock.textContent)
     if grammar = atom.grammars.grammarForScopeName(scopeForFenceName(fenceName))
       editor.setGrammar(grammar)
+
+    # Remove line decorations from code blocks.
+    if editor.cursorLineDecorations?
+      for cursorLineDecoration in editor.cursorLineDecorations
+        cursorLineDecoration.destroy()
+    else
+      editor.getDecorations(class: 'cursor-line', type: 'line')[0].destroy()
 
   domFragment
 
