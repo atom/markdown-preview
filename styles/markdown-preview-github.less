@@ -37,4 +37,37 @@
     border-radius: 4px;
     overflow: auto;
   }
+  
+  // Set to page to fixed width centered
+  width: 990px; // TODO: Where are the extra 10px coming from?
+  padding: 45px;
+  margin-left: auto;
+  margin-right: auto;
+
+  // Not sure if these are necessary...
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: rgb(221, 221, 221);
+  word-wrap: break-word;
+
+  // Fix styling for code blocks
+  code {
+    border: none;
+    color: black;
+    background-color: rgba(0,0,0,0.04);
+    font-family: Consolas, 'Liberation Mono', Menlo, Courier, monospace !important;
+  }
+  atom-text-editor {
+    border: none;
+    color: black;
+    background-color: #f7f7f7;
+    font-family: Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  }
+  atom-text-editor::shadow {
+    .invisible-character {
+      visibility: hidden;
+    }
+  }
 }
