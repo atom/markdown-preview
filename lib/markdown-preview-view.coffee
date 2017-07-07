@@ -32,6 +32,9 @@ class MarkdownPreviewView
     filePath: @getPath() ? @filePath
     editorId: @editorId
 
+  copy: ->
+    new MarkdownPreviewView({@editorId, filePath: @getPath() ? @filePath})
+
   destroy: ->
     @disposables.dispose()
     @element.remove()
@@ -39,10 +42,10 @@ class MarkdownPreviewView
   registerScrollCommands: ->
     @disposables.add(atom.commands.add(@element, {
       'core:move-up': =>
-        @element.scrollTop -= window.offsetHeight / 20
+        @element.scrollTop -= document.body.offsetHeight / 20
         return
       'core:move-down': =>
-        @element.scrollTop += window.offsetHeight / 20
+        @element.scrollTop += document.body.offsetHeight / 20
         return
       'core:page-up': =>
         @element.scrollTop -= @element.offsetHeight
@@ -103,23 +106,19 @@ class MarkdownPreviewView
     @disposables.add atom.grammars.onDidUpdateGrammar _.debounce((=> @renderMarkdown()), 250)
 
     atom.commands.add @element,
-      'core:move-up': =>
-        @scrollUp()
-      'core:move-down': =>
-        @scrollDown()
       'core:save-as': (event) =>
         event.stopPropagation()
         @saveAs()
       'core:copy': (event) =>
         event.stopPropagation() if @copyToClipboard()
       'markdown-preview:zoom-in': =>
-        zoomLevel = parseFloat(@css('zoom')) or 1
-        @css('zoom', zoomLevel + .1)
+        zoomLevel = parseFloat(getComputedStyle(@element).zoom)
+        @element.style.zoom = zoomLevel + 0.1
       'markdown-preview:zoom-out': =>
-        zoomLevel = parseFloat(@css('zoom')) or 1
-        @css('zoom', zoomLevel - .1)
+        zoomLevel = parseFloat(getComputedStyle(@element).zoom)
+        @element.style.zoom = zoomLevel - 0.1
       'markdown-preview:reset-zoom': =>
-        @css('zoom', 1)
+        @element.style.zoom = 1
 
     changeHandler = =>
       @renderMarkdown()
@@ -247,7 +246,7 @@ class MarkdownPreviewView
   showError: (result) ->
     @element.textContent = ''
     h2 = document.createElement('h2')
-    h2.textContent = 'Prevewing Markdown Failed'
+    h2.textContent = 'Previewing Markdown Failed'
     @element.appendChild(h2)
     if failureMessage = result?.message
       h3 = document.createElement('h3')

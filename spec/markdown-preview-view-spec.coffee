@@ -274,3 +274,17 @@ describe "MarkdownPreviewView", ->
          <pre class="editor-colors lang-javascript"><div class="line"><span class="syntax--source syntax--js"><span class="syntax--keyword syntax--control syntax--js"><span>if</span></span><span>&nbsp;a&nbsp;</span><span class="syntax--keyword syntax--operator syntax--comparison syntax--js"><span>===</span></span><span>&nbsp;</span><span class="syntax--constant syntax--numeric syntax--decimal syntax--js"><span>3</span></span><span>&nbsp;</span><span class="syntax--meta syntax--brace syntax--curly syntax--js"><span>{</span></span></span></div><div class="line"><span class="syntax--source syntax--js"><span>&nbsp;&nbsp;b&nbsp;</span><span class="syntax--keyword syntax--operator syntax--assignment syntax--js"><span>=</span></span><span>&nbsp;</span><span class="syntax--constant syntax--numeric syntax--decimal syntax--js"><span>5</span></span></span></div><div class="line"><span class="syntax--source syntax--js"><span class="syntax--meta syntax--brace syntax--curly syntax--js"><span>}</span></span></span></div></pre>
          <p>encoding \u2192 issue</p>
         """
+
+  describe "when markdown-preview:zoom-in or markdown-preview:zoom-out are triggered", ->
+    it "increases or decreases the zoom level of the markdown preview element", ->
+      jasmine.attachToDOM(preview.element)
+
+      waitsForPromise ->
+        preview.renderMarkdown()
+
+      runs ->
+        originalZoomLevel = getComputedStyle(preview.element).zoom
+        atom.commands.dispatch(preview.element, 'markdown-preview:zoom-in')
+        expect(getComputedStyle(preview.element).zoom).toBeGreaterThan(originalZoomLevel)
+        atom.commands.dispatch(preview.element, 'markdown-preview:zoom-out')
+        expect(getComputedStyle(preview.element).zoom).toBe(originalZoomLevel)
