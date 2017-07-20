@@ -2,6 +2,7 @@ path = require 'path'
 fs = require 'fs-plus'
 temp = require 'temp'
 MarkdownPreviewView = require '../lib/markdown-preview-view'
+url = require 'url'
 
 describe "MarkdownPreviewView", ->
   [file, preview, workspaceElement] = []
@@ -26,17 +27,17 @@ describe "MarkdownPreviewView", ->
   describe "::constructor", ->
     it "shows a loading spinner and renders the markdown", ->
       preview.showLoading()
-      expect(preview.find('.markdown-spinner')).toExist()
+      expect(preview.element.querySelector('.markdown-spinner')).toBeDefined()
 
       waitsForPromise ->
         preview.renderMarkdown()
 
       runs ->
-        expect(preview.find(".emoji")).toExist()
+        expect(preview.element.querySelector(".emoji")).toBeDefined()
 
     it "shows an error message when there is an error", ->
       preview.showError("Not a real file")
-      expect(preview.text()).toContain "Failed"
+      expect(preview.element.textContent).toMatch("Failed")
 
   describe "serialization", ->
     newPreview = null
@@ -83,37 +84,37 @@ describe "MarkdownPreviewView", ->
         preview.renderMarkdown()
 
     it "removes line decorations on rendered code blocks", ->
-      editor = preview.find("atom-text-editor[data-grammar='text plain null-grammar']")
-      decorations = editor[0].getModel().getDecorations(class: 'cursor-line', type: 'line')
+      editor = preview.element.querySelector("atom-text-editor[data-grammar='text plain null-grammar']")
+      decorations = editor.getModel().getDecorations(class: 'cursor-line', type: 'line')
       expect(decorations.length).toBe 0
 
     describe "when the code block's fence name has a matching grammar", ->
       it "assigns the grammar on the atom-text-editor", ->
-        rubyEditor = preview.find("atom-text-editor[data-grammar='source ruby']")
-        expect(rubyEditor).toExist()
-        expect(rubyEditor[0].getModel().getText()).toBe """
+        rubyEditor = preview.element.querySelector("atom-text-editor[data-grammar='source ruby']")
+        expect(rubyEditor.getModel().getText()).toBe """
           def func
             x = 1
           end
+
         """
 
         # nested in a list item
-        jsEditor = preview.find("atom-text-editor[data-grammar='source js']")
-        expect(jsEditor).toExist()
-        expect(jsEditor[0].getModel().getText()).toBe """
+        jsEditor = preview.element.querySelector("atom-text-editor[data-grammar='source js']")
+        expect(jsEditor.getModel().getText()).toBe """
           if a === 3 {
           b = 5
           }
+
         """
 
     describe "when the code block's fence name doesn't have a matching grammar", ->
       it "does not assign a specific grammar", ->
-        plainEditor = preview.find("atom-text-editor[data-grammar='text plain null-grammar']")
-        expect(plainEditor).toExist()
-        expect(plainEditor[0].getModel().getText()).toBe """
+        plainEditor = preview.element.querySelector("atom-text-editor[data-grammar='text plain null-grammar']")
+        expect(plainEditor.getModel().getText()).toBe """
           function f(x) {
             return x++;
           }
+
         """
 
   describe "image resolving", ->
@@ -123,13 +124,13 @@ describe "MarkdownPreviewView", ->
 
     describe "when the image uses a relative path", ->
       it "resolves to a path relative to the file", ->
-        image = preview.find("img[alt=Image1]")
-        expect(image.attr('src')).toBe atom.project.getDirectories()[0].resolve('subdir/image1.png')
+        image = preview.element.querySelector("img[alt=Image1]")
+        expect(image.src).toMatch url.parse(atom.project.getDirectories()[0].resolve('subdir/image1.png'))
 
     describe "when the image uses an absolute path that does not exist", ->
       it "resolves to a path relative to the project root", ->
-        image = preview.find("img[alt=Image2]")
-        expect(image.attr('src')).toBe atom.project.getDirectories()[0].resolve('tmp/image2.png')
+        image = preview.element.querySelector("img[alt=Image2]")
+        expect(image.src).toMatch url.parse(atom.project.getDirectories()[0].resolve('tmp/image2.png'))
 
     describe "when the image uses an absolute path that exists", ->
       it "doesn't change the URL", ->
@@ -144,12 +145,12 @@ describe "MarkdownPreviewView", ->
           preview.renderMarkdown()
 
         runs ->
-          expect(preview.find("img[alt=absolute]").attr('src')).toBe filePath
+          expect(preview.element.querySelector("img[alt=absolute]").src).toMatch url.parse(filePath)
 
     describe "when the image uses a web URL", ->
       it "doesn't change the URL", ->
-        image = preview.find("img[alt=Image3]")
-        expect(image.attr('src')).toBe 'http://github.com/image3.png'
+        image = preview.element.querySelector("img[alt=Image3]")
+        expect(image.src).toBe 'http://github.com/image3.png'
 
   describe "gfm newlines", ->
     describe "when gfm newlines are not enabled", ->
@@ -160,7 +161,7 @@ describe "MarkdownPreviewView", ->
           preview.renderMarkdown()
 
         runs ->
-          expect(preview.find("p:last-child br").length).toBe 0
+          expect(preview.element.querySelectorAll("p:last-child br").length).toBe 0
 
     describe "when gfm newlines are enabled", ->
       it "creates a single paragraph with no <br>", ->
@@ -170,7 +171,7 @@ describe "MarkdownPreviewView", ->
           preview.renderMarkdown()
 
         runs ->
-          expect(preview.find("p:last-child br").length).toBe 1
+          expect(preview.element.querySelectorAll("p:last-child br").length).toBe 1
 
   describe "when core:save-as is triggered", ->
     beforeEach ->
@@ -180,7 +181,7 @@ describe "MarkdownPreviewView", ->
       jasmine.attachToDOM(preview.element)
 
     it "saves the rendered HTML and opens it", ->
-      outputPath = temp.path(suffix: '.html')
+      outputPath = fs.realpathSync(temp.mkdirSync()) + 'output.html'
       expectedFilePath = atom.project.getDirectories()[0].resolve('saved-html.html')
       expectedOutput = fs.readFileSync(expectedFilePath).toString()
 
@@ -221,7 +222,7 @@ describe "MarkdownPreviewView", ->
         atom.commands.dispatch preview.element, 'core:save-as'
 
       waitsFor ->
-        fs.existsSync(outputPath) and atom.workspace.getActiveTextEditor()?.getPath() is fs.realpathSync(outputPath)
+        fs.existsSync(outputPath) and atom.workspace.getActiveTextEditor()?.getPath() is outputPath
 
       runs ->
         expect(fs.isFileSync(outputPath)).toBe true
@@ -270,6 +271,20 @@ describe "MarkdownPreviewView", ->
       runs ->
         expect(atom.clipboard.read()).toBe """
          <h1 id="code-block">Code Block</h1>
-         <pre class="editor-colors lang-javascript"><div class="line"><span class="source js"><span class="keyword control js"><span>if</span></span><span>&nbsp;a&nbsp;</span><span class="keyword operator comparison js"><span>===</span></span><span>&nbsp;</span><span class="constant numeric decimal js"><span>3</span></span><span>&nbsp;</span><span class="meta brace curly js"><span>{</span></span></span></div><div class="line"><span class="source js"><span>&nbsp;&nbsp;b&nbsp;</span><span class="keyword operator assignment js"><span>=</span></span><span>&nbsp;</span><span class="constant numeric decimal js"><span>5</span></span></span></div><div class="line"><span class="source js"><span class="meta brace curly js"><span>}</span></span></span></div></pre>
+         <pre class="editor-colors lang-javascript"><div class="line"><span class="syntax--source syntax--js"><span class="syntax--keyword syntax--control syntax--js"><span>if</span></span><span>&nbsp;a&nbsp;</span><span class="syntax--keyword syntax--operator syntax--comparison syntax--js"><span>===</span></span><span>&nbsp;</span><span class="syntax--constant syntax--numeric syntax--decimal syntax--js"><span>3</span></span><span>&nbsp;</span><span class="syntax--meta syntax--brace syntax--curly syntax--js"><span>{</span></span></span></div><div class="line"><span class="syntax--source syntax--js"><span>&nbsp;&nbsp;b&nbsp;</span><span class="syntax--keyword syntax--operator syntax--assignment syntax--js"><span>=</span></span><span>&nbsp;</span><span class="syntax--constant syntax--numeric syntax--decimal syntax--js"><span>5</span></span></span></div><div class="line"><span class="syntax--source syntax--js"><span class="syntax--meta syntax--brace syntax--curly syntax--js"><span>}</span></span></span></div></pre>
          <p>encoding \u2192 issue</p>
         """
+
+  describe "when markdown-preview:zoom-in or markdown-preview:zoom-out are triggered", ->
+    it "increases or decreases the zoom level of the markdown preview element", ->
+      jasmine.attachToDOM(preview.element)
+
+      waitsForPromise ->
+        preview.renderMarkdown()
+
+      runs ->
+        originalZoomLevel = getComputedStyle(preview.element).zoom
+        atom.commands.dispatch(preview.element, 'markdown-preview:zoom-in')
+        expect(getComputedStyle(preview.element).zoom).toBeGreaterThan(originalZoomLevel)
+        atom.commands.dispatch(preview.element, 'markdown-preview:zoom-out')
+        expect(getComputedStyle(preview.element).zoom).toBe(originalZoomLevel)

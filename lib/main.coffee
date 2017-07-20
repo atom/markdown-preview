@@ -10,18 +10,18 @@ isMarkdownPreviewView = (object) ->
 
 module.exports =
   activate: ->
-    if parseFloat(atom.getVersion()) < 1.7
-      atom.deserializers.add
-        name: 'MarkdownPreviewView'
-        deserialize: module.exports.createMarkdownPreviewView.bind(module.exports)
-
     atom.commands.add 'atom-workspace',
       'markdown-preview:toggle': =>
         @toggle()
       'markdown-preview:copy-html': =>
         @copyHtml()
+      'markdown-preview:save-as-html': =>
+        @saveAsHtml()
       'markdown-preview:toggle-break-on-single-newline': ->
         keyPath = 'markdown-preview.breakOnSingleNewline'
+        atom.config.set(keyPath, not atom.config.get(keyPath))
+      'markdown-preview:toggle-github-style': ->
+        keyPath = 'markdown-preview.useGitHubStyle'
         atom.config.set(keyPath, not atom.config.get(keyPath))
 
     previewFile = @previewFile.bind(this)
@@ -34,22 +34,18 @@ module.exports =
     atom.commands.add '.tree-view .file .name[data-name$=\\.txt]', 'markdown-preview:preview-file', previewFile
 
     atom.workspace.addOpener (uriToOpen) =>
-      try
-        {protocol, host, pathname} = url.parse(uriToOpen)
-      catch error
-        return
-
-      return unless protocol is 'markdown-preview:'
+      [protocol, path] = uriToOpen.split('://')
+      return unless protocol is 'markdown-preview'
 
       try
-        pathname = decodeURI(pathname) if pathname
-      catch error
+        path = decodeURI(path)
+      catch
         return
 
-      if host is 'editor'
-        @createMarkdownPreviewView(editorId: pathname.substring(1))
+      if path.startsWith 'editor/'
+        @createMarkdownPreviewView(editorId: path.substring(7))
       else
-        @createMarkdownPreviewView(filePath: pathname)
+        @createMarkdownPreviewView(filePath: path)
 
   createMarkdownPreviewView: (state) ->
     if state.editorId or fs.isFileSync(state.filePath)
@@ -113,3 +109,27 @@ module.exports =
         console.warn('Copying Markdown as HTML failed', error)
       else
         atom.clipboard.write(html)
+
+  saveAsHtml: ->
+    activePane = atom.workspace.getActivePaneItem()
+    if isMarkdownPreviewView(activePane)
+      activePane.saveAs()
+      return
+
+    editor = atom.workspace.getActiveTextEditor()
+    return unless editor?
+
+    grammars = atom.config.get('markdown-preview.grammars') ? []
+    return unless editor.getGrammar().scopeName in grammars
+
+    uri = @uriForEditor(editor)
+    markdownPreviewPane = atom.workspace.paneForURI(uri)
+    return unless markdownPreviewPane?
+
+    previousActivePane = atom.workspace.getActivePane()
+    markdownPreviewPane.activate()
+    activePane = atom.workspace.getActivePaneItem()
+
+    if isMarkdownPreviewView(activePane)
+      activePane.saveAs().then ->
+        previousActivePane.activate()
