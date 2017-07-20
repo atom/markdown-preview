@@ -407,7 +407,7 @@ describe "Markdown preview package", ->
       expectPreviewInSplitPane()
 
       runs ->
-        expect(preview[0].innerHTML).toBe """
+        expect(preview.element.innerHTML).toBe """
           <p>YAML Front Matter</p>
         """
 
