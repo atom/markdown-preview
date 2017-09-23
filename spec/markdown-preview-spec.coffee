@@ -4,9 +4,6 @@ temp = require 'temp'
 wrench = require 'wrench'
 MarkdownPreviewView = require '../lib/markdown-preview-view'
 
-# TODO: Remove this after atom/atom#13977 lands in favor of unguarded `getCenter()` calls
-getCenter = -> atom.workspace.getCenter?() ? atom.workspace
-
 describe "Markdown preview package", ->
   [workspaceElement, preview] = []
 
@@ -28,10 +25,10 @@ describe "Markdown preview package", ->
       atom.packages.activatePackage('language-gfm')
 
   expectPreviewInSplitPane = ->
-    waitsFor -> getCenter().getPanes().length is 2
+    waitsFor -> atom.workspace.getCenter().getPanes().length is 2
 
     waitsFor "markdown preview to be created", ->
-      preview = getCenter().getPanes()[1].getActiveItem()
+      preview = atom.workspace.getCenter().getPanes()[1].getActiveItem()
 
     runs ->
       expect(preview).toBeInstanceOf(MarkdownPreviewView)
@@ -44,7 +41,7 @@ describe "Markdown preview package", ->
       expectPreviewInSplitPane()
 
       runs ->
-        [editorPane] = getCenter().getPanes()
+        [editorPane] = atom.workspace.getCenter().getPanes()
         expect(editorPane.getItems()).toHaveLength 1
         expect(editorPane.isActive()).toBe true
 
@@ -81,12 +78,12 @@ describe "Markdown preview package", ->
     it "closes the existing preview when toggle is triggered a second time on the editor", ->
       atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
 
-      [editorPane, previewPane] = getCenter().getPanes()
+      [editorPane, previewPane] = atom.workspace.getCenter().getPanes()
       expect(editorPane.isActive()).toBe true
       expect(previewPane.getActiveItem()).toBeUndefined()
 
     it "closes the existing preview when toggle is triggered on it and it has focus", ->
-      [editorPane, previewPane] = getCenter().getPanes()
+      [editorPane, previewPane] = atom.workspace.getCenter().getPanes()
       previewPane.activate()
 
       atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
@@ -118,7 +115,7 @@ describe "Markdown preview package", ->
       describe "when the preview is in the active pane but is not the active item", ->
         it "re-renders the preview but does not make it active", ->
           markdownEditor = atom.workspace.getActiveTextEditor()
-          previewPane = getCenter().getPanes()[1]
+          previewPane = atom.workspace.getCenter().getPanes()[1]
           previewPane.activate()
 
           waitsForPromise ->
@@ -137,7 +134,7 @@ describe "Markdown preview package", ->
       describe "when the preview is not the active item and not in the active pane", ->
         it "re-renders the preview and makes it active", ->
           markdownEditor = atom.workspace.getActiveTextEditor()
-          [editorPane, previewPane] = getCenter().getPanes()
+          [editorPane, previewPane] = atom.workspace.getCenter().getPanes()
           previewPane.splitRight(copyActiveItem: true)
           previewPane.activate()
 
@@ -175,12 +172,12 @@ describe "Markdown preview package", ->
 
     describe "when the original preview is split", ->
       it "renders another preview in the new split pane", ->
-        getCenter().getPanes()[1].splitRight({copyActiveItem: true})
+        atom.workspace.getCenter().getPanes()[1].splitRight({copyActiveItem: true})
 
-        expect(getCenter().getPanes()).toHaveLength 3
+        expect(atom.workspace.getCenter().getPanes()).toHaveLength 3
 
         waitsFor "split markdown preview to be created", ->
-          preview = getCenter().getPanes()[2].getActiveItem()
+          preview = atom.workspace.getCenter().getPanes()[2].getActiveItem()
 
         runs ->
           expect(preview).toBeInstanceOf(MarkdownPreviewView)
@@ -188,10 +185,10 @@ describe "Markdown preview package", ->
 
     describe "when the editor is destroyed", ->
       beforeEach ->
-        getCenter().getPanes()[0].destroyActiveItem()
+        atom.workspace.getCenter().getPanes()[0].destroyActiveItem()
 
       it "falls back to using the file path", ->
-        getCenter().getPanes()[1].activate()
+        atom.workspace.getCenter().getPanes()[1].activate()
         expect(preview.file.getPath()).toBe atom.workspace.getActivePaneItem().getPath()
 
       it "continues to update the preview if the file is changed on #win32 and #darwin", ->
@@ -228,12 +225,12 @@ describe "Markdown preview package", ->
           listener.callCount > 0
 
       it "allows a new split pane of the preview to be created", ->
-        getCenter().getPanes()[1].splitRight({copyActiveItem: true})
+        atom.workspace.getCenter().getPanes()[1].splitRight({copyActiveItem: true})
 
-        expect(getCenter().getPanes()).toHaveLength 3
+        expect(atom.workspace.getCenter().getPanes()).toHaveLength 3
 
         waitsFor "split markdown preview to be created", ->
-          preview = getCenter().getPanes()[2].getActiveItem()
+          preview = atom.workspace.getCenter().getPanes()[2].getActiveItem()
 
         runs ->
           expect(preview).toBeInstanceOf(MarkdownPreviewView)
@@ -476,7 +473,7 @@ describe "Markdown preview package", ->
       expectPreviewInSplitPane()
 
     it "saves the HTML when it is triggered and the editor has focus", ->
-      [editorPane, previewPane] = getCenter().getPanes()
+      [editorPane, previewPane] = atom.workspace.getCenter().getPanes()
       editorPane.activate()
 
       outputPath = temp.path(suffix: '.html')
@@ -493,7 +490,7 @@ describe "Markdown preview package", ->
         expect(fs.isFileSync(outputPath)).toBe true
 
     it "saves the HTML when it is triggered and the preview pane has focus", ->
-      [editorPane, previewPane] = getCenter().getPanes()
+      [editorPane, previewPane] = atom.workspace.getCenter().getPanes()
       previewPane.activate()
 
       outputPath = temp.path(suffix: '.html')
