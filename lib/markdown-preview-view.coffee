@@ -172,6 +172,7 @@ class MarkdownPreviewView
       renderer.toHTML source, @getPath(), @getGrammar(), callback
 
   renderMarkdownText: (text) ->
+    scrollTop = @element.scrollTop
     renderer.toDOMFragment text, @getPath(), @getGrammar(), (error, domFragment) =>
       if error
         @showError(error)
@@ -181,6 +182,7 @@ class MarkdownPreviewView
         @element.textContent = ''
         @element.appendChild(domFragment)
         @emitter.emit 'did-change-markdown'
+        @element.scrollTop = scrollTop
 
   getTitle: ->
     if @file? and @getPath()?
