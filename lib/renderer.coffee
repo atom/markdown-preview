@@ -53,7 +53,6 @@ resolveImagePaths = (html, filePath) ->
   [rootDirectory] = atom.project.relativizePath(filePath)
   o = document.createElement('div')
   o.innerHTML = html
-  console.log(o.querySelectorAll('img'))
   for img in o.querySelectorAll('img')
     if src = img.src
       continue if src.match(/^(https?|atom):\/\//)
@@ -102,24 +101,28 @@ convertCodeBlocksToAtomEditors = (domFragment, defaultLanguage='text') ->
   domFragment
 
 tokenizeCodeBlocks = (html, defaultLanguage='text') ->
-  o = cheerio.load(html)
+  o = document.createElement('div')
+  o.innerHTML = html
 
   if fontFamily = atom.config.get('editor.fontFamily')
-    o('code').css('font-family', fontFamily)
+    for codeElement in o.querySelectorAll('code')
+      codeElement.style['font-family'] = fontFamily
 
-  for preElement in o("pre")
-    codeBlock = o(preElement).children().first()
-    fenceName = codeBlock.attr('class')?.replace(/^lang-/, '') ? defaultLanguage
+  for preElement in o.querySelectorAll("pre")
+    codeBlock = preElement.children[0]
+    fenceName = codeBlock.className?.replace(/^lang-/, '') ? defaultLanguage
 
     highlighter ?= new Highlights(registry: atom.grammars, scopePrefix: 'syntax--')
     highlightedHtml = highlighter.highlightSync
-      fileContents: codeBlock.text()
+      fileContents: codeBlock.textContent
       scopeName: scopeForFenceName(fenceName)
 
-    highlightedBlock = o(highlightedHtml)
+    highlightedBlock = document.createElement('pre')
+    highlightedBlock.innerHTML = highlightedHtml
     # The `editor` class messes things up as `.editor` has absolutely positioned lines
-    highlightedBlock.removeClass('editor').addClass("lang-#{fenceName}")
+    highlightedBlock.children[0].classList.remove('editor')
+    highlightedBlock.children[0].classList.add("lang-#{fenceName}")
 
-    o(preElement).replaceWith(highlightedBlock)
+    preElement.outerHTML = highlightedBlock.innerHTML
 
-  o.html()
+  o.innerHTML

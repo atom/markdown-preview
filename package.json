@@ -9,7 +9,6 @@
     "atom": "*"
   },
   "dependencies": {
-    "cheerio": "0.15.0",
     "dompurify": "^1.0.2",
     "fs-plus": "^3.0.0",
     "highlights": "^3.0.1",
