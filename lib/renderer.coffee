@@ -51,10 +51,11 @@ render = (text, filePath, callback) ->
 
 resolveImagePaths = (html, filePath) ->
   [rootDirectory] = atom.project.relativizePath(filePath)
-  o = cheerio.load(html)
-  for imgElement in o('img')
-    img = o(imgElement)
-    if src = img.attr('src')
+  o = document.createElement('div')
+  o.innerHTML = html
+  console.log(o.querySelectorAll('img'))
+  for img in o.querySelectorAll('img')
+    if src = img.src
       continue if src.match(/^(https?|atom):\/\//)
       continue if src.startsWith(process.resourcesPath)
       continue if src.startsWith(resourcePath)
@@ -63,11 +64,11 @@ resolveImagePaths = (html, filePath) ->
       if src[0] is '/'
         unless fs.isFileSync(src)
           if rootDirectory
-            img.attr('src', path.join(rootDirectory, src.substring(1)))
+            src = path.join(rootDirectory, src.substring(1))
       else
-        img.attr('src', path.resolve(path.dirname(filePath), src))
+        src = path.resolve(path.dirname(filePath), src)
 
-  o.html()
+  o.innerHTML
 
 convertCodeBlocksToAtomEditors = (domFragment, defaultLanguage='text') ->
   if fontFamily = atom.config.get('editor.fontFamily')
