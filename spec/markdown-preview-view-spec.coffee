@@ -144,12 +144,15 @@ describe "MarkdownPreviewView", ->
 
     describe "when the image uses an absolute path that does not exist", ->
       it "resolves to a path relative to the project root", ->
+
         image = preview.element.querySelector("img[alt=Image2]")
         expect(image.src).toMatch url.parse(atom.project.getDirectories()[0].resolve('tmp/image2.png'))
 
     describe "when the image uses an absolute path that exists", ->
-      it "doesn't change the URL", ->
+      it "doesn't change the URL when allowUnsafeProtocols is true", ->
         preview.destroy()
+
+        atom.config.set('markdown-preview.allowUnsafeProtocols', true)
 
         filePath = path.join(temp.mkdirSync('atom'), 'foo.md')
         fs.writeFileSync(filePath, "![absolute](#{filePath})")
@@ -161,6 +164,23 @@ describe "MarkdownPreviewView", ->
 
         runs ->
           expect(preview.element.querySelector("img[alt=absolute]").src).toMatch url.parse(filePath)
+
+    it "removes the URL when allowUnsafeProtocols is false", ->
+      preview.destroy()
+
+      atom.config.set('markdown-preview.allowUnsafeProtocols', false)
+
+      filePath = path.join(temp.mkdirSync('atom'), 'foo.md')
+      fs.writeFileSync(filePath, "![absolute](#{filePath})")
+      preview = new MarkdownPreviewView({filePath})
+      jasmine.attachToDOM(preview.element)
+
+      waitsForPromise ->
+        preview.renderMarkdown()
+
+      runs ->
+        expect(preview.element.querySelector("img[alt=absolute]").src).toMatch ''
+
 
     describe "when the image uses a web URL", ->
       it "doesn't change the URL", ->

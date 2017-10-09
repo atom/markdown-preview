@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "cheerio": "0.15.0",
+    "dompurify": "^1.0.2",
     "fs-plus": "^3.0.0",
     "highlights": "^3.0.1",
     "roaster": "^1.2.1",
@@ -38,6 +39,11 @@
       "type": "boolean",
       "default": true,
       "description": "Open the preview in a split pane. If disabled, the preview is opened in a new tab in the same pane."
+    },
+    "allowUnsafeProtocols": {
+      "type": "boolean",
+      "default": false,
+      "description": "Allow HTML attributes to use protocols normally considered unsafe such as `file://` and absolute paths on Windows."
     },
     "grammars": {
       "type": "array",

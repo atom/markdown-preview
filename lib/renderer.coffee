@@ -1,6 +1,7 @@
 path = require 'path'
 _ = require 'underscore-plus'
 cheerio = require 'cheerio'
+createDOMPurify = require 'dompurify'
 fs = require 'fs-plus'
 Highlights = require 'highlights'
 roaster = null # Defer until used
@@ -44,39 +45,9 @@ render = (text, filePath, callback) ->
   roaster text, options, (error, html) ->
     return callback(error) if error?
 
-    html = sanitize(html)
+    html = createDOMPurify().sanitize(html, {ALLOW_UNKNOWN_PROTOCOLS: atom.config.get('markdown-preview.allowUnsafeProtocols')})
     html = resolveImagePaths(html, filePath)
     callback(null, html.trim())
-
-sanitize = (html) ->
-  o = cheerio.load(html)
-  o('script').remove()
-  attributesToRemove = [
-    'onabort'
-    'onblur'
-    'onchange'
-    'onclick'
-    'ondbclick'
-    'onerror'
-    'onfocus'
-    'onkeydown'
-    'onkeypress'
-    'onkeyup'
-    'onload'
-    'onmousedown'
-    'onmousemove'
-    'onmouseover'
-    'onmouseout'
-    'onmouseup'
-    'onreset'
-    'onresize'
-    'onscroll'
-    'onselect'
-    'onsubmit'
-    'onunload'
-  ]
-  o('*').removeAttr(attribute) for attribute in attributesToRemove
-  o.html()
 
 resolveImagePaths = (html, filePath) ->
   [rootDirectory] = atom.project.relativizePath(filePath)
