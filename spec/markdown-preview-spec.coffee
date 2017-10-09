@@ -429,7 +429,7 @@ describe "Markdown preview package", ->
 
       runs ->
         expect(preview.element.innerHTML).toBe """
-          <p><img src="/foo.png" alt="rel path"></p>
+          <p><img alt="rel path" src="/foo.png"></p>
         """
 
   describe "GitHub style markdown preview", ->
