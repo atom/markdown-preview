@@ -398,6 +398,16 @@ describe "Markdown preview package", ->
           &lt;!doctype html&gt;</p>
         """
 
+    it "removes YAML front-matter from the beginning of the file", ->
+      waitsForPromise -> atom.workspace.open("subdir/yaml-front-matter.md")
+      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      expectPreviewInSplitPane()
+
+      runs ->
+        expect(preview.element.innerHTML).toBe """
+          <p>YAML Front Matter</p>
+        """
+
   describe "when the markdown contains an <html> tag", ->
     it "does not throw an exception", ->
       waitsForPromise -> atom.workspace.open("subdir/html-tag.md")
