@@ -12,6 +12,7 @@
     "dompurify": "^1.0.2",
     "fs-plus": "^3.0.0",
     "highlights": "^3.0.1",
+    "primer-markdown": "^3.6.0",
     "roaster": "^1.2.1",
     "temp": "^0.8.1",
     "underscore-plus": "^1.0.0",
