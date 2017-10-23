@@ -11,7 +11,7 @@
   "dependencies": {
     "dompurify": "^1.0.2",
     "fs-plus": "^3.0.0",
-    "highlights": "^3.0.1",
+    "highlights": "^3.1.1",
     "roaster": "^1.2.1",
     "temp": "^0.8.1",
     "underscore-plus": "^1.0.0",
