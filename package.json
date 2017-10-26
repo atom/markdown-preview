@@ -13,12 +13,11 @@
     "fs-plus": "^3.0.0",
     "highlights": "^3.1.1",
     "roaster": "^1.2.1",
-    "temp": "^0.8.1",
-    "underscore-plus": "^1.0.0",
-    "wrench": "^1.5.0"
+    "underscore-plus": "^1.0.0"
   },
   "devDependencies": {
-    "coffeelint": "^1.9.7"
+    "coffeelint": "^1.9.7",
+    "temp": "^0.8.1"
   },
   "deserializers": {
     "MarkdownPreviewView": "createMarkdownPreviewView"

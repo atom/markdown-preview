@@ -1,16 +1,15 @@
 path = require 'path'
 fs = require 'fs-plus'
-temp = require 'temp'
-wrench = require 'wrench'
+temp = require('temp').track()
 MarkdownPreviewView = require '../lib/markdown-preview-view'
 
-describe "Markdown preview package", ->
+describe "Markdown Preview", ->
   [workspaceElement, preview] = []
 
   beforeEach ->
     fixturesPath = path.join(__dirname, 'fixtures')
     tempPath = temp.mkdirSync('atom')
-    wrench.copyDirSyncRecursive(fixturesPath, tempPath, forceDelete: true)
+    fs.copySync(fixturesPath, tempPath)
     atom.project.setPaths([tempPath])
 
     jasmine.useRealClock()
@@ -477,7 +476,7 @@ describe "Markdown preview package", ->
       editorPane.activate()
 
       outputPath = temp.path(suffix: '.html')
-      expect(fs.isFileSync(outputPath)).toBe false
+      expect(fs.existsSync(outputPath)).toBe false
 
       runs ->
         spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
@@ -487,14 +486,14 @@ describe "Markdown preview package", ->
         fs.existsSync(outputPath)
 
       runs ->
-        expect(fs.isFileSync(outputPath)).toBe true
+        expect(fs.existsSync(outputPath)).toBe true
 
     it "saves the HTML when it is triggered and the preview pane has focus", ->
       [editorPane, previewPane] = atom.workspace.getCenter().getPanes()
       previewPane.activate()
 
       outputPath = temp.path(suffix: '.html')
-      expect(fs.isFileSync(outputPath)).toBe false
+      expect(fs.existsSync(outputPath)).toBe false
 
       runs ->
         spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
@@ -504,4 +503,4 @@ describe "Markdown preview package", ->
         fs.existsSync(outputPath)
 
       runs ->
-        expect(fs.isFileSync(outputPath)).toBe true
+        expect(fs.existsSync(outputPath)).toBe true
