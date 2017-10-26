@@ -17,7 +17,6 @@
   },
   "devDependencies": {
     "coffeelint": "^1.9.7",
-    "fs-extra": "^4.0.2",
     "temp": "^0.8.1"
   },
   "deserializers": {

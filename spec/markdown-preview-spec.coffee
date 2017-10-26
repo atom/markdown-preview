@@ -1,6 +1,6 @@
 path = require 'path'
-fs = require 'fs-extra'
-temp = require 'temp'
+fs = require 'fs-plus'
+temp = require('temp').track()
 MarkdownPreviewView = require '../lib/markdown-preview-view'
 
 describe "Markdown Preview", ->
