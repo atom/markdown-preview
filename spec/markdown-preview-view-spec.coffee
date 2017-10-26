@@ -110,7 +110,6 @@ describe "MarkdownPreviewView", ->
           def func
             x = 1
           end
-
         """
 
         # nested in a list item
@@ -119,7 +118,6 @@ describe "MarkdownPreviewView", ->
           if a === 3 {
           b = 5
           }
-
         """
 
     describe "when the code block's fence name doesn't have a matching grammar", ->
@@ -129,7 +127,6 @@ describe "MarkdownPreviewView", ->
           function f(x) {
             return x++;
           }
-
         """
 
   describe "image resolving", ->
