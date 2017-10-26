@@ -103,6 +103,10 @@ describe "MarkdownPreviewView", ->
       decorations = editor.getModel().getDecorations(class: 'cursor-line', type: 'line')
       expect(decorations.length).toBe 0
 
+    it "sets the editors as read-only", ->
+      preview.element.querySelectorAll("atom-text-editor").forEach (editorElement) ->
+        expect(editorElement.getAttribute('tabindex')).toBeNull()
+
     describe "when the code block's fence name has a matching grammar", ->
       it "assigns the grammar on the atom-text-editor", ->
         rubyEditor = preview.element.querySelector("atom-text-editor[data-grammar='source ruby']")
