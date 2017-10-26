@@ -140,7 +140,7 @@ describe "MarkdownPreviewView", ->
     describe "when the image uses a relative path", ->
       it "resolves to a path relative to the file", ->
         image = preview.element.querySelector("img[alt=Image1]")
-        expect(image.src).toMatch url.parse(atom.project.getDirectories()[0].resolve('subdir/image1.png'))
+        expect(image.getAttribute('src')).toBe atom.project.getDirectories()[0].resolve('subdir/image1.png')
 
     describe "when the image uses an absolute path that does not exist", ->
       it "resolves to a path relative to the project root", ->

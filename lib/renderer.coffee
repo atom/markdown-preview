@@ -54,7 +54,9 @@ resolveImagePaths = (html, filePath) ->
   o = document.createElement('div')
   o.innerHTML = html
   for img in o.querySelectorAll('img')
-    if src = img.src
+    # We use the raw attribute instead of the .src property because the value
+    # of the property seems to be transformed in some cases.
+    if src = img.getAttribute('src')
       continue if src.match(/^(https?|atom):\/\//)
       continue if src.startsWith(process.resourcesPath)
       continue if src.startsWith(resourcePath)
@@ -63,9 +65,9 @@ resolveImagePaths = (html, filePath) ->
       if src[0] is '/'
         unless fs.isFileSync(src)
           if rootDirectory
-            src = path.join(rootDirectory, src.substring(1))
+            img.src = path.join(rootDirectory, src.substring(1))
       else
-        src = path.resolve(path.dirname(filePath), src)
+        img.src = path.resolve(path.dirname(filePath), src)
 
   o.innerHTML
 
