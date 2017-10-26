@@ -135,11 +135,13 @@ describe "MarkdownPreviewView", ->
 
     describe "when an editor cannot find the grammar that is later loaded", ->
       it "updates the editor grammar", ->
+        renderSpy = spyOn(preview, 'renderMarkdown').andCallThrough()
+
         waitsForPromise ->
           atom.packages.deactivatePackage('language-ruby')
 
-        waitsForPromise ->
-          preview.renderMarkdown()
+        waitsFor 'renderMarkdown to be called after disabling a language', ->
+          renderSpy.callCount is 1
 
         runs ->
           rubyEditor = preview.element.querySelector("atom-text-editor[data-grammar='source ruby']")
@@ -148,8 +150,8 @@ describe "MarkdownPreviewView", ->
         waitsForPromise ->
           atom.packages.activatePackage('language-ruby')
 
-        waitsForPromise ->
-          preview.renderMarkdown()
+        waitsFor 'renderMarkdown to be called after enabling a language', ->
+          renderSpy.callCount is 2
 
         runs ->
           rubyEditor = preview.element.querySelector("atom-text-editor[data-grammar='source ruby']")
