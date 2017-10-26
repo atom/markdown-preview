@@ -129,6 +129,32 @@ describe "MarkdownPreviewView", ->
           }
         """
 
+    describe "when an editor cannot find the grammar that is later loaded", ->
+      it "updates the editor grammar", ->
+        waitsForPromise ->
+          atom.packages.deactivatePackage('language-ruby')
+
+        waitsForPromise ->
+          preview.renderMarkdown()
+
+        runs ->
+          rubyEditor = preview.element.querySelector("atom-text-editor[data-grammar='source ruby']")
+          expect(rubyEditor).toBeNull()
+
+        waitsForPromise ->
+          atom.packages.activatePackage('language-ruby')
+
+        waitsForPromise ->
+          preview.renderMarkdown()
+
+        runs ->
+          rubyEditor = preview.element.querySelector("atom-text-editor[data-grammar='source ruby']")
+          expect(rubyEditor.getModel().getText()).toBe """
+            def func
+              x = 1
+            end
+          """
+
   describe "image resolving", ->
     beforeEach ->
       waitsForPromise ->
