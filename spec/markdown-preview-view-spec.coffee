@@ -8,6 +8,9 @@ describe "MarkdownPreviewView", ->
   [file, preview, workspaceElement] = []
 
   beforeEach ->
+    # Makes _.debounce work
+    jasmine.useRealClock()
+
     filePath = atom.project.getDirectories()[0].resolve('subdir/file.markdown')
     preview = new MarkdownPreviewView({filePath})
     jasmine.attachToDOM(preview.element)
@@ -135,7 +138,14 @@ describe "MarkdownPreviewView", ->
 
     describe "when an editor cannot find the grammar that is later loaded", ->
       it "updates the editor grammar", ->
-        renderSpy = spyOn(preview, 'renderMarkdown').andCallThrough()
+        renderSpy = null
+
+        # FIXME: This is a temporary hack until atom.grammars.onDidRemoveGrammar exists
+        waitsForPromise ->
+          atom.packages.activatePackage('language-gfm')
+
+        runs ->
+          renderSpy = spyOn(preview, 'renderMarkdown').andCallThrough()
 
         waitsForPromise ->
           atom.packages.deactivatePackage('language-ruby')
