@@ -106,6 +106,7 @@ class MarkdownPreviewView
     @disposables.add atom.grammars.onDidAddGrammar -> lazyRenderMarkdown()
     @disposables.add atom.grammars.onDidUpdateGrammar -> lazyRenderMarkdown()
     # TODO: Add atom.grammars.onDidRemoveGrammar when it exists
+    # https://github.com/atom/first-mate/issues/103
 
     atom.commands.add @element,
       'core:save-as': (event) =>
