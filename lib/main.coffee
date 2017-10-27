@@ -28,8 +28,6 @@ module.exports =
 
     previewFile = @previewFile.bind(this)
     for extension in ['markdown', 'md', 'mdown', 'mkd', 'mkdown', 'ron', 'txt']
-      # FIXME: This doesn't work. Individual elements in the Tree View do not get focus
-      # so this selector never matches.
       @disposables.add atom.commands.add ".tree-view .file .name[data-name$=\\.#{extension}]",
         'markdown-preview:preview-file', previewFile
 
