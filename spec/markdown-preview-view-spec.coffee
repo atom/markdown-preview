@@ -5,7 +5,7 @@ MarkdownPreviewView = require '../lib/markdown-preview-view'
 url = require 'url'
 
 describe "MarkdownPreviewView", ->
-  [file, preview, workspaceElement] = []
+  preview = null
 
   beforeEach ->
     # Makes _.debounce work
