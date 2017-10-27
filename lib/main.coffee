@@ -1,5 +1,6 @@
 url = require 'url'
 fs = require 'fs-plus'
+{CompositeDisposable} = require 'atom'
 
 MarkdownPreviewView = null
 renderer = null
@@ -10,13 +11,14 @@ isMarkdownPreviewView = (object) ->
 
 module.exports =
   activate: ->
-    atom.commands.add 'atom-workspace',
+    @disposables = new CompositeDisposable()
+    @disposables.add atom.commands.add 'atom-workspace',
       'markdown-preview:toggle': =>
         @toggle()
       'markdown-preview:copy-html': =>
-        @copyHtml()
+        @copyHTML()
       'markdown-preview:save-as-html': =>
-        @saveAsHtml()
+        @saveAsHTML()
       'markdown-preview:toggle-break-on-single-newline': ->
         keyPath = 'markdown-preview.breakOnSingleNewline'
         atom.config.set(keyPath, not atom.config.get(keyPath))
@@ -25,15 +27,11 @@ module.exports =
         atom.config.set(keyPath, not atom.config.get(keyPath))
 
     previewFile = @previewFile.bind(this)
-    atom.commands.add '.tree-view .file .name[data-name$=\\.markdown]', 'markdown-preview:preview-file', previewFile
-    atom.commands.add '.tree-view .file .name[data-name$=\\.md]', 'markdown-preview:preview-file', previewFile
-    atom.commands.add '.tree-view .file .name[data-name$=\\.mdown]', 'markdown-preview:preview-file', previewFile
-    atom.commands.add '.tree-view .file .name[data-name$=\\.mkd]', 'markdown-preview:preview-file', previewFile
-    atom.commands.add '.tree-view .file .name[data-name$=\\.mkdown]', 'markdown-preview:preview-file', previewFile
-    atom.commands.add '.tree-view .file .name[data-name$=\\.ron]', 'markdown-preview:preview-file', previewFile
-    atom.commands.add '.tree-view .file .name[data-name$=\\.txt]', 'markdown-preview:preview-file', previewFile
+    for extension in ['markdown', 'md', 'mdown', 'mkd', 'mkdown', 'ron', 'txt']
+      @disposables.add atom.commands.add ".tree-view .file .name[data-name$=\\.#{extension}]",
+        'markdown-preview:preview-file', previewFile
 
-    atom.workspace.addOpener (uriToOpen) =>
+    @disposables.add atom.workspace.addOpener (uriToOpen) =>
       [protocol, path] = uriToOpen.split('://')
       return unless protocol is 'markdown-preview'
 
@@ -46,6 +44,9 @@ module.exports =
         @createMarkdownPreviewView(editorId: path.substring(7))
       else
         @createMarkdownPreviewView(filePath: path)
+
+  deactivate: ->
+    @disposables.dispose()
 
   createMarkdownPreviewView: (state) ->
     if state.editorId or fs.isFileSync(state.filePath)
@@ -98,7 +99,7 @@ module.exports =
 
     atom.workspace.open "markdown-preview://#{encodeURI(filePath)}", searchAllPanes: true
 
-  copyHtml: ->
+  copyHTML: ->
     editor = atom.workspace.getActiveTextEditor()
     return unless editor?
 
@@ -110,7 +111,7 @@ module.exports =
       else
         atom.clipboard.write(html)
 
-  saveAsHtml: ->
+  saveAsHTML: ->
     activePane = atom.workspace.getActivePaneItem()
     if isMarkdownPreviewView(activePane)
       activePane.saveAs()
