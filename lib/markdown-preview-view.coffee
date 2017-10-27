@@ -154,6 +154,15 @@ class MarkdownPreviewView
       else
         @element.removeAttribute('data-use-github-style')
 
+    document.onselectionchange = =>
+      selection = window.getSelection()
+      selectedNode = selection.baseNode
+      if @element is selectedNode or @element.contains(selectedNode)
+        if selection.isCollapsed
+          @element.classList.remove('has-selection')
+        else
+          @element.classList.add('has-selection')
+
   renderMarkdown: ->
     @showLoading() unless @loaded
     @getMarkdownSource()
