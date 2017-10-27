@@ -462,7 +462,7 @@ describe "Markdown Preview", ->
         atom.config.set 'markdown-preview.useGitHubStyle', false
         expect(preview.element.getAttribute('data-use-github-style')).toBeNull()
 
-  describe "when Save as Html is triggered", ->
+  describe "when markdown-preview:save-as-html is triggered", ->
     beforeEach ->
       waitsForPromise -> atom.workspace.open("subdir/simple.markdown")
       runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
