@@ -1,6 +1,6 @@
 url = require 'url'
 fs = require 'fs-plus'
-{CompositeDisposable} = require 'atom'
+{Disposable, CompositeDisposable} = require 'atom'
 
 MarkdownPreviewView = null
 renderer = null
@@ -12,13 +12,24 @@ isMarkdownPreviewView = (object) ->
 module.exports =
   activate: ->
     @disposables = new CompositeDisposable()
+
+    @disposables.add atom.config.observe 'markdown-preview.grammars', (grammars) =>
+      @commandSubscription?.dispose()
+
+      grammars ?= []
+      grammars = grammars.map (grammar) -> grammar.replace(/\./g, ' ')
+      for grammar in grammars
+        @commandSubscription = atom.commands.add "atom-text-editor[data-grammar='#{grammar}']",
+          'markdown-preview:toggle': =>
+            @toggle()
+          'markdown-preview:copy-html':
+            displayName: 'Markdown Preview: Copy HTML'
+            didDispatch: => @copyHTML()
+          'markdown-preview:save-as-html':
+            displayName: 'Markdown Preview: Save as HTML'
+            didDispatch: => @saveAsHTML()
+
     @disposables.add atom.commands.add 'atom-workspace',
-      'markdown-preview:toggle': =>
-        @toggle()
-      'markdown-preview:copy-html': =>
-        @copyHTML()
-      'markdown-preview:save-as-html': =>
-        @saveAsHTML()
       'markdown-preview:toggle-break-on-single-newline': ->
         keyPath = 'markdown-preview.breakOnSingleNewline'
         atom.config.set(keyPath, not atom.config.get(keyPath))
@@ -47,6 +58,7 @@ module.exports =
 
   deactivate: ->
     @disposables.dispose()
+    @commandSubscription.dispose()
 
   createMarkdownPreviewView: (state) ->
     if state.editorId or fs.isFileSync(state.filePath)
