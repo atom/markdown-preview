@@ -111,10 +111,10 @@ class MarkdownPreviewView
       @disposables.add atom.grammars.onDidUpdateGrammar -> lazyRenderMarkdown()
 
     atom.commands.add @element,
-      'core:save-as': =>
+      'core:save-as': (event) =>
         event.stopPropagation()
         @saveAs()
-      'core:copy': =>
+      'core:copy': (event) =>
         event.stopPropagation()
         @copyToClipboard()
       'markdown-preview:select-all': =>
