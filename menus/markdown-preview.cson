@@ -11,6 +11,7 @@
 
 'context-menu':
   '.markdown-preview': [
+    {label: 'Select All', command: 'markdown-preview:select-all'}
     {label: 'Save As HTML\u2026', command: 'core:save-as'}
   ]
   '.markdown-preview.has-selection': [
