@@ -13,7 +13,7 @@ class MarkdownPreviewView
 
   constructor: ({@editorId, @filePath}) ->
     @element = document.createElement('div')
-    @element.classList.add('markdown-preview', 'native-key-bindings')
+    @element.classList.add('markdown-preview')
     @element.tabIndex = -1
     @emitter = new Emitter
     @loaded = false
@@ -115,7 +115,10 @@ class MarkdownPreviewView
         event.stopPropagation()
         @saveAs()
       'core:copy': (event) =>
-        event.stopPropagation() if @copyToClipboard()
+        event.stopPropagation()
+        @copyToClipboard()
+      'markdown-preview:select-all': =>
+        @selectAll()
       'markdown-preview:zoom-in': =>
         zoomLevel = parseFloat(getComputedStyle(@element).zoom)
         @element.style.zoom = zoomLevel + 0.1
@@ -150,6 +153,15 @@ class MarkdownPreviewView
         @element.setAttribute('data-use-github-style', '')
       else
         @element.removeAttribute('data-use-github-style')
+
+    document.onselectionchange = =>
+      selection = window.getSelection()
+      selectedNode = selection.baseNode
+      if @element is selectedNode or @element.contains(selectedNode)
+        if selection.isCollapsed
+          @element.classList.remove('has-selection')
+        else
+          @element.classList.add('has-selection')
 
   renderMarkdown: ->
     @showLoading() unless @loaded
@@ -268,23 +280,31 @@ class MarkdownPreviewView
     div.textContent = 'Loading Markdown\u2026'
     @element.appendChild(div)
 
+  selectAll: ->
+    return if @loading
+
+    selection = window.getSelection()
+    selection.removeAllRanges()
+    range = document.createRange()
+    range.selectNodeContents(@element)
+    selection.addRange(range)
+
   copyToClipboard: ->
-    return false if @loading
+    return if @loading
 
     selection = window.getSelection()
     selectedText = selection.toString()
     selectedNode = selection.baseNode
 
     # Use default copy event handler if there is selected text inside this view
-    return false if selectedText and selectedNode? and (@element is selectedNode or @element.contains(selectedNode))
-
-    @getHTML (error, html) ->
-      if error?
-        console.warn('Copying Markdown as HTML failed', error)
-      else
-        atom.clipboard.write(html)
-
-    true
+    if selectedText and selectedNode? and (@element is selectedNode or @element.contains(selectedNode))
+      atom.clipboard.write(selectedText)
+    else
+      @getHTML (error, html) ->
+        if error?
+          atom.notifications.addError('Copying Markdown as HTML failed', {dismissable: true, detail: error.message})
+        else
+          atom.clipboard.write(html)
 
   saveAs: ->
     return if @loading
@@ -303,9 +323,8 @@ class MarkdownPreviewView
 
       @getHTML (error, htmlBody) =>
         if error?
-          console.warn('Saving Markdown as HTML failed', error)
+          atom.notifications.addError('Saving Markdown as HTML failed', {dismissable: true, detail: error.message})
         else
-
           html = """
             <!DOCTYPE html>
             <html>
