@@ -157,7 +157,7 @@ class MarkdownPreviewView
     document.onselectionchange = =>
       selection = window.getSelection()
       selectedNode = selection.baseNode
-      if @element is selectedNode or @element.contains(selectedNode)
+      if selectedNode is null or @element is selectedNode or @element.contains(selectedNode)
         if selection.isCollapsed
           @element.classList.remove('has-selection')
         else
