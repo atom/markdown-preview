@@ -357,7 +357,6 @@ describe "MarkdownPreviewView", ->
         selection.removeAllRanges()
         range = document.createRange()
         range.setStart(document.querySelector('atom-text-editor'), 0)
-        console.dir document.querySelector('p').firstChild
         range.setEnd(document.querySelector('p').firstChild, 3)
         selection.addRange(range)
 
