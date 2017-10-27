@@ -13,7 +13,7 @@ class MarkdownPreviewView
 
   constructor: ({@editorId, @filePath}) ->
     @element = document.createElement('div')
-    @element.classList.add('markdown-preview', 'native-key-bindings')
+    @element.classList.add('markdown-preview')
     @element.tabIndex = -1
     @emitter = new Emitter
     @loaded = false
@@ -111,11 +111,12 @@ class MarkdownPreviewView
       @disposables.add atom.grammars.onDidUpdateGrammar -> lazyRenderMarkdown()
 
     atom.commands.add @element,
-      'core:save-as': (event) =>
+      'core:save-as': =>
         event.stopPropagation()
         @saveAs()
-      'core:copy': (event) =>
-        event.stopPropagation() if @copyToClipboard()
+      'core:copy': =>
+        event.stopPropagation()
+        @copyToClipboard()
       'markdown-preview:zoom-in': =>
         zoomLevel = parseFloat(getComputedStyle(@element).zoom)
         @element.style.zoom = zoomLevel + 0.1
@@ -269,22 +270,21 @@ class MarkdownPreviewView
     @element.appendChild(div)
 
   copyToClipboard: ->
-    return false if @loading
+    return if @loading
 
     selection = window.getSelection()
     selectedText = selection.toString()
     selectedNode = selection.baseNode
 
     # Use default copy event handler if there is selected text inside this view
-    return false if selectedText and selectedNode? and (@element is selectedNode or @element.contains(selectedNode))
-
-    @getHTML (error, html) ->
-      if error?
-        console.warn('Copying Markdown as HTML failed', error)
-      else
-        atom.clipboard.write(html)
-
-    true
+    if selectedText and selectedNode? and (@element is selectedNode or @element.contains(selectedNode))
+      atom.clipboard.write(selectedText)
+    else
+      @getHTML (error, html) ->
+        if error?
+          console.warn('Copying Markdown as HTML failed', error)
+        else
+          atom.clipboard.write(html)
 
   saveAs: ->
     return if @loading
