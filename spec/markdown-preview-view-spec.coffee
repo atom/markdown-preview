@@ -140,10 +140,10 @@ describe "MarkdownPreviewView", ->
       it "updates the editor grammar", ->
         renderSpy = null
 
-        # FIXME: This is a temporary hack until atom.grammars.onDidRemoveGrammar exists
-        # https://github.com/atom/first-mate/issues/103
-        waitsForPromise ->
-          atom.packages.activatePackage('language-gfm')
+        unless typeof atom.grammars.onDidRemoveGrammar is 'function'
+          # TODO: Remove once atom.grammars.onDidRemoveGrammar is released
+          waitsForPromise ->
+            atom.packages.activatePackage('language-gfm')
 
         runs ->
           renderSpy = spyOn(preview, 'renderMarkdown').andCallThrough()

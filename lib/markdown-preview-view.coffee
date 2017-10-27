@@ -104,9 +104,11 @@ class MarkdownPreviewView
   handleEvents: ->
     lazyRenderMarkdown = _.debounce((=> @renderMarkdown()), 250)
     @disposables.add atom.grammars.onDidAddGrammar -> lazyRenderMarkdown()
-    @disposables.add atom.grammars.onDidUpdateGrammar -> lazyRenderMarkdown()
-    # TODO: Add atom.grammars.onDidRemoveGrammar when it exists
-    # https://github.com/atom/first-mate/issues/103
+    if typeof atom.grammars.onDidRemoveGrammar is 'function'
+      @disposables.add atom.grammars.onDidRemoveGrammar -> lazyRenderMarkdown()
+    else
+      # TODO: Remove onDidUpdateGrammar hook once onDidRemoveGrammar is released
+      @disposables.add atom.grammars.onDidUpdateGrammar -> lazyRenderMarkdown()
 
     atom.commands.add @element,
       'core:save-as': (event) =>
