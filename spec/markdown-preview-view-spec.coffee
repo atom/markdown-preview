@@ -326,7 +326,7 @@ describe "MarkdownPreviewView", ->
         expect(extractedStyles.indexOf(unrelatedStyle)).toBe(-1)
 
   describe "when core:copy is triggered", ->
-    it "writes the rendered HTML to the clipboard", ->
+    beforeEach ->
       preview.destroy()
       preview.element.remove()
 
@@ -337,18 +337,63 @@ describe "MarkdownPreviewView", ->
       waitsForPromise ->
         preview.renderMarkdown()
 
-      runs ->
+    describe "when there is no text selected", ->
+      it "copies the rendered HTML of the entire Markdown document to the clipboard", ->
         atom.commands.dispatch preview.element, 'core:copy'
 
-      waitsFor ->
-        atom.clipboard.read() isnt "initial clipboard content"
+        waitsFor ->
+          atom.clipboard.read() isnt "initial clipboard content"
+
+        runs ->
+          expect(atom.clipboard.read()).toBe """
+           <h1 id="code-block">Code Block</h1>
+           <pre class="editor-colors lang-javascript"><div class="line"><span class="syntax--source syntax--js"><span class="syntax--keyword syntax--control syntax--js"><span>if</span></span><span>&nbsp;a&nbsp;</span><span class="syntax--keyword syntax--operator syntax--comparison syntax--js"><span>===</span></span><span>&nbsp;</span><span class="syntax--constant syntax--numeric syntax--decimal syntax--js"><span>3</span></span><span>&nbsp;</span><span class="syntax--meta syntax--brace syntax--curly syntax--js"><span>{</span></span></span></div><div class="line"><span class="syntax--source syntax--js"><span>&nbsp;&nbsp;b&nbsp;</span><span class="syntax--keyword syntax--operator syntax--assignment syntax--js"><span>=</span></span><span>&nbsp;</span><span class="syntax--constant syntax--numeric syntax--decimal syntax--js"><span>5</span></span></span></div><div class="line"><span class="syntax--source syntax--js"><span class="syntax--meta syntax--brace syntax--curly syntax--js"><span>}</span></span></span></div></pre>
+           <p>encoding \u2192 issue</p>
+          """
+
+    describe "when there is a text selection", ->
+      it "directly copies the selection to the clipboard", ->
+        selection = window.getSelection()
+        selection.removeAllRanges()
+        range = document.createRange()
+        range.setStart(document.querySelector('atom-text-editor'), 0)
+        console.dir document.querySelector('p').firstChild
+        range.setEnd(document.querySelector('p').firstChild, 3)
+        selection.addRange(range)
+
+        atom.commands.dispatch preview.element, 'core:copy'
+        expect(atom.clipboard.read()).toBe '''
+
+          if a === 3 {
+            b = 5
+          }
+
+          enc
+        '''
+
+  describe "when markdown-preview:select-all is triggered", ->
+    it "selects the entire Markdown preview", ->
+      filePath = atom.project.getDirectories()[0].resolve('subdir/code-block.md')
+      preview2 = new MarkdownPreviewView({filePath})
+      jasmine.attachToDOM(preview2.element)
+
+      waitsForPromise ->
+        preview.renderMarkdown()
 
       runs ->
-        expect(atom.clipboard.read()).toBe """
-         <h1 id="code-block">Code Block</h1>
-         <pre class="editor-colors lang-javascript"><div class="line"><span class="syntax--source syntax--js"><span class="syntax--keyword syntax--control syntax--js"><span>if</span></span><span>&nbsp;a&nbsp;</span><span class="syntax--keyword syntax--operator syntax--comparison syntax--js"><span>===</span></span><span>&nbsp;</span><span class="syntax--constant syntax--numeric syntax--decimal syntax--js"><span>3</span></span><span>&nbsp;</span><span class="syntax--meta syntax--brace syntax--curly syntax--js"><span>{</span></span></span></div><div class="line"><span class="syntax--source syntax--js"><span>&nbsp;&nbsp;b&nbsp;</span><span class="syntax--keyword syntax--operator syntax--assignment syntax--js"><span>=</span></span><span>&nbsp;</span><span class="syntax--constant syntax--numeric syntax--decimal syntax--js"><span>5</span></span></span></div><div class="line"><span class="syntax--source syntax--js"><span class="syntax--meta syntax--brace syntax--curly syntax--js"><span>}</span></span></span></div></pre>
-         <p>encoding \u2192 issue</p>
-        """
+        atom.commands.dispatch(preview.element, 'markdown-preview:select-all')
+        {commonAncestorContainer} = window.getSelection().getRangeAt(0)
+        expect(commonAncestorContainer).toEqual preview.element
+
+      waitsForPromise ->
+        preview2.renderMarkdown()
+
+      runs ->
+        atom.commands.dispatch(preview2.element, 'markdown-preview:select-all')
+        selection = window.getSelection()
+        expect(selection.rangeCount).toBe 1
+        {commonAncestorContainer} = selection.getRangeAt(0)
+        expect(commonAncestorContainer).toEqual preview2.element
 
   describe "when markdown-preview:zoom-in or markdown-preview:zoom-out are triggered", ->
     it "increases or decreases the zoom level of the markdown preview element", ->

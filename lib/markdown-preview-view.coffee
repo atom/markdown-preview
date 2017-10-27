@@ -286,7 +286,7 @@ class MarkdownPreviewView
     selection = window.getSelection()
     selection.removeAllRanges()
     range = document.createRange()
-    range.selectNode(@element)
+    range.selectNodeContents(@element)
     selection.addRange(range)
 
   copyToClipboard: ->
