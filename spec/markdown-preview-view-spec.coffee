@@ -8,6 +8,9 @@ describe "MarkdownPreviewView", ->
   [file, preview, workspaceElement] = []
 
   beforeEach ->
+    # Makes _.debounce work
+    jasmine.useRealClock()
+
     filePath = atom.project.getDirectories()[0].resolve('subdir/file.markdown')
     preview = new MarkdownPreviewView({filePath})
     jasmine.attachToDOM(preview.element)
@@ -103,6 +106,10 @@ describe "MarkdownPreviewView", ->
       decorations = editor.getModel().getDecorations(class: 'cursor-line', type: 'line')
       expect(decorations.length).toBe 0
 
+    it "sets the editors as read-only", ->
+      preview.element.querySelectorAll("atom-text-editor").forEach (editorElement) ->
+        expect(editorElement.getAttribute('tabindex')).toBeNull()
+
     describe "when the code block's fence name has a matching grammar", ->
       it "assigns the grammar on the atom-text-editor", ->
         rubyEditor = preview.element.querySelector("atom-text-editor[data-grammar='source ruby']")
@@ -110,7 +117,6 @@ describe "MarkdownPreviewView", ->
           def func
             x = 1
           end
-
         """
 
         # nested in a list item
@@ -119,7 +125,6 @@ describe "MarkdownPreviewView", ->
           if a === 3 {
           b = 5
           }
-
         """
 
     describe "when the code block's fence name doesn't have a matching grammar", ->
@@ -129,8 +134,43 @@ describe "MarkdownPreviewView", ->
           function f(x) {
             return x++;
           }
-
         """
+
+    describe "when an editor cannot find the grammar that is later loaded", ->
+      it "updates the editor grammar", ->
+        renderSpy = null
+
+        unless typeof atom.grammars.onDidRemoveGrammar is 'function'
+          # TODO: Remove once atom.grammars.onDidRemoveGrammar is released
+          waitsForPromise ->
+            atom.packages.activatePackage('language-gfm')
+
+        runs ->
+          renderSpy = spyOn(preview, 'renderMarkdown').andCallThrough()
+
+        waitsForPromise ->
+          atom.packages.deactivatePackage('language-ruby')
+
+        waitsFor 'renderMarkdown to be called after disabling a language', ->
+          renderSpy.callCount is 1
+
+        runs ->
+          rubyEditor = preview.element.querySelector("atom-text-editor[data-grammar='source ruby']")
+          expect(rubyEditor).toBeNull()
+
+        waitsForPromise ->
+          atom.packages.activatePackage('language-ruby')
+
+        waitsFor 'renderMarkdown to be called after enabling a language', ->
+          renderSpy.callCount is 2
+
+        runs ->
+          rubyEditor = preview.element.querySelector("atom-text-editor[data-grammar='source ruby']")
+          expect(rubyEditor.getModel().getText()).toBe """
+            def func
+              x = 1
+            end
+          """
 
   describe "image resolving", ->
     beforeEach ->

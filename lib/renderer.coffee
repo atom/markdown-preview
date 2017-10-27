@@ -1,5 +1,4 @@
 path = require 'path'
-_ = require 'underscore-plus'
 cheerio = require 'cheerio'
 createDOMPurify = require 'dompurify'
 fs = require 'fs-plus'
@@ -73,7 +72,6 @@ resolveImagePaths = (html, filePath) ->
 
 convertCodeBlocksToAtomEditors = (domFragment, defaultLanguage='text') ->
   if fontFamily = atom.config.get('editor.fontFamily')
-
     for codeElement in domFragment.querySelectorAll('code')
       codeElement.style.fontFamily = fontFamily
 
@@ -82,23 +80,22 @@ convertCodeBlocksToAtomEditors = (domFragment, defaultLanguage='text') ->
     fenceName = codeBlock.getAttribute('class')?.replace(/^lang-/, '') ? defaultLanguage
 
     editorElement = document.createElement('atom-text-editor')
-    editorElement.setAttributeNode(document.createAttribute('gutter-hidden'))
-    editorElement.removeAttribute('tabindex') # make read-only
 
     preElement.parentNode.insertBefore(editorElement, preElement)
     preElement.remove()
 
     editor = editorElement.getModel()
-    editor.setText(codeBlock.textContent)
+    lastNewlineIndex = codeBlock.textContent.search(/\r?\n$/)
+    editor.setText(codeBlock.textContent.substring(0, lastNewlineIndex)) # Do not include a trailing newline
+    editorElement.setAttributeNode(document.createAttribute('gutter-hidden')) # Hide gutter
+    editorElement.removeAttribute('tabindex') # Make read-only
+
     if grammar = atom.grammars.grammarForScopeName(scopeForFenceName(fenceName))
       editor.setGrammar(grammar)
 
     # Remove line decorations from code blocks.
-    if editor.cursorLineDecorations?
-      for cursorLineDecoration in editor.cursorLineDecorations
-        cursorLineDecoration.destroy()
-    else
-      editor.getDecorations(class: 'cursor-line', type: 'line')[0].destroy()
+    for cursorLineDecoration in editor.cursorLineDecorations
+      cursorLineDecoration.destroy()
 
   domFragment
 
