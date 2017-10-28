@@ -21,7 +21,7 @@ class MarkdownPreviewView
     @registerScrollCommands()
     if @editorId?
       @resolveEditor(@editorId)
-    else if atom.workspace?
+    else if atom.packages.hasActivatedInitialPackages()
       @subscribeToFilePath(@filePath)
     else
       @disposables.add atom.packages.onDidActivateInitialPackages =>
@@ -75,7 +75,7 @@ class MarkdownPreviewView
   subscribeToFilePath: (filePath) ->
     @file = new File(filePath)
     @emitter.emit 'did-change-title'
-    @disposables.add @file.onDidRename(=> @emitter.emit 'did-change-title')
+    @disposables.add @file.onDidRename => @emitter.emit 'did-change-title'
     @handleEvents()
     @renderMarkdown()
 
@@ -85,13 +85,13 @@ class MarkdownPreviewView
 
       if @editor?
         @emitter.emit 'did-change-title'
-        @disposables.add @editor.onDidDestroy(=> @subscribeToFilePath(@getPath()))
+        @disposables.add @editor.onDidDestroy => @subscribeToFilePath(@getPath())
         @handleEvents()
         @renderMarkdown()
       else
         @subscribeToFilePath(@filePath)
 
-    if atom.workspace?
+    if atom.packages.hasActivatedInitialPackages()
       resolve()
     else
       @disposables.add atom.packages.onDidActivateInitialPackages(resolve)

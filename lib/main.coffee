@@ -1,4 +1,3 @@
-url = require 'url'
 fs = require 'fs-plus'
 {CompositeDisposable} = require 'atom'
 
