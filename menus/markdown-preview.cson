@@ -1,10 +1,11 @@
-'menu': [
-  'label': 'Packages'
-  'submenu': [
-    'label': 'Markdown Preview'
-    'submenu': [
-      'label': 'Toggle Preview'
-      'command': 'markdown-preview:toggle'
+menu: [
+  label: 'Packages'
+  submenu: [
+    label: 'Markdown Preview'
+    submenu: [
+      {label: 'Toggle Preview', command: 'markdown-preview:toggle'}
+      {label: 'Toggle Break on Single Newline', command: 'markdown-preview:toggle-break-on-single-newline'}
+      {label: 'Toggle GitHub Style', command: 'markdown-preview:toggle-github-style'}
     ]
   ]
 ]

@@ -29,16 +29,14 @@ module.exports =
           'markdown-preview:save-as-html':
             displayName: 'Markdown Preview: Save as HTML'
             didDispatch: => @saveAsHTML()
+          'markdown-preview:toggle-break-on-single-newline': ->
+            keyPath = 'markdown-preview.breakOnSingleNewline'
+            atom.config.set(keyPath, not atom.config.get(keyPath))
+          'markdown-preview:toggle-github-style': ->
+            keyPath = 'markdown-preview.useGitHubStyle'
+            atom.config.set(keyPath, not atom.config.get(keyPath))
 
       return # Do not return the results of the for loop
-
-    @disposables.add atom.commands.add 'atom-workspace',
-      'markdown-preview:toggle-break-on-single-newline': ->
-        keyPath = 'markdown-preview.breakOnSingleNewline'
-        atom.config.set(keyPath, not atom.config.get(keyPath))
-      'markdown-preview:toggle-github-style': ->
-        keyPath = 'markdown-preview.useGitHubStyle'
-        atom.config.set(keyPath, not atom.config.get(keyPath))
 
     previewFile = @previewFile.bind(this)
     for extension in ['markdown', 'md', 'mdown', 'mkd', 'mkdown', 'ron', 'txt']
