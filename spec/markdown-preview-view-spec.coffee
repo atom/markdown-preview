@@ -11,6 +11,8 @@ describe "MarkdownPreviewView", ->
     # Makes _.debounce work
     jasmine.useRealClock()
 
+    spyOn(atom.packages, 'hasActivatedInitialPackages').andReturn true
+
     filePath = atom.project.getDirectories()[0].resolve('subdir/file.markdown')
     preview = new MarkdownPreviewView({filePath})
     jasmine.attachToDOM(preview.element)
