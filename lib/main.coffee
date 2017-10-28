@@ -9,13 +9,10 @@ isMarkdownPreviewView = (object) ->
   object instanceof MarkdownPreviewView
 
 module.exports =
-  destroyedItems: new Set()
-  lastActiveEditor: null
-  lastRemovedPreview: null
-
   activate: ->
     @disposables = new CompositeDisposable()
     @commandSubscriptions = new CompositeDisposable()
+    @destroyedItems = new Set()
 
     @disposables.add atom.config.observe 'markdown-preview.grammars', (grammars) =>
       @commandSubscriptions.dispose()
