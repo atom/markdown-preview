@@ -68,21 +68,21 @@ module.exports =
       return if @lastActiveEditor is editor
 
       if atom.config.get('markdown-preview.automaticallyClosePreview') and @lastActiveEditor
-        unless isMarkdownPreviewView(item) and item.editorId is "#{@lastActiveEditor.id}"
+        # Do not close preview if we change focus from the editor to the preview itself
+        unless isMarkdownPreviewView(item) and item.editorId is @lastActiveEditor.id.toString()
           @removePreviewForEditor(@lastActiveEditor)
 
       @lastActiveEditor = editor
 
-      if atom.config.get('markdown-preview.automaticallyOpenPreview')
-        return unless editor?
-
+      if editor? and atom.config.get('markdown-preview.automaticallyOpenPreview')
         uri = @uriForEditor(editor)
-        return if atom.workspace.paneForURI(uri)?
+        return if atom.workspace.paneForURI(uri)? # Preview already exists
 
         openPreview = true
         @destroyedItems.forEach (destroyedItem) ->
           return unless isMarkdownPreviewView(destroyedItem) and openPreview
-          openPreview = false if destroyedItem.editorId is String(editor.id)
+          # Do not open preview for a text editor whose preview we just closed
+          openPreview = false if destroyedItem.editorId is editor.id.toString()
 
         @destroyedItems.clear()
         return unless openPreview
@@ -94,10 +94,8 @@ module.exports =
 
     @disposables.add atom.workspace.getCenter().onDidDestroyPaneItem ({item}) =>
       @destroyedItems.add(item) unless item is @lastRemovedPreview
-
       if atom.config.get('markdown-preview.automaticallyClosePreview')
-        if atom.workspace.isTextEditor(item)
-          @removePreviewForEditor(item)
+        @removePreviewForEditor(item) if atom.workspace.isTextEditor(item)
 
   deactivate: ->
     @disposables.dispose()
