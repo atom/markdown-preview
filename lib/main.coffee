@@ -84,7 +84,7 @@ module.exports =
         @destroyedItems.clear()
         return unless openPreview
 
-        grammars = atom.config.get('markdown-preview.grammars') ? []
+        grammars = atom.config.get('markdown-preview.automaticPreviewGrammars') ? []
         return unless editor.getGrammar().scopeName in grammars
 
         @addPreviewForEditor(editor, atom.workspace.paneForItem(item))
