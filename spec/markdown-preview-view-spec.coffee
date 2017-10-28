@@ -1,8 +1,8 @@
 path = require 'path'
 fs = require 'fs-plus'
-temp = require 'temp'
-MarkdownPreviewView = require '../lib/markdown-preview-view'
+temp = require('temp').track()
 url = require 'url'
+MarkdownPreviewView = require '../lib/markdown-preview-view'
 
 describe "MarkdownPreviewView", ->
   preview = null
