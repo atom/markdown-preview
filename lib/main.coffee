@@ -9,6 +9,10 @@ isMarkdownPreviewView = (object) ->
   object instanceof MarkdownPreviewView
 
 module.exports =
+  destroyedItems: new Set()
+  lastActiveEditor: null
+  lastRemovedPreview: null
+
   activate: ->
     @disposables = new CompositeDisposable()
     @commandSubscriptions = new CompositeDisposable()
@@ -59,6 +63,42 @@ module.exports =
       else
         @createMarkdownPreviewView(filePath: path)
 
+    @disposables.add atom.workspace.getCenter().onDidStopChangingActivePaneItem (item) =>
+      editor = atom.workspace.getActiveTextEditor()
+      return if @lastActiveEditor is editor
+
+      if atom.config.get('markdown-preview.automaticallyClosePreview') and @lastActiveEditor
+        unless isMarkdownPreviewView(item) and item.editorId is "#{@lastActiveEditor.id}"
+          @removePreviewForEditor(@lastActiveEditor)
+
+      @lastActiveEditor = editor
+
+      if atom.config.get('markdown-preview.automaticallyOpenPreview')
+        return unless editor?
+
+        uri = @uriForEditor(editor)
+        return if atom.workspace.paneForURI(uri)?
+
+        openPreview = true
+        @destroyedItems.forEach (destroyedItem) ->
+          return unless isMarkdownPreviewView(destroyedItem) and openPreview
+          openPreview = false if destroyedItem.editorId is String(editor.id)
+
+        @destroyedItems.clear()
+        return unless openPreview
+
+        grammars = atom.config.get('markdown-preview.grammars') ? []
+        return unless editor.getGrammar().scopeName in grammars
+
+        @addPreviewForEditor(editor, atom.workspace.paneForItem(item))
+
+    @disposables.add atom.workspace.getCenter().onDidDestroyPaneItem ({item}) =>
+      @destroyedItems.add(item) unless item is @lastRemovedPreview
+
+      if atom.config.get('markdown-preview.automaticallyClosePreview')
+        if atom.workspace.isTextEditor(item)
+          @removePreviewForEditor(item)
+
   deactivate: ->
     @disposables.dispose()
     @commandSubscriptions.dispose()
@@ -88,14 +128,15 @@ module.exports =
     uri = @uriForEditor(editor)
     previewPane = atom.workspace.paneForURI(uri)
     if previewPane?
-      previewPane.destroyItem(previewPane.itemForURI(uri))
+      @lastRemovedPreview = previewPane.itemForURI(uri)
+      previewPane.destroyItem(@lastRemovedPreview)
       true
     else
       false
 
-  addPreviewForEditor: (editor) ->
+  addPreviewForEditor: (editor, previousActivePane) ->
     uri = @uriForEditor(editor)
-    previousActivePane = atom.workspace.getActivePane()
+    previousActivePane ?= atom.workspace.getActivePane()
     options =
       searchAllPanes: true
     if atom.config.get('markdown-preview.openPreviewInSplitPane')
