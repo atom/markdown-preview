@@ -329,7 +329,6 @@ describe "Markdown Preview", ->
     it "exists for text editors that are set to a grammar defined in `markdown-preview.grammars`", ->
       atom.config.set('markdown-preview.grammars', ['source.gfm'])
       editorElement = atom.workspace.getActiveTextEditor().getElement()
-      console.log editorElement.getAttribute('data-grammar')
       commands = atom.commands.findCommands({target: editorElement}).map (command) -> command.name
       expect(commands).toContain 'markdown-preview:toggle'
 
