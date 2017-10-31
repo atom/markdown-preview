@@ -127,6 +127,12 @@ class MarkdownPreviewView
         @element.style.zoom = zoomLevel - 0.1
       'markdown-preview:reset-zoom': =>
         @element.style.zoom = 1
+      'markdown-preview:toggle-break-on-single-newline': ->
+        keyPath = 'markdown-preview.breakOnSingleNewline'
+        atom.config.set(keyPath, not atom.config.get(keyPath))
+      'markdown-preview:toggle-github-style': ->
+        keyPath = 'markdown-preview.useGitHubStyle'
+        atom.config.set(keyPath, not atom.config.get(keyPath))
 
     changeHandler = =>
       @renderMarkdown()
