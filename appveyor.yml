@@ -1,6 +1,6 @@
-version: "{build}"
-
-platform: x64
+platform:
+  - x64
+  - x86
 
 branches:
     only:
@@ -18,7 +18,7 @@ environment:
   - ATOM_CHANNEL: beta
 
 install:
-  - ps: Install-Product node 4
+  - ps: Install-Product node 6
 
 build_script:
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/atom/ci/master/build-package.ps1'))
