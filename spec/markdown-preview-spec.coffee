@@ -508,7 +508,11 @@ describe "Markdown Preview", ->
 
       runs ->
         spyOn(preview, 'getSaveDialogOptions').andReturn({defaultPath: outputPath})
-        spyOn(atom.applicationDelegate, 'showSaveDialog').andCallFake((options, callback) -> callback(options.defaultPath))
+        spyOn(atom.applicationDelegate, 'showSaveDialog').andCallFake (options, callback) ->
+          callback?(options.defaultPath)
+          # TODO: When https://github.com/atom/atom/pull/16245 lands remove the return
+          # and the existence check on the callback
+          return options.defaultPath
         atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:save-as-html'
 
       waitsFor ->
@@ -526,7 +530,11 @@ describe "Markdown Preview", ->
 
       runs ->
         spyOn(preview, 'getSaveDialogOptions').andReturn({defaultPath: outputPath})
-        spyOn(atom.applicationDelegate, 'showSaveDialog').andCallFake((options, callback) -> callback(options.defaultPath))
+        spyOn(atom.applicationDelegate, 'showSaveDialog').andCallFake (options, callback) ->
+          callback?(options.defaultPath)
+          # TODO: When https://github.com/atom/atom/pull/16245 lands remove the return
+          # and the existence check on the callback
+          return options.defaultPath
         atom.commands.dispatch editorPane.getActiveItem().getElement(), 'markdown-preview:save-as-html'
 
       waitsFor ->
