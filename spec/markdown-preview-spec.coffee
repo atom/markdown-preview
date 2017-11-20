@@ -507,7 +507,8 @@ describe "Markdown Preview", ->
       expect(fs.existsSync(outputPath)).toBe false
 
       runs ->
-        spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
+        spyOn(preview, 'getSaveDialogOptions').andReturn({defaultPath: outputPath})
+        spyOn(atom.applicationDelegate, 'showSaveDialog').andCallFake((options, callback) -> callback(options.defaultPath))
         atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:save-as-html'
 
       waitsFor ->
@@ -524,7 +525,8 @@ describe "Markdown Preview", ->
       expect(fs.existsSync(outputPath)).toBe false
 
       runs ->
-        spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
+        spyOn(preview, 'getSaveDialogOptions').andReturn({defaultPath: outputPath})
+        spyOn(atom.applicationDelegate, 'showSaveDialog').andCallFake((options, callback) -> callback(options.defaultPath))
         atom.commands.dispatch editorPane.getActiveItem().getElement(), 'markdown-preview:save-as-html'
 
       waitsFor ->

@@ -272,7 +272,9 @@ describe "MarkdownPreviewView", ->
       preview.destroy()
       filePath = atom.project.getDirectories()[0].resolve('subdir/code-block.md')
       preview = new MarkdownPreviewView({filePath})
-      jasmine.attachToDOM(preview.element)
+      # Add to workspace for core:save-as command to be propagated up to the workspace
+      waitsForPromise -> atom.workspace.open(preview)
+      runs -> jasmine.attachToDOM(atom.views.getView(atom.workspace))
 
     it "saves the rendered HTML and opens it", ->
       outputPath = fs.realpathSync(temp.mkdirSync()) + 'output.html'
@@ -310,7 +312,8 @@ describe "MarkdownPreviewView", ->
         preview.renderMarkdown()
 
       runs ->
-        spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
+        spyOn(preview, 'getSaveDialogOptions').andReturn({defaultPath: outputPath})
+        spyOn(atom.applicationDelegate, 'showSaveDialog').andCallFake((options, callback) -> callback(options.defaultPath))
         spyOn(preview, 'getDocumentStyleSheets').andReturn(markdownPreviewStyles)
         spyOn(preview, 'getTextEditorStyles').andReturn(atomTextEditorStyles)
         atom.commands.dispatch preview.element, 'core:save-as'
