@@ -111,9 +111,6 @@ class MarkdownPreviewView
       @disposables.add atom.grammars.onDidUpdateGrammar -> lazyRenderMarkdown()
 
     atom.commands.add @element,
-      'core:save-as': (event) =>
-        event.stopPropagation()
-        @saveAs()
       'core:copy': (event) =>
         event.stopPropagation()
         @copyToClipboard()
@@ -312,35 +309,41 @@ class MarkdownPreviewView
         else
           atom.clipboard.write(html)
 
-  saveAs: ->
-    return if @loading
+  getSaveDialogOptions: ->
+    defaultPath = @getPath()
+    if defaultPath
+      defaultPath += '.html'
+    else
+      defaultPath = 'untitled.md.html'
+      if projectPath = atom.project.getPaths()[0]
+        defaultPath = path.join(projectPath, defaultPath)
+
+    return {defaultPath}
+
+  saveAs: (htmlFilePath) ->
+    if @loading
+      atom.notifications.addWarning('Please wait until the Markdown Preview has finished loading before saving')
+      return
 
     filePath = @getPath()
     title = 'Markdown to HTML'
     if filePath
       title = path.parse(filePath).name
-      filePath += '.html'
-    else
-      filePath = 'untitled.md.html'
-      if projectPath = atom.project.getPaths()[0]
-        filePath = path.join(projectPath, filePath)
 
-    if htmlFilePath = atom.showSaveDialogSync(filePath)
+    @getHTML (error, htmlBody) =>
+      if error?
+        throw error
+      else
+        html = """
+          <!DOCTYPE html>
+          <html>
+            <head>
+                <meta charset="utf-8" />
+                <title>#{title}</title>
+                <style>#{@getMarkdownPreviewCSS()}</style>
+            </head>
+            <body class='markdown-preview' data-use-github-style>#{htmlBody}</body>
+          </html>""" + "\n" # Ensure trailing newline
 
-      @getHTML (error, htmlBody) =>
-        if error?
-          atom.notifications.addError('Saving Markdown as HTML failed', {dismissable: true, detail: error.message})
-        else
-          html = """
-            <!DOCTYPE html>
-            <html>
-              <head>
-                  <meta charset="utf-8" />
-                  <title>#{title}</title>
-                  <style>#{@getMarkdownPreviewCSS()}</style>
-              </head>
-              <body class='markdown-preview' data-use-github-style>#{htmlBody}</body>
-            </html>""" + "\n" # Ensure trailing newline
-
-          fs.writeFileSync(htmlFilePath, html)
-          atom.workspace.open(htmlFilePath)
+        fs.writeFileSync(htmlFilePath, html)
+        atom.workspace.open(htmlFilePath)

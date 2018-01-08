@@ -125,9 +125,9 @@ module.exports =
         atom.clipboard.write(html)
 
   saveAsHTML: ->
-    activePane = atom.workspace.getActivePaneItem()
-    if isMarkdownPreviewView(activePane)
-      activePane.saveAs()
+    activePaneItem = atom.workspace.getActivePaneItem()
+    if isMarkdownPreviewView(activePaneItem)
+      atom.workspace.getActivePane().saveItemAs(activePaneItem)
       return
 
     editor = atom.workspace.getActiveTextEditor()
@@ -138,12 +138,7 @@ module.exports =
 
     uri = @uriForEditor(editor)
     markdownPreviewPane = atom.workspace.paneForURI(uri)
-    return unless markdownPreviewPane?
+    markdownPreviewPaneItem = markdownPreviewPane?.itemForURI(uri)
 
-    previousActivePane = atom.workspace.getActivePane()
-    markdownPreviewPane.activate()
-    activePane = atom.workspace.getActivePaneItem()
-
-    if isMarkdownPreviewView(activePane)
-      activePane.saveAs().then ->
-        previousActivePane.activate()
+    if isMarkdownPreviewView(markdownPreviewPaneItem)
+      markdownPreviewPane.saveItemAs(markdownPreviewPaneItem)
