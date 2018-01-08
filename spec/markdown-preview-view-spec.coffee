@@ -387,8 +387,15 @@ describe "MarkdownPreviewView", ->
         selection.addRange(range)
 
         atom.commands.dispatch preview.element, 'core:copy'
-        expect(atom.clipboard.read()).toBe '''
+        clipboardText = atom.clipboard.read()
 
+        # TODO: Remove this when Atom 1.25 hits stable. Prior to
+        # https://github.com/atom/atom/pull/16511 there was a leading newline
+        # for some reason I don't care to understand.
+        if clipboardText[0] is '\n'
+          clipboardText = clipboardText.slice(1)
+
+        expect(clipboardText).toBe '''
           if a === 3 {
             b = 5
           }
