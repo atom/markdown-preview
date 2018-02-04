@@ -191,6 +191,17 @@ class MarkdownPreviewView
 
       renderer.toHTML source, @getPath(), @getGrammar(), callback
 
+  syncScroll: ->
+    pane = atom.workspace.getActivePane()
+    if pane
+      editor = pane.getActiveEditor()
+    if editor
+      editorEle = atom.views.getView editor
+    pos = 0
+    if editorEle
+      pos = editorEle.getScrollTop()
+    @element.scrollTop = pos
+
   renderMarkdownText: (text) ->
     scrollTop = @element.scrollTop
     renderer.toDOMFragment text, @getPath(), @getGrammar(), (error, domFragment) =>
@@ -201,6 +212,7 @@ class MarkdownPreviewView
         @loaded = true
         @element.textContent = ''
         @element.appendChild(domFragment)
+        do this.syncScroll
         @emitter.emit 'did-change-markdown'
         @element.scrollTop = scrollTop
 
