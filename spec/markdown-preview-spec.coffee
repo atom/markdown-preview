@@ -1,25 +1,20 @@
 path = require 'path'
 fs = require 'fs-plus'
-temp = require 'temp'
-wrench = require 'wrench'
+temp = require('temp').track()
 MarkdownPreviewView = require '../lib/markdown-preview-view'
 
-# TODO: Remove this after atom/atom#13977 lands in favor of unguarded `getCenter()` calls
-getCenter = -> atom.workspace.getCenter?() ? atom.workspace
-
-describe "Markdown preview package", ->
-  [workspaceElement, previewPane, preview] = []
+describe "Markdown Preview", ->
+  previewPane = null
+  preview = null
 
   beforeEach ->
     fixturesPath = path.join(__dirname, 'fixtures')
     tempPath = temp.mkdirSync('atom')
-    wrench.copyDirSyncRecursive(fixturesPath, tempPath, forceDelete: true)
+    fs.copySync(fixturesPath, tempPath)
     atom.project.setPaths([tempPath])
 
     jasmine.useRealClock()
-
-    workspaceElement = atom.views.getView(atom.workspace)
-    jasmine.attachToDOM(workspaceElement)
+    jasmine.attachToDOM(atom.views.getView(atom.workspace))
 
     waitsForPromise ->
       atom.packages.activatePackage("markdown-preview")
@@ -27,11 +22,14 @@ describe "Markdown preview package", ->
     waitsForPromise ->
       atom.packages.activatePackage('language-gfm')
 
+    runs ->
+      spyOn(atom.packages, 'hasActivatedInitialPackages').andReturn true
+
   expectPreviewInSplitPane = (orientation='horizontal') ->
-    waitsFor -> getCenter().getPanes().length is 2
+    waitsFor -> atom.workspace.getCenter().getPanes().length is 2
 
     waitsFor "markdown preview to be created", ->
-      previewPane = getCenter().getPanes()[1]
+      previewPane = atom.workspace.getCenter().getPanes()[1]
       preview = previewPane.getActiveItem()
 
     runs ->
@@ -42,7 +40,7 @@ describe "Markdown preview package", ->
   describe "when a preview has not been created for the file", ->
     it "displays a markdown preview in a split pane (right by default)", ->
       waitsForPromise -> atom.workspace.open("subdir/file.markdown")
-      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
       expectPreviewInSplitPane('horizontal')
 
       runs ->
@@ -53,7 +51,7 @@ describe "Markdown preview package", ->
     it "displays a markdown preview in a split pane (right)", ->
       atom.config.set 'markdown-preview.splitPaneDirection', 'right'
       waitsForPromise -> atom.workspace.open("subdir/file.markdown")
-      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
       expectPreviewInSplitPane('horizontal')
 
       runs ->
@@ -64,56 +62,56 @@ describe "Markdown preview package", ->
     it "displays a markdown preview in a split pane (down)", ->
       atom.config.set 'markdown-preview.splitPaneDirection', 'down'
       waitsForPromise -> atom.workspace.open("subdir/file.markdown")
-      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
       expectPreviewInSplitPane('vertical')
 
       runs ->
-        [editorPane] = getCenter().getPanes()
+        [editorPane] = atom.workspace.getCenter().getPanes()
         expect(editorPane.getItems()).toHaveLength 1
         expect(editorPane.isActive()).toBe true
 
     describe "when the editor's path does not exist", ->
       it "splits the current pane to the right with a markdown preview for the file", ->
         waitsForPromise -> atom.workspace.open("new.markdown")
-        runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+        runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
         expectPreviewInSplitPane()
 
     describe "when the editor does not have a path", ->
       it "splits the current pane to the right with a markdown preview for the file", ->
         waitsForPromise -> atom.workspace.open("")
-        runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+        runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
         expectPreviewInSplitPane()
 
     describe "when the path contains a space", ->
       it "renders the preview", ->
         waitsForPromise -> atom.workspace.open("subdir/file with space.md")
-        runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+        runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
         expectPreviewInSplitPane()
 
     describe "when the path contains accented characters", ->
       it "renders the preview", ->
         waitsForPromise -> atom.workspace.open("subdir/áccéntéd.md")
-        runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+        runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
         expectPreviewInSplitPane()
 
   describe "when a preview has been created for the file", ->
     beforeEach ->
       waitsForPromise -> atom.workspace.open("subdir/file.markdown")
-      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
       expectPreviewInSplitPane()
 
     it "closes the existing preview when toggle is triggered a second time on the editor", ->
-      atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
 
-      [editorPane, previewPane] = getCenter().getPanes()
+      [editorPane, previewPane] = atom.workspace.getCenter().getPanes()
       expect(editorPane.isActive()).toBe true
       expect(previewPane.getActiveItem()).toBeUndefined()
 
     it "closes the existing preview when toggle is triggered on it and it has focus", ->
-      [editorPane, previewPane] = getCenter().getPanes()
+      [editorPane, previewPane] = atom.workspace.getCenter().getPanes()
       previewPane.activate()
 
-      atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      atom.commands.dispatch editorPane.getActiveItem().getElement(), 'markdown-preview:toggle'
       expect(previewPane.getActiveItem()).toBeUndefined()
 
     describe "when the editor is modified", ->
@@ -142,7 +140,7 @@ describe "Markdown preview package", ->
       describe "when the preview is in the active pane but is not the active item", ->
         it "re-renders the preview but does not make it active", ->
           markdownEditor = atom.workspace.getActiveTextEditor()
-          previewPane = getCenter().getPanes()[1]
+          previewPane = atom.workspace.getCenter().getPanes()[1]
           previewPane.activate()
 
           waitsForPromise ->
@@ -161,7 +159,7 @@ describe "Markdown preview package", ->
       describe "when the preview is not the active item and not in the active pane", ->
         it "re-renders the preview and makes it active", ->
           markdownEditor = atom.workspace.getActiveTextEditor()
-          [editorPane, previewPane] = getCenter().getPanes()
+          [editorPane, previewPane] = atom.workspace.getCenter().getPanes()
           previewPane.splitRight(copyActiveItem: true)
           previewPane.activate()
 
@@ -199,12 +197,12 @@ describe "Markdown preview package", ->
 
     describe "when the original preview is split", ->
       it "renders another preview in the new split pane", ->
-        getCenter().getPanes()[1].splitRight({copyActiveItem: true})
+        atom.workspace.getCenter().getPanes()[1].splitRight({copyActiveItem: true})
 
-        expect(getCenter().getPanes()).toHaveLength 3
+        expect(atom.workspace.getCenter().getPanes()).toHaveLength 3
 
         waitsFor "split markdown preview to be created", ->
-          preview = getCenter().getPanes()[2].getActiveItem()
+          preview = atom.workspace.getCenter().getPanes()[2].getActiveItem()
 
         runs ->
           expect(preview).toBeInstanceOf(MarkdownPreviewView)
@@ -212,10 +210,10 @@ describe "Markdown preview package", ->
 
     describe "when the editor is destroyed", ->
       beforeEach ->
-        getCenter().getPanes()[0].destroyActiveItem()
+        atom.workspace.getCenter().getPanes()[0].destroyActiveItem()
 
       it "falls back to using the file path", ->
-        getCenter().getPanes()[1].activate()
+        atom.workspace.getCenter().getPanes()[1].activate()
         expect(preview.file.getPath()).toBe atom.workspace.getActivePaneItem().getPath()
 
       it "continues to update the preview if the file is changed on #win32 and #darwin", ->
@@ -252,12 +250,12 @@ describe "Markdown preview package", ->
           listener.callCount > 0
 
       it "allows a new split pane of the preview to be created", ->
-        getCenter().getPanes()[1].splitRight({copyActiveItem: true})
+        atom.workspace.getCenter().getPanes()[1].splitRight({copyActiveItem: true})
 
-        expect(getCenter().getPanes()).toHaveLength 3
+        expect(atom.workspace.getCenter().getPanes()).toHaveLength 3
 
         waitsFor "split markdown preview to be created", ->
-          preview = getCenter().getPanes()[2].getActiveItem()
+          preview = atom.workspace.getCenter().getPanes()[2].getActiveItem()
 
         runs ->
           expect(preview).toBeInstanceOf(MarkdownPreviewView)
@@ -311,7 +309,7 @@ describe "Markdown preview package", ->
 
       runs ->
         spyOn(atom.workspace, 'open').andCallThrough()
-        atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+        atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
         expect(atom.workspace.open).not.toHaveBeenCalled()
 
   describe "when the editor's path changes on #win32 and #darwin", ->
@@ -319,7 +317,7 @@ describe "Markdown preview package", ->
       titleChangedCallback = jasmine.createSpy('titleChangedCallback')
 
       waitsForPromise -> atom.workspace.open("subdir/file.markdown")
-      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
 
       expectPreviewInSplitPane()
 
@@ -342,13 +340,41 @@ describe "Markdown preview package", ->
       runs ->
         expect(atom.workspace.getActiveTextEditor()).toBeTruthy()
 
+  describe "markdown-preview:toggle", ->
+    beforeEach ->
+      waitsForPromise ->
+        atom.workspace.open("code-block.md")
+
+    it "does not exist for text editors that are not set to a grammar defined in `markdown-preview.grammars`", ->
+      atom.config.set('markdown-preview.grammars', ['source.weird-md'])
+      editorElement = atom.workspace.getActiveTextEditor().getElement()
+      commands = atom.commands.findCommands({target: editorElement}).map (command) -> command.name
+      expect(commands).not.toContain 'markdown-preview:toggle'
+
+    it "exists for text editors that are set to a grammar defined in `markdown-preview.grammars`", ->
+      atom.config.set('markdown-preview.grammars', ['source.gfm'])
+      editorElement = atom.workspace.getActiveTextEditor().getElement()
+      commands = atom.commands.findCommands({target: editorElement}).map (command) -> command.name
+      expect(commands).toContain 'markdown-preview:toggle'
+
+    it "updates whenever the list of grammars changes", ->
+      # Last two tests combined
+      atom.config.set('markdown-preview.grammars', ['source.gfm', 'text.plain'])
+      editorElement = atom.workspace.getActiveTextEditor().getElement()
+      commands = atom.commands.findCommands({target: editorElement}).map (command) -> command.name
+      expect(commands).toContain 'markdown-preview:toggle'
+
+      atom.config.set('markdown-preview.grammars', ['source.weird-md', 'text.plain'])
+      commands = atom.commands.findCommands({target: editorElement}).map (command) -> command.name
+      expect(commands).not.toContain 'markdown-preview:toggle'
+
   describe "when markdown-preview:copy-html is triggered", ->
     it "copies the HTML to the clipboard", ->
       waitsForPromise ->
         atom.workspace.open("subdir/simple.md")
 
       runs ->
-        atom.commands.dispatch workspaceElement, 'markdown-preview:copy-html'
+        atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:copy-html'
         expect(atom.clipboard.read()).toBe """
           <p><em>italic</em></p>
           <p><strong>bold</strong></p>
@@ -356,7 +382,7 @@ describe "Markdown preview package", ->
         """
 
         atom.workspace.getActiveTextEditor().setSelectedBufferRange [[0, 0], [1, 0]]
-        atom.commands.dispatch workspaceElement, 'markdown-preview:copy-html'
+        atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:copy-html'
         expect(atom.clipboard.read()).toBe """
           <p><em>italic</em></p>
         """
@@ -375,8 +401,7 @@ describe "Markdown preview package", ->
           atom.workspace.open("subdir/file.markdown")
 
         runs ->
-          workspaceElement = atom.views.getView(atom.workspace)
-          atom.commands.dispatch workspaceElement, 'markdown-preview:copy-html'
+          atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:copy-html'
           preview = document.createElement('div')
           preview.innerHTML = atom.clipboard.read()
 
@@ -402,7 +427,7 @@ describe "Markdown preview package", ->
   describe "sanitization", ->
     it "removes script tags and attributes that commonly contain inline scripts", ->
       waitsForPromise -> atom.workspace.open("subdir/evil.md")
-      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
       expectPreviewInSplitPane()
 
       runs ->
@@ -416,7 +441,7 @@ describe "Markdown preview package", ->
 
     it "remove the first <!doctype> tag at the beginning of the file", ->
       waitsForPromise -> atom.workspace.open("subdir/doctype-tag.md")
-      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
       expectPreviewInSplitPane()
 
       runs ->
@@ -428,7 +453,7 @@ describe "Markdown preview package", ->
   describe "when the markdown contains an <html> tag", ->
     it "does not throw an exception", ->
       waitsForPromise -> atom.workspace.open("subdir/html-tag.md")
-      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
       expectPreviewInSplitPane()
 
       runs -> expect(preview.element.innerHTML).toBe "content"
@@ -436,7 +461,7 @@ describe "Markdown preview package", ->
   describe "when the markdown contains a <pre> tag", ->
     it "does not throw an exception", ->
       waitsForPromise -> atom.workspace.open("subdir/pre-tag.md")
-      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
       expectPreviewInSplitPane()
 
       runs -> expect(preview.element.querySelector('atom-text-editor')).toBeDefined()
@@ -451,12 +476,12 @@ describe "Markdown preview package", ->
       waitsForPromise ->
         atom.workspace.open(filePath)
 
-      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
       expectPreviewInSplitPane()
 
       runs ->
         expect(preview.element.innerHTML).toBe """
-          <p><img src="/foo.png" alt="rel path"></p>
+          <p><img alt="rel path" src="/foo.png"></p>
         """
 
   describe "GitHub style markdown preview", ->
@@ -465,7 +490,7 @@ describe "Markdown preview package", ->
 
     it "renders markdown using the default style when GitHub styling is disabled", ->
       waitsForPromise -> atom.workspace.open("subdir/simple.md")
-      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
       expectPreviewInSplitPane()
 
       runs -> expect(preview.element.getAttribute('data-use-github-style')).toBeNull()
@@ -474,14 +499,14 @@ describe "Markdown preview package", ->
       atom.config.set 'markdown-preview.useGitHubStyle', true
 
       waitsForPromise -> atom.workspace.open("subdir/simple.md")
-      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
       expectPreviewInSplitPane()
 
       runs -> expect(preview.element.getAttribute('data-use-github-style')).toBe ''
 
     it "updates the rendering style immediately when the configuration is changed", ->
       waitsForPromise -> atom.workspace.open("subdir/simple.md")
-      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
       expectPreviewInSplitPane()
 
       runs ->
@@ -493,42 +518,52 @@ describe "Markdown preview package", ->
         atom.config.set 'markdown-preview.useGitHubStyle', false
         expect(preview.element.getAttribute('data-use-github-style')).toBeNull()
 
-  describe "when Save as Html is triggered", ->
+  describe "when markdown-preview:save-as-html is triggered", ->
     beforeEach ->
       waitsForPromise -> atom.workspace.open("subdir/simple.markdown")
-      runs -> atom.commands.dispatch workspaceElement, 'markdown-preview:toggle'
+      runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
       expectPreviewInSplitPane()
 
     it "saves the HTML when it is triggered and the editor has focus", ->
-      [editorPane, previewPane] = getCenter().getPanes()
+      [editorPane, previewPane] = atom.workspace.getCenter().getPanes()
       editorPane.activate()
 
       outputPath = temp.path(suffix: '.html')
-      expect(fs.isFileSync(outputPath)).toBe false
+      expect(fs.existsSync(outputPath)).toBe false
 
       runs ->
-        spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
-        atom.commands.dispatch workspaceElement, 'markdown-preview:save-as-html'
+        spyOn(preview, 'getSaveDialogOptions').andReturn({defaultPath: outputPath})
+        spyOn(atom.applicationDelegate, 'showSaveDialog').andCallFake (options, callback) ->
+          callback?(options.defaultPath)
+          # TODO: When https://github.com/atom/atom/pull/16245 lands remove the return
+          # and the existence check on the callback
+          return options.defaultPath
+        atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:save-as-html'
 
       waitsFor ->
         fs.existsSync(outputPath)
 
       runs ->
-        expect(fs.isFileSync(outputPath)).toBe true
+        expect(fs.existsSync(outputPath)).toBe true
 
     it "saves the HTML when it is triggered and the preview pane has focus", ->
-      [editorPane, previewPane] = getCenter().getPanes()
+      [editorPane, previewPane] = atom.workspace.getCenter().getPanes()
       previewPane.activate()
 
       outputPath = temp.path(suffix: '.html')
-      expect(fs.isFileSync(outputPath)).toBe false
+      expect(fs.existsSync(outputPath)).toBe false
 
       runs ->
-        spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
-        atom.commands.dispatch workspaceElement, 'markdown-preview:save-as-html'
+        spyOn(preview, 'getSaveDialogOptions').andReturn({defaultPath: outputPath})
+        spyOn(atom.applicationDelegate, 'showSaveDialog').andCallFake (options, callback) ->
+          callback?(options.defaultPath)
+          # TODO: When https://github.com/atom/atom/pull/16245 lands remove the return
+          # and the existence check on the callback
+          return options.defaultPath
+        atom.commands.dispatch editorPane.getActiveItem().getElement(), 'markdown-preview:save-as-html'
 
       waitsFor ->
         fs.existsSync(outputPath)
 
       runs ->
-        expect(fs.isFileSync(outputPath)).toBe true
+        expect(fs.existsSync(outputPath)).toBe true

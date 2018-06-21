@@ -13,7 +13,7 @@ class MarkdownPreviewView
 
   constructor: ({@editorId, @filePath}) ->
     @element = document.createElement('div')
-    @element.classList.add('markdown-preview', 'native-key-bindings')
+    @element.classList.add('markdown-preview')
     @element.tabIndex = -1
     @emitter = new Emitter
     @loaded = false
@@ -21,7 +21,7 @@ class MarkdownPreviewView
     @registerScrollCommands()
     if @editorId?
       @resolveEditor(@editorId)
-    else if atom.workspace?
+    else if atom.packages.hasActivatedInitialPackages()
       @subscribeToFilePath(@filePath)
     else
       @disposables.add atom.packages.onDidActivateInitialPackages =>
@@ -75,7 +75,7 @@ class MarkdownPreviewView
   subscribeToFilePath: (filePath) ->
     @file = new File(filePath)
     @emitter.emit 'did-change-title'
-    @disposables.add @file.onDidRename(=> @emitter.emit 'did-change-title')
+    @disposables.add @file.onDidRename => @emitter.emit 'did-change-title'
     @handleEvents()
     @renderMarkdown()
 
@@ -85,13 +85,13 @@ class MarkdownPreviewView
 
       if @editor?
         @emitter.emit 'did-change-title'
-        @disposables.add @editor.onDidDestroy(=> @subscribeToFilePath(@getPath()))
+        @disposables.add @editor.onDidDestroy => @subscribeToFilePath(@getPath())
         @handleEvents()
         @renderMarkdown()
       else
         @subscribeToFilePath(@filePath)
 
-    if atom.workspace?
+    if atom.packages.hasActivatedInitialPackages()
       resolve()
     else
       @disposables.add atom.packages.onDidActivateInitialPackages(resolve)
@@ -102,15 +102,20 @@ class MarkdownPreviewView
     null
 
   handleEvents: ->
-    @disposables.add atom.grammars.onDidAddGrammar => _.debounce((=> @renderMarkdown()), 250)
-    @disposables.add atom.grammars.onDidUpdateGrammar _.debounce((=> @renderMarkdown()), 250)
+    lazyRenderMarkdown = _.debounce((=> @renderMarkdown()), 250)
+    @disposables.add atom.grammars.onDidAddGrammar -> lazyRenderMarkdown()
+    if typeof atom.grammars.onDidRemoveGrammar is 'function'
+      @disposables.add atom.grammars.onDidRemoveGrammar -> lazyRenderMarkdown()
+    else
+      # TODO: Remove onDidUpdateGrammar hook once onDidRemoveGrammar is released
+      @disposables.add atom.grammars.onDidUpdateGrammar -> lazyRenderMarkdown()
 
     atom.commands.add @element,
-      'core:save-as': (event) =>
-        event.stopPropagation()
-        @saveAs()
       'core:copy': (event) =>
-        event.stopPropagation() if @copyToClipboard()
+        event.stopPropagation()
+        @copyToClipboard()
+      'markdown-preview:select-all': =>
+        @selectAll()
       'markdown-preview:zoom-in': =>
         zoomLevel = parseFloat(getComputedStyle(@element).zoom)
         @element.style.zoom = zoomLevel + 0.1
@@ -119,6 +124,12 @@ class MarkdownPreviewView
         @element.style.zoom = zoomLevel - 0.1
       'markdown-preview:reset-zoom': =>
         @element.style.zoom = 1
+      'markdown-preview:toggle-break-on-single-newline': ->
+        keyPath = 'markdown-preview.breakOnSingleNewline'
+        atom.config.set(keyPath, not atom.config.get(keyPath))
+      'markdown-preview:toggle-github-style': ->
+        keyPath = 'markdown-preview.useGitHubStyle'
+        atom.config.set(keyPath, not atom.config.get(keyPath))
 
     changeHandler = =>
       @renderMarkdown()
@@ -146,6 +157,15 @@ class MarkdownPreviewView
       else
         @element.removeAttribute('data-use-github-style')
 
+    document.onselectionchange = =>
+      selection = window.getSelection()
+      selectedNode = selection.baseNode
+      if selectedNode is null or @element is selectedNode or @element.contains(selectedNode)
+        if selection.isCollapsed
+          @element.classList.remove('has-selection')
+        else
+          @element.classList.add('has-selection')
+
   renderMarkdown: ->
     @showLoading() unless @loaded
     @getMarkdownSource()
@@ -172,6 +192,7 @@ class MarkdownPreviewView
       renderer.toHTML source, @getPath(), @getGrammar(), callback
 
   renderMarkdownText: (text) ->
+    scrollTop = @element.scrollTop
     renderer.toDOMFragment text, @getPath(), @getGrammar(), (error, domFragment) =>
       if error
         @showError(error)
@@ -181,6 +202,7 @@ class MarkdownPreviewView
         @element.textContent = ''
         @element.appendChild(domFragment)
         @emitter.emit 'did-change-markdown'
+        @element.scrollTop = scrollTop
 
   getTitle: ->
     if @file? and @getPath()?
@@ -261,54 +283,67 @@ class MarkdownPreviewView
     div.textContent = 'Loading Markdown\u2026'
     @element.appendChild(div)
 
+  selectAll: ->
+    return if @loading
+
+    selection = window.getSelection()
+    selection.removeAllRanges()
+    range = document.createRange()
+    range.selectNodeContents(@element)
+    selection.addRange(range)
+
   copyToClipboard: ->
-    return false if @loading
+    return if @loading
 
     selection = window.getSelection()
     selectedText = selection.toString()
     selectedNode = selection.baseNode
 
     # Use default copy event handler if there is selected text inside this view
-    return false if selectedText and selectedNode? and (@element is selectedNode or @element.contains(selectedNode))
+    if selectedText and selectedNode? and (@element is selectedNode or @element.contains(selectedNode))
+      atom.clipboard.write(selectedText)
+    else
+      @getHTML (error, html) ->
+        if error?
+          atom.notifications.addError('Copying Markdown as HTML failed', {dismissable: true, detail: error.message})
+        else
+          atom.clipboard.write(html)
 
-    @getHTML (error, html) ->
-      if error?
-        console.warn('Copying Markdown as HTML failed', error)
-      else
-        atom.clipboard.write(html)
+  getSaveDialogOptions: ->
+    defaultPath = @getPath()
+    if defaultPath
+      defaultPath += '.html'
+    else
+      defaultPath = 'untitled.md.html'
+      if projectPath = atom.project.getPaths()[0]
+        defaultPath = path.join(projectPath, defaultPath)
 
-    true
+    return {defaultPath}
 
-  saveAs: ->
-    return if @loading
+  saveAs: (htmlFilePath) ->
+    if @loading
+      atom.notifications.addWarning('Please wait until the Markdown Preview has finished loading before saving')
+      return
 
     filePath = @getPath()
     title = 'Markdown to HTML'
     if filePath
       title = path.parse(filePath).name
-      filePath += '.html'
-    else
-      filePath = 'untitled.md.html'
-      if projectPath = atom.project.getPaths()[0]
-        filePath = path.join(projectPath, filePath)
 
-    if htmlFilePath = atom.showSaveDialogSync(filePath)
+    @getHTML (error, htmlBody) =>
+      if error?
+        throw error
+      else
+        html = """
+          <!DOCTYPE html>
+          <html>
+            <head>
+                <meta charset="utf-8" />
+                <title>#{title}</title>
+                <style>#{@getMarkdownPreviewCSS()}</style>
+            </head>
+            <body class='markdown-preview' data-use-github-style>#{htmlBody}</body>
+          </html>""" + "\n" # Ensure trailing newline
 
-      @getHTML (error, htmlBody) =>
-        if error?
-          console.warn('Saving Markdown as HTML failed', error)
-        else
-
-          html = """
-            <!DOCTYPE html>
-            <html>
-              <head>
-                  <meta charset="utf-8" />
-                  <title>#{title}</title>
-                  <style>#{@getMarkdownPreviewCSS()}</style>
-              </head>
-              <body class='markdown-preview' data-use-github-style>#{htmlBody}</body>
-            </html>""" + "\n" # Ensure trailing newline
-
-          fs.writeFileSync(htmlFilePath, html)
-          atom.workspace.open(htmlFilePath)
+        fs.writeFileSync(htmlFilePath, html)
+        atom.workspace.open(htmlFilePath)
