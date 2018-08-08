@@ -2,7 +2,9 @@ path = require 'path'
 fs = require 'fs-plus'
 temp = require('temp').track()
 url = require 'url'
+{TextEditor} = require 'atom'
 MarkdownPreviewView = require '../lib/markdown-preview-view'
+TextMateLanguageMode = new TextEditor().getBuffer().getLanguageMode().constructor
 
 describe "MarkdownPreviewView", ->
   preview = null
@@ -10,6 +12,8 @@ describe "MarkdownPreviewView", ->
   beforeEach ->
     # Makes _.debounce work
     jasmine.useRealClock()
+
+    jasmine.unspy(TextMateLanguageMode.prototype, 'tokenizeInBackground')
 
     spyOn(atom.packages, 'hasActivatedInitialPackages').andReturn true
 
@@ -306,12 +310,11 @@ describe "MarkdownPreviewView", ->
         "atom-text-editor .hr { background: url(atom://markdown-preview/assets/hr.png); }"
       ]
 
-      expect(fs.isFileSync(outputPath)).toBe false
-
       waitsForPromise ->
         preview.renderMarkdown()
 
       runs ->
+        expect(fs.isFileSync(outputPath)).toBe false
         spyOn(preview, 'getSaveDialogOptions').andReturn({defaultPath: outputPath})
         spyOn(atom.applicationDelegate, 'showSaveDialog').andCallFake (options, callback) ->
           callback?(options.defaultPath)
@@ -320,6 +323,8 @@ describe "MarkdownPreviewView", ->
           return options.defaultPath
         spyOn(preview, 'getDocumentStyleSheets').andReturn(markdownPreviewStyles)
         spyOn(preview, 'getTextEditorStyles').andReturn(atomTextEditorStyles)
+
+      waitsForPromise ->
         atom.commands.dispatch preview.element, 'core:save-as'
 
       waitsFor ->
@@ -365,16 +370,16 @@ describe "MarkdownPreviewView", ->
 
     describe "when there is no text selected", ->
       it "copies the rendered HTML of the entire Markdown document to the clipboard", ->
-        atom.commands.dispatch preview.element, 'core:copy'
+        expect(atom.clipboard.read()).toBe("initial clipboard content")
 
-        waitsFor ->
-          atom.clipboard.read() isnt "initial clipboard content"
+        waitsForPromise ->
+          atom.commands.dispatch preview.element, 'core:copy'
 
         runs ->
           expect(atom.clipboard.read()).toBe """
            <h1 id="code-block">Code Block</h1>
-           <pre class="editor-colors lang-javascript"><div class="line"><span class="syntax--source syntax--js"><span class="syntax--keyword syntax--control syntax--js"><span>if</span></span><span>&nbsp;a&nbsp;</span><span class="syntax--keyword syntax--operator syntax--comparison syntax--js"><span>===</span></span><span>&nbsp;</span><span class="syntax--constant syntax--numeric syntax--decimal syntax--js"><span>3</span></span><span>&nbsp;</span><span class="syntax--meta syntax--brace syntax--curly syntax--js"><span>{</span></span></span></div><div class="line"><span class="syntax--source syntax--js"><span>&nbsp;&nbsp;b&nbsp;</span><span class="syntax--keyword syntax--operator syntax--assignment syntax--js"><span>=</span></span><span>&nbsp;</span><span class="syntax--constant syntax--numeric syntax--decimal syntax--js"><span>5</span></span></span></div><div class="line"><span class="syntax--source syntax--js"><span class="syntax--meta syntax--brace syntax--curly syntax--js"><span>}</span></span></span></div></pre>
-           <p>encoding \u2192 issue</p>
+           <pre class="editor-colors lang-javascript"><div class="line"><span class="syntax--source syntax--js"><span class="syntax--keyword syntax--control syntax--js">if</span> a <span class="syntax--keyword syntax--operator syntax--comparison syntax--js">===</span> <span class="syntax--constant syntax--numeric syntax--decimal syntax--js">3</span> <span class="syntax--meta syntax--brace syntax--curly syntax--js">{</span></span></div><div class="line"><span class="syntax--source syntax--js"><span class="leading-whitespace">  </span>b <span class="syntax--keyword syntax--operator syntax--assignment syntax--js">=</span> <span class="syntax--constant syntax--numeric syntax--decimal syntax--js">5</span></span></div><div class="line"><span class="syntax--source syntax--js"><span class="syntax--meta syntax--brace syntax--curly syntax--js">}</span></span></div></pre>
+           <p>encoding → issue</p>
           """
 
     describe "when there is a text selection", ->

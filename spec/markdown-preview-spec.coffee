@@ -2,6 +2,8 @@ path = require 'path'
 fs = require 'fs-plus'
 temp = require('temp').track()
 MarkdownPreviewView = require '../lib/markdown-preview-view'
+{TextEditor} = require 'atom'
+TextMateLanguageMode = new TextEditor().getBuffer().getLanguageMode().constructor
 
 describe "Markdown Preview", ->
   preview = null
@@ -11,6 +13,8 @@ describe "Markdown Preview", ->
     tempPath = temp.mkdirSync('atom')
     fs.copySync(fixturesPath, tempPath)
     atom.project.setPaths([tempPath])
+
+    jasmine.unspy(TextMateLanguageMode.prototype, 'tokenizeInBackground')
 
     jasmine.useRealClock()
     jasmine.attachToDOM(atom.views.getView(atom.workspace))
@@ -348,8 +352,10 @@ describe "Markdown Preview", ->
       waitsForPromise ->
         atom.workspace.open("subdir/simple.md")
 
-      runs ->
+      waitsForPromise ->
         atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:copy-html'
+
+      runs ->
         expect(atom.clipboard.read()).toBe """
           <p><em>italic</em></p>
           <p><strong>bold</strong></p>
@@ -357,14 +363,16 @@ describe "Markdown Preview", ->
         """
 
         atom.workspace.getActiveTextEditor().setSelectedBufferRange [[0, 0], [1, 0]]
+
+      waitsForPromise ->
         atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:copy-html'
+
+      runs ->
         expect(atom.clipboard.read()).toBe """
           <p><em>italic</em></p>
         """
 
     describe "code block tokenization", ->
-      preview = null
-
       beforeEach ->
         waitsForPromise ->
           atom.packages.activatePackage('language-ruby')
@@ -375,8 +383,10 @@ describe "Markdown Preview", ->
         waitsForPromise ->
           atom.workspace.open("subdir/file.markdown")
 
-        runs ->
+        waitsForPromise ->
           atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:copy-html'
+
+        runs ->
           preview = document.createElement('div')
           preview.innerHTML = atom.clipboard.read()
 

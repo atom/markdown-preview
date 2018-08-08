@@ -118,11 +118,13 @@ module.exports =
 
     renderer ?= require './renderer'
     text = editor.getSelectedText() or editor.getText()
-    renderer.toHTML text, editor.getPath(), editor.getGrammar(), (error, html) ->
-      if error
-        console.warn('Copying Markdown as HTML failed', error)
-      else
-        atom.clipboard.write(html)
+    new Promise (resolve) ->
+      renderer.toHTML text, editor.getPath(), editor.getGrammar(), (error, html) ->
+        if error
+          console.warn('Copying Markdown as HTML failed', error)
+        else
+          atom.clipboard.write(html)
+          resolve()
 
   saveAsHTML: ->
     activePaneItem = atom.workspace.getActivePaneItem()
