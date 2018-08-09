@@ -330,20 +330,21 @@ class MarkdownPreviewView
     if filePath
       title = path.parse(filePath).name
 
-    @getHTML (error, htmlBody) =>
-      if error?
-        throw error
-      else
-        html = """
-          <!DOCTYPE html>
-          <html>
-            <head>
-                <meta charset="utf-8" />
-                <title>#{title}</title>
-                <style>#{@getMarkdownPreviewCSS()}</style>
-            </head>
-            <body class='markdown-preview' data-use-github-style>#{htmlBody}</body>
-          </html>""" + "\n" # Ensure trailing newline
+    new Promise (resolve, reject) =>
+      @getHTML (error, htmlBody) =>
+        if error?
+          throw error
+        else
+          html = """
+            <!DOCTYPE html>
+            <html>
+              <head>
+                  <meta charset="utf-8" />
+                  <title>#{title}</title>
+                  <style>#{@getMarkdownPreviewCSS()}</style>
+              </head>
+              <body class='markdown-preview' data-use-github-style>#{htmlBody}</body>
+            </html>""" + "\n" # Ensure trailing newline
 
-        fs.writeFileSync(htmlFilePath, html)
-        atom.workspace.open(htmlFilePath)
+          fs.writeFileSync(htmlFilePath, html)
+          atom.workspace.open(htmlFilePath).then(resolve)
