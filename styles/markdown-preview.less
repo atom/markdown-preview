@@ -23,6 +23,12 @@
     position: absolute;
     margin: .25em 0 0 -1.4em;
   }
+
+  // hide bullet for task lists
+  // TODO: Use more specific selector once https://github.com/gjtorikian/task-lists-js/issues/5 gets fixed
+  ul label {
+    vertical-align: top;
+  }
 }
 
 .markdown-spinner {
