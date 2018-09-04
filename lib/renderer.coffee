@@ -107,16 +107,18 @@ makeAtomEditorNonInteractive = (editorElement, preElement) ->
 
 convertAtomEditorToStandardElement = (editorElement, preElement) ->
   new Promise (resolve) ->
-    done = ->
-      for line in editorElement.querySelectorAll('.line:not(.dummy)')
-        line2 = document.createElement('div')
-        line2.className = 'line'
-        line2.innerHTML = line.firstChild.innerHTML
-        preElement.appendChild(line2)
-      editorElement.remove()
-      resolve()
     editor = editorElement.getModel()
-    if editor.getBuffer().getLanguageMode().fullyTokenized
+    done = ->
+      editor.component.getNextUpdatePromise().then ->
+        for line in editorElement.querySelectorAll('.line:not(.dummy)')
+          line2 = document.createElement('div')
+          line2.className = 'line'
+          line2.innerHTML = line.firstChild.innerHTML
+          preElement.appendChild(line2)
+        editorElement.remove()
+        resolve()
+    languageMode = editor.getBuffer().getLanguageMode()
+    if languageMode.fullyTokenized or languageMode.tree
       done()
     else
       editor.onDidTokenize(done)
