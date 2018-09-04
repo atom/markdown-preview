@@ -282,8 +282,6 @@ describe "MarkdownPreviewView", ->
 
     it "saves the rendered HTML and opens it", ->
       outputPath = fs.realpathSync(temp.mkdirSync()) + 'output.html'
-      expectedFilePath = atom.project.getDirectories()[0].resolve('saved-html.html')
-      expectedOutput = fs.readFileSync(expectedFilePath).toString()
 
       createRule = (selector, css) ->
         return {
@@ -328,11 +326,21 @@ describe "MarkdownPreviewView", ->
         atom.commands.dispatch preview.element, 'core:save-as'
 
       waitsFor ->
-        fs.existsSync(outputPath) and atom.workspace.getActiveTextEditor()?.getPath() is outputPath
+        atom.workspace.getActiveTextEditor()?.getPath() is outputPath
 
       runs ->
-        expect(fs.isFileSync(outputPath)).toBe true
-        expect(atom.workspace.getActiveTextEditor().getText()).toBe expectedOutput
+        element = document.createElement('div')
+        element.innerHTML = fs.readFileSync(outputPath)
+        expect(element.querySelector('h1').innerText).toBe('Code Block')
+        expect(element.querySelector(
+          '.line .syntax--source.syntax--js .syntax--constant.syntax--numeric'
+        ).innerText).toBe('3')
+        expect(element.querySelector(
+          '.line .syntax--source.syntax--js .syntax--keyword.syntax--control'
+        ).innerText).toBe('if')
+        expect(element.querySelector(
+          '.line .syntax--source.syntax--js .syntax--constant.syntax--numeric'
+        ).innerText).toBe('3')
 
     describe "text editor style extraction", ->
 
@@ -376,11 +384,18 @@ describe "MarkdownPreviewView", ->
           atom.commands.dispatch preview.element, 'core:copy'
 
         runs ->
-          expect(atom.clipboard.read()).toBe """
-           <h1 id="code-block">Code Block</h1>
-           <pre class="editor-colors lang-javascript"><div class="line"><span class="syntax--source syntax--js"><span class="syntax--keyword syntax--control syntax--js">if</span> a <span class="syntax--keyword syntax--operator syntax--comparison syntax--js">===</span> <span class="syntax--constant syntax--numeric syntax--decimal syntax--js">3</span> <span class="syntax--meta syntax--brace syntax--curly syntax--js">{</span></span></div><div class="line"><span class="syntax--source syntax--js"><span class="leading-whitespace">  </span>b <span class="syntax--keyword syntax--operator syntax--assignment syntax--js">=</span> <span class="syntax--constant syntax--numeric syntax--decimal syntax--js">5</span></span></div><div class="line"><span class="syntax--source syntax--js"><span class="syntax--meta syntax--brace syntax--curly syntax--js">}</span></span></div></pre>
-           <p>encoding → issue</p>
-          """
+          element = document.createElement('div')
+          element.innerHTML = atom.clipboard.read()
+          expect(element.querySelector('h1').innerText).toBe('Code Block')
+          expect(element.querySelector(
+            '.line .syntax--source.syntax--js .syntax--constant.syntax--numeric'
+          ).innerText).toBe('3')
+          expect(element.querySelector(
+            '.line .syntax--source.syntax--js .syntax--keyword.syntax--control'
+          ).innerText).toBe('if')
+          expect(element.querySelector(
+            '.line .syntax--source.syntax--js .syntax--constant.syntax--numeric'
+          ).innerText).toBe('3')
 
     describe "when there is a text selection", ->
       it "directly copies the selection to the clipboard", ->
