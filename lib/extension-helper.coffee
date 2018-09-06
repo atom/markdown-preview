@@ -37,6 +37,7 @@ scopesByFenceName =
   'xml': 'text.xml'
   'yaml': 'source.yaml'
   'yml': 'source.yaml'
+  'assembly': 'source.assembly'
 
 module.exports =
   scopeForFenceName: (fenceName) ->
