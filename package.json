@@ -32,10 +32,11 @@
       "default": true,
       "description": "Re-render the preview as the contents of the source changes, without requiring the source buffer to be saved. If disabled, the preview is re-rendered only when the buffer is saved to disk."
     },
-    "openPreviewInSplitPane": {
-      "type": "boolean",
-      "default": true,
-      "description": "Open the preview in a split pane. If disabled, the preview is opened in a new tab in the same pane."
+    "splitPaneDirection": {
+      "type": "string",
+      "default": "right",
+      "enum": ["none", "right", "down"],
+      "description": "Whether to open the preview in a split pane, and if so the direction in which to open it. If `none`, the preview is opened in a new tab in the same pane."
     },
     "allowUnsafeProtocols": {
       "type": "boolean",

@@ -6,6 +6,7 @@ MarkdownPreviewView = require '../lib/markdown-preview-view'
 TextMateLanguageMode = new TextEditor().getBuffer().getLanguageMode().constructor
 
 describe "Markdown Preview", ->
+  previewPane = null
   preview = null
 
   beforeEach ->
@@ -28,21 +29,45 @@ describe "Markdown Preview", ->
     runs ->
       spyOn(atom.packages, 'hasActivatedInitialPackages').andReturn true
 
-  expectPreviewInSplitPane = ->
+  expectPreviewInSplitPane = (orientation='horizontal') ->
     waitsFor -> atom.workspace.getCenter().getPanes().length is 2
 
     waitsFor "markdown preview to be created", ->
-      preview = atom.workspace.getCenter().getPanes()[1].getActiveItem()
+      previewPane = atom.workspace.getCenter().getPanes()[1]
+      preview = previewPane.getActiveItem()
 
     runs ->
       expect(preview).toBeInstanceOf(MarkdownPreviewView)
       expect(preview.getPath()).toBe atom.workspace.getActivePaneItem().getPath()
+      expect(previewPane.getParent().getOrientation()).toBe orientation
 
   describe "when a preview has not been created for the file", ->
-    it "displays a markdown preview in a split pane", ->
+    it "displays a markdown preview in a split pane (right by default)", ->
       waitsForPromise -> atom.workspace.open("subdir/file.markdown")
       runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
-      expectPreviewInSplitPane()
+      expectPreviewInSplitPane('horizontal')
+
+      runs ->
+        [editorPane] = atom.workspace.getPanes()
+        expect(editorPane.getItems()).toHaveLength 1
+        expect(editorPane.isActive()).toBe true
+
+    it "displays a markdown preview in a split pane (right)", ->
+      atom.config.set 'markdown-preview.splitPaneDirection', 'right'
+      waitsForPromise -> atom.workspace.open("subdir/file.markdown")
+      runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
+      expectPreviewInSplitPane('horizontal')
+
+      runs ->
+        [editorPane] = atom.workspace.getPanes()
+        expect(editorPane.getItems()).toHaveLength 1
+        expect(editorPane.isActive()).toBe true
+
+    it "displays a markdown preview in a split pane (down)", ->
+      atom.config.set 'markdown-preview.splitPaneDirection', 'down'
+      waitsForPromise -> atom.workspace.open("subdir/file.markdown")
+      runs -> atom.commands.dispatch atom.workspace.getActiveTextEditor().getElement(), 'markdown-preview:toggle'
+      expectPreviewInSplitPane('vertical')
 
       runs ->
         [editorPane] = atom.workspace.getCenter().getPanes()
