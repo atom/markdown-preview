@@ -22,28 +22,52 @@
     "MarkdownPreviewView": "createMarkdownPreviewView"
   },
   "configSchema": {
-    "breakOnSingleNewline": {
-      "type": "boolean",
-      "default": false,
-      "description": "In Markdown, a single newline character doesn't cause a line break in the generated HTML. In GitHub Flavored Markdown, that is not true. Enable this config option to insert line breaks in rendered HTML for single newlines in Markdown source."
-    },
     "liveUpdate": {
       "type": "boolean",
+      "order": 0,
       "default": true,
       "description": "Re-render the preview as the contents of the source changes, without requiring the source buffer to be saved. If disabled, the preview is re-rendered only when the buffer is saved to disk."
     },
+    "useGitHubStyle": {
+      "title": "Use GitHub.com style",
+      "type": "boolean",
+      "order": 1,
+      "default": false,
+      "description": "Use the same CSS styles for preview as the ones used on GitHub.com."
+    },
     "openPreviewInSplitPane": {
       "type": "boolean",
+      "order": 2,
       "default": true,
       "description": "Open the preview in a split pane. If disabled, the preview is opened in a new tab in the same pane."
     },
+    "automaticallyOpenPreview": {
+      "type": "boolean",
+      "order": 3,
+      "default": false,
+      "description": "Automatically open the preview when a Markdown file is focused."
+    },
+    "automaticallyClosePreview": {
+      "type": "boolean",
+      "order": 4,
+      "default": false,
+      "description": "Automatically close the preview when its corresponding file is no longer focused."
+    },
+    "breakOnSingleNewline": {
+      "type": "boolean",
+      "order": 5,
+      "default": false,
+      "description": "In Markdown, a single newline character doesn't cause a line break in the generated HTML. In GitHub Flavored Markdown, that is not true. Enable this config option to insert line breaks in rendered HTML for single newlines in Markdown source."
+    },
     "allowUnsafeProtocols": {
       "type": "boolean",
+      "order": 6,
       "default": false,
       "description": "Allow HTML attributes to use protocols normally considered unsafe such as `file://` and absolute paths on Windows."
     },
     "grammars": {
       "type": "array",
+      "order": 7,
       "default": [
         "source.gfm",
         "source.litcoffee",
@@ -54,11 +78,14 @@
       ],
       "description": "List of scopes for languages for which previewing is enabled. See [this README](https://github.com/atom/spell-check#spell-check-package-) for more information on finding the correct scope for a specific language."
     },
-    "useGitHubStyle": {
-      "title": "Use GitHub.com style",
-      "type": "boolean",
-      "default": false,
-      "description": "Use the same CSS styles for preview as the ones used on GitHub.com."
+    "automaticPreviewGrammars": {
+      "type": "array",
+      "order": 8,
+      "default": [
+        "source.gfm",
+        "source.litcoffee"
+      ],
+      "description": "Only automatically open previews for the given list of scopes."
     }
   }
 }
