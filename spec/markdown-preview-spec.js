@@ -657,7 +657,7 @@ world\
       )
     })
 
-    it('remove the first <!doctype> tag at the beginning of the file', function () {
+    it('remove any <!doctype> tag on markdown files', function () {
       waitsForPromise(() => atom.workspace.open('subdir/doctype-tag.md'))
       runs(() =>
         atom.commands.dispatch(
@@ -670,7 +670,7 @@ world\
       runs(() =>
         expect(preview.element.innerHTML).toBe(`\
 <p>content
-&lt;!doctype html&gt;</p>\
+</p>\
 `)
       )
     })
