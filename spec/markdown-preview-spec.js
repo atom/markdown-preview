@@ -649,10 +649,10 @@ var x = y;
       runs(() =>
         expect(preview.element.innerHTML).toBe(`\
 <p>hello</p>
-<p></p>
-<p>
+
+
 <img>
-world</p>\
+world\
 `)
       )
     })
