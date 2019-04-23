@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "dompurify": "^1.0.2",
+    "emoji-images": "^0.1.1",
     "fs-plus": "^3.0.0",
     "marked": "^0.6.2",
     "underscore-plus": "^1.0.0",
