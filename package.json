@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "coffeelint": "^1.9.7",
+    "standard": "^10.0.3",
     "temp": "^0.8.1"
   },
   "deserializers": {
@@ -60,5 +61,16 @@
       "default": false,
       "description": "Use the same CSS styles for preview as the ones used on GitHub.com."
     }
+  },
+  "standard": {
+    "env": {
+      "atomtest": true,
+      "browser": true,
+      "jasmine": true,
+      "node": true
+    },
+    "globals": [
+      "atom"
+    ]
   }
 }

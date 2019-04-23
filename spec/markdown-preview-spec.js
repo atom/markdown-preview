@@ -789,7 +789,7 @@ world</p>\
     })
 
     it('saves the HTML when it is triggered and the editor has focus', function () {
-      const [editorPane, previewPane] = atom.workspace.getCenter().getPanes()
+      const [editorPane] = atom.workspace.getCenter().getPanes()
       editorPane.activate()
 
       const outputPath = temp.path({ suffix: '.html' })
