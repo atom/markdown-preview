@@ -1,8 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 const path = require('path')
 const fs = require('fs-plus')
 const temp = require('temp').track()
@@ -46,7 +41,7 @@ describe('Markdown Preview', function () {
           .getActiveItem())
     )
 
-    runs(function () {
+    runs(() => {
       expect(preview).toBeInstanceOf(MarkdownPreviewView)
       expect(preview.getPath()).toBe(
         atom.workspace.getActivePaneItem().getPath()
@@ -65,14 +60,14 @@ describe('Markdown Preview', function () {
       )
       expectPreviewInSplitPane()
 
-      runs(function () {
+      runs(() => {
         const [editorPane] = atom.workspace.getCenter().getPanes()
         expect(editorPane.getItems()).toHaveLength(1)
         expect(editorPane.isActive()).toBe(true)
       })
     })
 
-    describe("when the editor's path does not exist", () =>
+    describe("when the editor's path does not exist", function () {
       it('splits the current pane to the right with a markdown preview for the file', function () {
         waitsForPromise(() => atom.workspace.open('new.markdown'))
         runs(() =>
@@ -82,9 +77,10 @@ describe('Markdown Preview', function () {
           )
         )
         expectPreviewInSplitPane()
-      }))
+      })
+    })
 
-    describe('when the editor does not have a path', () =>
+    describe('when the editor does not have a path', function () {
       it('splits the current pane to the right with a markdown preview for the file', function () {
         waitsForPromise(() => atom.workspace.open(''))
         runs(() =>
@@ -94,9 +90,10 @@ describe('Markdown Preview', function () {
           )
         )
         expectPreviewInSplitPane()
-      }))
+      })
+    })
 
-    describe('when the path contains a space', () =>
+    describe('when the path contains a space', function () {
       it('renders the preview', function () {
         waitsForPromise(() => atom.workspace.open('subdir/file with space.md'))
         runs(() =>
@@ -106,9 +103,10 @@ describe('Markdown Preview', function () {
           )
         )
         expectPreviewInSplitPane()
-      }))
+      })
+    })
 
-    describe('when the path contains accented characters', () =>
+    describe('when the path contains accented characters', function () {
       it('renders the preview', function () {
         waitsForPromise(() => atom.workspace.open('subdir/áccéntéd.md'))
         runs(() =>
@@ -118,7 +116,8 @@ describe('Markdown Preview', function () {
           )
         )
         expectPreviewInSplitPane()
-      }))
+      })
+    })
   })
 
   describe('when a preview has been created for the file', function () {
@@ -182,7 +181,7 @@ describe('Markdown Preview', function () {
         )
       })
 
-      describe('when the preview is in the active pane but is not the active item', () =>
+      describe('when the preview is in the active pane but is not the active item', function () {
         it('re-renders the preview but does not make it active', function () {
           const markdownEditor = atom.workspace.getActiveTextEditor()
           const previewPane = atom.workspace.getCenter().getPanes()[1]
@@ -194,13 +193,14 @@ describe('Markdown Preview', function () {
 
           waitsFor(() => preview.element.textContent.includes('Hey!'))
 
-          runs(function () {
+          runs(() => {
             expect(previewPane.isActive()).toBe(true)
             expect(previewPane.getActiveItem()).not.toBe(preview)
           })
-        }))
+        })
+      })
 
-      describe('when the preview is not the active item and not in the active pane', () =>
+      describe('when the preview is not the active item and not in the active pane', function () {
         it('re-renders the preview and makes it active', function () {
           const markdownEditor = atom.workspace.getActiveTextEditor()
           const [
@@ -212,20 +212,21 @@ describe('Markdown Preview', function () {
 
           waitsForPromise(() => atom.workspace.open())
 
-          runs(function () {
+          runs(() => {
             editorPane.activate()
             markdownEditor.setText('Hey!')
           })
 
           waitsFor(() => preview.element.textContent.includes('Hey!'))
 
-          runs(function () {
+          runs(() => {
             expect(editorPane.isActive()).toBe(true)
             expect(previewPane.getActiveItem()).toBe(preview)
           })
-        }))
+        })
+      })
 
-      describe('when the liveUpdate config is set to false', () =>
+      describe('when the liveUpdate config is set to false', function () {
         it('only re-renders the markdown when the editor is saved, not when the contents are modified', function () {
           atom.config.set('markdown-preview.liveUpdate', false)
 
@@ -240,16 +241,17 @@ describe('Markdown Preview', function () {
 
           waitsFor(() => didStopChangingHandler.callCount > 0)
 
-          runs(function () {
+          runs(() => {
             expect(preview.element.textContent).not.toMatch('ch ch changes')
             atom.workspace.getActiveTextEditor().save()
           })
 
           waitsFor(() => preview.element.textContent.includes('ch ch changes'))
-        }))
+        })
+      })
     })
 
-    describe('when the original preview is split', () =>
+    describe('when the original preview is split', function () {
       it('renders another preview in the new split pane', function () {
         atom.workspace
           .getCenter()
@@ -267,13 +269,14 @@ describe('Markdown Preview', function () {
               .getActiveItem())
         )
 
-        runs(function () {
+        runs(() => {
           expect(preview).toBeInstanceOf(MarkdownPreviewView)
           expect(preview.getPath()).toBe(
             atom.workspace.getActivePaneItem().getPath()
           )
         })
-      }))
+      })
+    })
 
     describe('when the editor is destroyed', function () {
       beforeEach(() =>
@@ -297,7 +300,7 @@ describe('Markdown Preview', function () {
         let listener
         const titleChangedCallback = jasmine.createSpy('titleChangedCallback')
 
-        runs(function () {
+        runs(() => {
           expect(preview.getTitle()).toBe('file.markdown Preview')
           preview.onDidChangeTitle(titleChangedCallback)
           fs.renameSync(
@@ -352,7 +355,7 @@ describe('Markdown Preview', function () {
               .getActiveItem())
         )
 
-        runs(function () {
+        runs(() => {
           expect(preview).toBeInstanceOf(MarkdownPreviewView)
           expect(preview.getPath()).toBe(
             atom.workspace.getActivePaneItem().getPath()
@@ -361,7 +364,7 @@ describe('Markdown Preview', function () {
       })
     })
 
-    describe('when a new grammar is loaded', () =>
+    describe('when a new grammar is loaded', function () {
       it('re-renders the preview', function () {
         atom.workspace.getActiveTextEditor().setText(`\
 \`\`\`javascript
@@ -394,10 +397,11 @@ var x = y;
             preview.element.querySelector('atom-text-editor').dataset
               .grammar !== 'source js'
         )
-      }))
+      })
+    })
   })
 
-  describe('when the markdown preview view is requested by file URI', () =>
+  describe('when the markdown preview view is requested by file URI', function () {
     it('opens a preview editor and watches the file for changes', function () {
       waitsForPromise('atom.workspace.open promise to be resolved', () =>
         atom.workspace.open(
@@ -407,7 +411,7 @@ var x = y;
         )
       )
 
-      runs(function () {
+      runs(() => {
         preview = atom.workspace.getActivePaneItem()
         expect(preview).toBeInstanceOf(MarkdownPreviewView)
 
@@ -419,15 +423,16 @@ var x = y;
         'markdown to be re-rendered after file changed',
         () => preview.renderMarkdownText.callCount > 0
       )
-    }))
+    })
+  })
 
-  describe("when the editor's grammar it not enabled for preview", () =>
+  describe("when the editor's grammar it not enabled for preview", function () {
     it('does not open the markdown preview', function () {
       atom.config.set('markdown-preview.grammars', [])
 
       waitsForPromise(() => atom.workspace.open('subdir/file.markdown'))
 
-      runs(function () {
+      runs(() => {
         spyOn(atom.workspace, 'open').andCallThrough()
         atom.commands.dispatch(
           atom.workspace.getActiveTextEditor().getElement(),
@@ -435,9 +440,10 @@ var x = y;
         )
         expect(atom.workspace.open).not.toHaveBeenCalled()
       })
-    }))
+    })
+  })
 
-  describe("when the editor's path changes on #win32 and #darwin", () =>
+  describe("when the editor's path changes on #win32 and #darwin", function () {
     it("updates the preview's title", function () {
       const titleChangedCallback = jasmine.createSpy('titleChangedCallback')
 
@@ -451,7 +457,7 @@ var x = y;
 
       expectPreviewInSplitPane()
 
-      runs(function () {
+      runs(() => {
         expect(preview.getTitle()).toBe('file.markdown Preview')
         preview.onDidChangeTitle(titleChangedCallback)
         fs.renameSync(
@@ -466,14 +472,16 @@ var x = y;
       waitsFor(() => preview.getTitle() === 'file2.md Preview')
 
       runs(() => expect(titleChangedCallback).toHaveBeenCalled())
-    }))
+    })
+  })
 
-  describe('when the URI opened does not have a markdown-preview protocol', () =>
+  describe('when the URI opened does not have a markdown-preview protocol', function () {
     it('does not throw an error trying to decode the URI (regression)', function () {
       waitsForPromise(() => atom.workspace.open('%'))
 
       runs(() => expect(atom.workspace.getActiveTextEditor()).toBeTruthy())
-    }))
+    })
+  })
 
   describe('markdown-preview:toggle', function () {
     beforeEach(() =>
@@ -529,7 +537,7 @@ var x = y;
         )
       )
 
-      runs(function () {
+      runs(() => {
         expect(atom.clipboard.read()).toBe(`\
 <p><em>italic</em></p>
 <p><strong>bold</strong></p>
@@ -570,27 +578,31 @@ var x = y;
           )
         )
 
-        runs(function () {
+        runs(() => {
           preview = document.createElement('div')
           preview.innerHTML = atom.clipboard.read()
         })
       })
 
-      describe("when the code block's fence name has a matching grammar", () =>
-        it('tokenizes the code block with the grammar', () =>
+      describe("when the code block's fence name has a matching grammar", function () {
+        it('tokenizes the code block with the grammar', function () {
           expect(
             preview.querySelector('pre span.entity.name.function.ruby')
-          ).toBeDefined()))
+          ).toBeDefined()
+        })
+      })
 
-      describe("when the code block's fence name doesn't have a matching grammar", () =>
-        it('does not tokenize the code block', () =>
+      describe("when the code block's fence name doesn't have a matching grammar", function () {
+        it('does not tokenize the code block', function () {
           expect(
             preview.querySelectorAll(
               'pre.lang-kombucha .line .syntax--null-grammar'
             ).length
-          ).toBe(2)))
+          ).toBe(2)
+        })
+      })
 
-      describe('when the code block contains empty lines', () =>
+      describe('when the code block contains empty lines', function () {
         it("doesn't remove the empty lines", function () {
           expect(preview.querySelector('pre.lang-python').children.length).toBe(
             6
@@ -610,13 +622,16 @@ var x = y;
               .querySelector('pre.lang-python div:nth-child(5)')
               .textContent.trim()
           ).toBe('')
-        }))
+        })
+      })
 
-      describe('when the code block is nested in a list', () =>
-        it('detects and styles the block', () =>
+      describe('when the code block is nested in a list', function () {
+        it('detects and styles the block', function () {
           expect(preview.querySelector('pre.lang-javascript')).toHaveClass(
             'editor-colors'
-          )))
+          )
+        })
+      })
     })
   })
 
@@ -661,7 +676,7 @@ world</p>\
     })
   })
 
-  describe('when the markdown contains an <html> tag', () =>
+  describe('when the markdown contains an <html> tag', function () {
     it('does not throw an exception', function () {
       waitsForPromise(() => atom.workspace.open('subdir/html-tag.md'))
       runs(() =>
@@ -673,9 +688,10 @@ world</p>\
       expectPreviewInSplitPane()
 
       runs(() => expect(preview.element.innerHTML).toBe('content'))
-    }))
+    })
+  })
 
-  describe('when the markdown contains a <pre> tag', () =>
+  describe('when the markdown contains a <pre> tag', function () {
     it('does not throw an exception', function () {
       waitsForPromise(() => atom.workspace.open('subdir/pre-tag.md'))
       runs(() =>
@@ -689,9 +705,10 @@ world</p>\
       runs(() =>
         expect(preview.element.querySelector('atom-text-editor')).toBeDefined()
       )
-    }))
+    })
+  })
 
-  describe('when there is an image with a relative path and no directory', () =>
+  describe('when there is an image with a relative path and no directory', function () {
     it('does not alter the image src', function () {
       for (let projectPath of atom.project.getPaths()) {
         atom.project.removePath(projectPath)
@@ -715,7 +732,8 @@ world</p>\
 <p><img alt="rel path" src="/foo.png"></p>\
 `)
       )
-    }))
+    })
+  })
 
   describe('GitHub style markdown preview', function () {
     beforeEach(() => atom.config.set('markdown-preview.useGitHubStyle', false))
@@ -762,7 +780,7 @@ world</p>\
       )
       expectPreviewInSplitPane()
 
-      runs(function () {
+      runs(() => {
         expect(preview.element.getAttribute('data-use-github-style')).toBeNull()
 
         atom.config.set('markdown-preview.useGitHubStyle', true)
@@ -795,7 +813,7 @@ world</p>\
       const outputPath = temp.path({ suffix: '.html' })
       expect(fs.existsSync(outputPath)).toBe(false)
 
-      runs(function () {
+      runs(() => {
         spyOn(preview, 'getSaveDialogOptions').andReturn({
           defaultPath: outputPath
         })
@@ -828,7 +846,7 @@ world</p>\
       const outputPath = temp.path({ suffix: '.html' })
       expect(fs.existsSync(outputPath)).toBe(false)
 
-      runs(function () {
+      runs(() => {
         spyOn(preview, 'getSaveDialogOptions').andReturn({
           defaultPath: outputPath
         })
