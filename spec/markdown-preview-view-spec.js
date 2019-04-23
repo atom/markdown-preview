@@ -327,6 +327,27 @@ end\
     })
   })
 
+  describe('yaml front matter', function () {
+    it('creates a table with the YAML variables', function () {
+      atom.config.set('markdown-preview.breakOnSingleNewline', true)
+
+      waitsForPromise(() => preview.renderMarkdown())
+
+      runs(() => {
+        expect(
+          [...preview.element.querySelectorAll('table th')].map(
+            el => el.textContent
+          )
+        ).toEqual(['variable1', 'array'])
+        expect(
+          [...preview.element.querySelectorAll('table td')].map(
+            el => el.textContent
+          )
+        ).toEqual(['value1', 'foo,bar'])
+      })
+    })
+  })
+
   describe('text selections', function () {
     it('adds the `has-selection` class to the preview depending on if there is a text selection', function () {
       expect(preview.element.classList.contains('has-selection')).toBe(false)

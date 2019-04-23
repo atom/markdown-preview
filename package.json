@@ -12,7 +12,8 @@
     "dompurify": "^1.0.2",
     "fs-plus": "^3.0.0",
     "marked": "^0.6.2",
-    "underscore-plus": "^1.0.0"
+    "underscore-plus": "^1.0.0",
+    "yaml-front-matter": "^4.0.0"
   },
   "devDependencies": {
     "coffeelint": "^1.9.7",

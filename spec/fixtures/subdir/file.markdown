@@ -1,3 +1,10 @@
+---
+variable1: value1
+array:
+  - foo
+  - bar
+---
+
 ## File.markdown
 
 :cool:
