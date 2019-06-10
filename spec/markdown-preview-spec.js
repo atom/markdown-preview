@@ -867,27 +867,27 @@ world\
   })
 })
 
-async function conditionPromise(
+async function conditionPromise (
   condition,
   description = 'anonymous condition'
 ) {
-  const startTime = Date.now();
+  const startTime = Date.now()
 
   while (true) {
-    await timeoutPromise(100);
+    await timeoutPromise(100)
 
     if (await condition()) {
-      return;
+      return
     }
 
     if (Date.now() - startTime > 5000) {
-      throw new Error('Timed out waiting on ' + description);
+      throw new Error('Timed out waiting on ' + description)
     }
   }
 }
 
-function timeoutPromise(timeout) {
+function timeoutPromise (timeout) {
   return new Promise(resolve => {
-    global.setTimeout(resolve, timeout);
-  });
+    global.setTimeout(resolve, timeout)
+  })
 }
