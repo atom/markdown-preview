@@ -365,38 +365,31 @@ describe('Markdown Preview', function () {
     })
 
     describe('when a new grammar is loaded', function () {
-      it('re-renders the preview', function () {
+      it('re-renders the preview', async function () {
         atom.workspace.getActiveTextEditor().setText(`\
 \`\`\`javascript
 var x = y;
 \`\`\`\
 `)
 
-        waitsFor(
-          'markdown to be rendered after its text changed',
-          () =>
-            preview.element.querySelector('atom-text-editor').dataset
-              .grammar === 'text plain null-grammar'
-        )
+        expect(
+          preview.element.querySelector('atom-text-editor').dataset.grammar
+        ).toBe('text plain null-grammar')
 
-        let grammarAdded = false
-        runs(() => atom.grammars.onDidAddGrammar(() => (grammarAdded = true)))
+        expect(
+          atom.packages.isPackageActive('language-javascript')
+        ).toBe(false)
 
-        waitsForPromise(function () {
-          expect(atom.packages.isPackageActive('language-javascript')).toBe(
-            false
-          )
-          return atom.packages.activatePackage('language-javascript')
+        const grammarAdded = new Promise(resolve => {
+          atom.grammars.onDidAddGrammar(resolve)
         })
+        await atom.packages.activatePackage('language-javascript')
 
-        waitsFor('grammar to be added', () => grammarAdded)
-
-        waitsFor(
-          'markdown to be rendered after grammar was added',
-          () =>
-            preview.element.querySelector('atom-text-editor').dataset
-              .grammar !== 'source js'
-        )
+        await grammarAdded
+        await conditionPromise(() => {
+          const grammar = preview.element.querySelector('atom-text-editor').dataset.grammar
+          return grammar !== 'source js'
+        }, 'markdown to be rendered after grammar was added')
       })
     })
   })
@@ -873,3 +866,28 @@ world\
     })
   })
 })
+
+async function conditionPromise(
+  condition,
+  description = 'anonymous condition'
+) {
+  const startTime = Date.now();
+
+  while (true) {
+    await timeoutPromise(100);
+
+    if (await condition()) {
+      return;
+    }
+
+    if (Date.now() - startTime > 5000) {
+      throw new Error('Timed out waiting on ' + description);
+    }
+  }
+}
+
+function timeoutPromise(timeout) {
+  return new Promise(resolve => {
+    global.setTimeout(resolve, timeout);
+  });
+}
