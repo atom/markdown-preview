@@ -363,35 +363,6 @@ describe('Markdown Preview', function () {
         })
       })
     })
-
-    describe('when a new grammar is loaded', function () {
-      it('re-renders the preview', async function () {
-        atom.workspace.getActiveTextEditor().setText(`\
-\`\`\`javascript
-var x = y;
-\`\`\`\
-`)
-
-        expect(
-          preview.element.querySelector('atom-text-editor').dataset.grammar
-        ).toBe('text plain null-grammar')
-
-        expect(
-          atom.packages.isPackageActive('language-javascript')
-        ).toBe(false)
-
-        const grammarAdded = new Promise(resolve => {
-          atom.grammars.onDidAddGrammar(resolve)
-        })
-        await atom.packages.activatePackage('language-javascript')
-
-        await grammarAdded
-        await conditionPromise(() => {
-          const grammar = preview.element.querySelector('atom-text-editor').dataset.grammar
-          return grammar !== 'source js'
-        }, 'markdown to be rendered after grammar was added')
-      })
-    })
   })
 
   describe('when the markdown preview view is requested by file URI', function () {
@@ -866,28 +837,3 @@ world\
     })
   })
 })
-
-async function conditionPromise (
-  condition,
-  description = 'anonymous condition'
-) {
-  const startTime = Date.now()
-
-  while (true) {
-    await timeoutPromise(100)
-
-    if (await condition()) {
-      return
-    }
-
-    if (Date.now() - startTime > 5000) {
-      throw new Error('Timed out waiting on ' + description)
-    }
-  }
-}
-
-function timeoutPromise (timeout) {
-  return new Promise(resolve => {
-    global.setTimeout(resolve, timeout)
-  })
-}
