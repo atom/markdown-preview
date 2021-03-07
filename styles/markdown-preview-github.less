@@ -37,4 +37,12 @@
     border-radius: 4px;
     overflow: auto;
   }
+
+  .task-list-item input[type=checkbox] {
+    -webkit-appearance: checkbox;
+
+    &::before, &:after {
+      display: none;
+    }
+  }
 }
