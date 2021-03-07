@@ -154,3 +154,40 @@
   }
 
 }
+
+// Align task list checkboxes --------------------
+.checkbox-position(@x, @y, @margin: 0) {
+  .markdown-preview:not([data-use-github-style]) {
+    .task-list-item .input-checkbox {
+      position: absolute;
+      transform: translate(~"calc(-50% - @{x})", ~"calc(-50% + @{y})");
+    }
+
+    .task-list-item {
+      margin: @margin 0 !important;
+    }
+  }
+}
+
+
+.checkbox-position(13px, 10px);
+
+.theme-atom-dark-ui, .theme-atom-light-ui {
+  .checkbox-position(13px, 10px, .1em);
+}
+
+.theme-atom-material-ui {
+  .checkbox-position(15px, 9px, .4em);
+}
+
+.theme-nucleus-dark-ui {
+  .checkbox-position(14px, 12px);
+}
+
+.theme-solarized-dark-ui {
+  .checkbox-position(13px, 9px, .1em);
+}
+
+.theme-solarized-light-ui {
+  .checkbox-position(14px, 12px, .1em);
+}
