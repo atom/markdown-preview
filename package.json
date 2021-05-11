@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
-    "dompurify": "^2.0.7",
+    "dompurify": "^2.0.17",
     "emoji-images": "^0.1.1",
     "fs-plus": "^3.0.0",
     "marked": "^0.7.0",
